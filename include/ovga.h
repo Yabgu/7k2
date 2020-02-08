@@ -25,11 +25,7 @@
 #ifndef __OVGA_H
 #define __OVGA_H
 
-#ifndef USE_NOVIDEO
 #include <vga_sdl.h>
-#else
-#include <vga_none.h>
-#endif
 
 extern Vga vga;
 

@@ -21,11 +21,7 @@
 #ifndef OAUDIO_H
 #define OAUDIO_H
 
-#if defined(USE_OPENAL)
 #include <openal_audio.h>
-#else
-#error "You need to define an audio backend, such as OpenAL or Win32"
-#endif
 
 extern Audio audio;
 
