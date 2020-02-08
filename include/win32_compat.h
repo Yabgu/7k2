@@ -22,7 +22,7 @@
 #ifndef _WIN32_COMPAT_H
 #define _WIN32_COMPAT_H
 
-
+#define NO_WINDOWS
 #ifdef NO_WINDOWS // !WINE && !WIN32
 
 #include <ctype.h>
