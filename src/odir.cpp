@@ -42,7 +42,8 @@ static int sort_file_function( const void *a, const void *b );
 
 //------- Begin of function Directory::Directory -------//
 
-Directory::Directory() : DynArray( sizeof(FileInfo), 20 )
+Directory::Directory(const boost::filesystem::path& base)
+	: DynArray( sizeof(FileInfo), 20 ), base(base)
 {
 }
 
@@ -61,165 +62,19 @@ Directory::Directory() : DynArray( sizeof(FileInfo), 20 )
 //
 int Directory::read(const char *fileSpec, int sortName)
 {
-   FileInfo				fileInfo;
-#ifndef NO_WINDOWS
-	WIN32_FIND_DATA	findData;
-   
-   //----------- get the file list -------------//
-
-   HANDLE findHandle = FindFirstFile( fileSpec, &findData );
-
-   while(findHandle!=INVALID_HANDLE_VALUE)
-   {
-      misc.extract_file_name( fileInfo.name, findData.cFileName );		// get the file name only from a full path string
-
-      fileInfo.size = findData.nFileSizeLow;
-      fileInfo.time = findData.ftLastWriteTime; 
-
-      linkin( &fileInfo );
-
-      if( !FindNextFile( findHandle, &findData ) )
-			break;
-   }
-
-	FindClose(findHandle);
-
-   //------ the file list by file name ---------//
-
-   if( sortName )
-      quick_sort( sort_file_function );
-
-#else
-
+   FileInfo fileInfo;
    MSG("Listing Directory %s sortName=%d\n", fileSpec, sortName);
 
-   char dirname[MAX_PATH];
-   char search[MAX_PATH];
-   struct dirent **namelist;
-   int n;
+   struct stat file_stat;
+   stat(fileSpec, &file_stat);
 
-   char *slash = strrchr((char*)fileSpec, '/');
-   if (slash)
-   {
-      char *s = (char*)fileSpec;
-      char *d = dirname;
-      int i = 0;
-      while (s != slash && i < MAX_PATH - 1)
-      {
-         if (*s == '\\')
-            *d = '/';
-         else if (isalpha(*s))
-            *d = tolower(*s);
-         else
-            *d = *s;
-         d++;
-         s++;
-         i++;
-      }
-      *d = 0;
+   strncpy(fileInfo.name, fileSpec, sizeof(fileInfo.name));
 
-      i = 0;
-      d = search;
-      s++;
-      while (*s && i < MAX_PATH - 1)
-      {
-         if (*s == '*')
-         {
-            s++;
-            i++;
-            continue;
-         }
-         else if (isalpha(*s))
-         {
-            *d = tolower(*s);
-         }
-         else
-         {
-            *d = *s;
-         }
-         d++;
-         s++;
-         i++;
-      }
-      *d = 0;
-   } else {
-      char *s = (char*)fileSpec;
-      char *d = search;
-      int i = 0;
+   fileInfo.size = file_stat.st_size;
+   fileInfo.time.dwLowDateTime = 0;
+   fileInfo.time.dwHighDateTime = 0;
 
-      while (*s && i < MAX_PATH - 1)
-      {
-         if (*s == '*')
-         {
-            s++;
-            i++;
-            continue;
-         }
-         else if (isalpha(*s))
-         {
-            *d = tolower(*s);
-         }
-         else
-         {
-            *d = *s;
-         }
-         d++;
-         s++;
-         i++;
-      }
-      *d = 0;
-
-
-      dirname[0] = '.';
-      dirname[1] = 0;
-   }
-
-   MSG("directory=%s search=%s\n", dirname, search);
-   n = scandir(dirname, &namelist, 0, alphasort);
-   for (int i = 0; i < n; i++)
-   {
-      char filename[MAX_PATH];
-      char *s = namelist[i]->d_name;
-      char *d = filename;
-      int j = 0;
-      while (*s && j < MAX_PATH - 1)
-      {
-         if (isalpha(*s))
-            *d = tolower(*s);
-         else
-            *d = *s;
-         d++;
-         s++;
-         j++;
-      }
-      *d = 0;
-
-      if (strstr(filename, search))
-      {
-         char full_path[MAX_PATH];
-         struct stat file_stat;
-
-         full_path[0] = 0;
-         strcat(full_path, dirname);
-         strcat(full_path, "/");
-         strcat(full_path, namelist[i]->d_name);
-
-         stat(full_path, &file_stat);
-
-         strncpy(fileInfo.name, namelist[i]->d_name, MAX_PATH - 2);
-
-         fileInfo.size = file_stat.st_size;
-         fileInfo.time.dwLowDateTime = 0;
-         fileInfo.time.dwHighDateTime = 0;
-
-         linkin( &fileInfo );
-      }
-      free(namelist[i]);
-   }
-   if (n > -1)
-     free(namelist);
-
-#endif
+   linkin( &fileInfo );
 
    return size();       // DynArray::size()
 }

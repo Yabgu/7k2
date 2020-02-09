@@ -5423,7 +5423,7 @@ void Campaign::play_speech(const char* fileName)
 
 	String str;
 	str  = DIR_CAMPAIGN;
-	str += "SOUND"PATH_DELIM;
+	str += "SOUND" PATH_DELIM;
 	strcat(str, fileName);
 
 	if( !misc.is_file_exist(str) )

@@ -26,6 +26,7 @@
 
 #include <win32_compat.h>
 #include <odynarr.h>
+#include <boost/filesystem/path.hpp>
 
 //---------- Define struct FileInfo ----------//
 
@@ -40,8 +41,11 @@ struct FileInfo
 
 class Directory : public DynArray
 {
+private:
+   boost::filesystem::path base;
+
 public:
-   Directory();
+   Directory(const boost::filesystem::path& base = ".");
 
    int       read(const char*, int=0);
    FileInfo* operator[](int recNo)  { return (FileInfo*) get(recNo); }

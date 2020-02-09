@@ -32,6 +32,8 @@
 #include <ogame.h>
 //#include <ot_gmenu.h>
 #include <dbglog.h>
+#include <boost/filesystem.hpp>
+#include <fstream>
 
 DBGLOG_DEFAULT_CHANNEL(Config);
 
@@ -501,14 +503,23 @@ int Config::load(const char *filename)
 	char full_path[MAX_PATH+1];
 	File configFile;
 
-        if(!misc.path_cat(full_path, sys.dir_config, filename, MAX_PATH))
-        {
-                ERR("Path too long to the config file.\n");
-                return 0;
-        }
-        MSG("Loading config: %s\n", full_path);
+	if(!misc.path_cat(full_path, sys.dir_config, filename, MAX_PATH))
+	{
+		ERR("Path too long to the config file.\n");
+		return 0;
+	}
+	MSG("Loading config: %s\n", full_path);
 
-	if( !misc.is_file_exist(full_path) || !configFile.file_open(full_path) )
+	if (!boost::filesystem::exists(full_path))
+	{
+		boost::filesystem::path configPath(full_path);
+		boost::filesystem::path configDir = configPath.parent_path();
+		boost::filesystem::create_directory(configDir);
+		std::ofstream newFile(full_path);
+		newFile.close();
+	}
+
+    if(!configFile.file_open(full_path))
 		return 0;
 
 	int retFlag = 0;

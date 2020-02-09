@@ -40,6 +40,8 @@
 
 #include <dbglog.h>
 
+#include <boost/filesystem.hpp>
+
 DBGLOG_DEFAULT_CHANNEL(Misc);
 
 #define	MOVE_AROUND_TABLE_SIZE	900
@@ -1165,8 +1167,7 @@ float Misc::round_dec(float inNum)
 //
 int Misc::is_file_exist(const char* fileName)
 {
-   Directory dir;
-   return dir.read(fileName, 0) == 1;
+   return boost::filesystem::exists(fileName);
 }
 //---------- End of function Misc::is_file_exist ---------//
 
@@ -1334,12 +1335,12 @@ char* Misc::num_th(int inNum)
    str = format(inNum);
 
 #if(defined(SPANISH)||defined(ITALIAN))
-	str += "º";
+	str += "ï¿½";
 #elif(defined(FRENCH))
 	if( inNum == 1 )
 		str += "er";
 	else
-		str += "ème";
+		str += "ï¿½me";
 #elif(defined(GERMAN))
 	str += ".";
 #elif(defined(CHINESE))

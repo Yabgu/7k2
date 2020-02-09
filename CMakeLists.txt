@@ -637,16 +637,20 @@ target_include_directories(7k2 PUBLIC include)
 # Libraries
 
 find_package(SDL2 REQUIRED)
+find_package(OpenAL REQUIRED)
+find_package(JPEG REQUIRED)
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+
 target_include_directories(7k2 PUBLIC "${SDL2_INCLUDE_DIRS}/SDL2")
-target_link_libraries (7k2 SDL2::SDL2)
-
-
-find_package (OpenAL REQUIRED)
 target_include_directories(7k2 PUBLIC ${OPENAL_INCLUDE_DIR})
-target_link_libraries (7k2 ${OPENAL_LIBRARY})
-
-find_package (JPEG REQUIRED)
 target_include_directories(7k2 PUBLIC ${JPEG_INCLUDE_DIRS})
-target_link_libraries (7k2 ${JPEG_LIBRARIES})
+target_include_directories(7k2 PUBLIC ${Boost_INCLUDE_DIRS})
 
-target_link_libraries (7k2 enet)
+target_link_libraries (7k2
+    SDL2::SDL2
+    enet
+    ${OPENAL_LIBRARY}
+    ${JPEG_LIBRARIES}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+)

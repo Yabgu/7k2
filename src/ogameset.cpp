@@ -72,7 +72,7 @@ void GameSet::load_set_header()
    char      *dataPtr;
    String     str;
 
-   setDir.read( DIR_RES"*.SET", 1 );	// read in the file list of all game sets in the directory, 1-Sort file names
+   setDir.read(DIR_RES "*.SET", 1);	// read in the file list of all game sets in the directory, 1-Sort file names
 
    set_count = setDir.size();	// no. of game set available to choose
 
@@ -84,8 +84,7 @@ void GameSet::load_set_header()
 
    for( i=1 ; i<=setDir.size() ; i++ )
    {
-      str  = DIR_RES;
-      str += setDir[i]->name;
+      str = setDir[i]->name;
 
       set_res.init( str, 0 );       // open the game set first
 

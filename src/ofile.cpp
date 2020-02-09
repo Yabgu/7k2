@@ -29,8 +29,39 @@
 #include <dbglog.h>
 #include <ofile.h>
 #include <errno.h>
+#include <stdexcept>
+#include <regex>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 
 DBGLOG_DEFAULT_CHANNEL(File);
+
+
+static boost::filesystem::path findRelativeFileCaseInsensitive(const boost::filesystem::path& path)
+{
+	using namespace boost::filesystem;
+	auto pathString = path.string();
+	static const std::string base = "/home/abdurrahim/Seven Kingdoms 2 HD/";
+
+	boost::replace_all(pathString, "*", ".*");
+	std::regex pattern(pathString, std::regex_constants::icase);
+
+	for (auto& entry : boost::make_iterator_range(recursive_directory_iterator(base), {}))
+	{
+		if (is_regular_file(entry))
+		{
+			auto fileName = entry.path().string().substr(base.length());
+			if (std::regex_match(fileName, pattern))
+			{
+				return entry;
+			}
+		}
+	}
+	throw std::runtime_error("cant find file");
+}
 
 //-------- Begin of function File::file_open ----------//
 //
@@ -71,14 +102,15 @@ int File::file_open(const char* fileName, int handleError, int fileType)
 	file_type = (FileType)fileType;
 
 	file_handle = fopen(name, "rb");
+
 	if (!file_handle)
-        {
-		for (int i = 0; i < size; i++)
-		{
-			name[i] = tolower(name[i]);
-		}
+	{
+		auto found = findRelativeFileCaseInsensitive(name);
+		strcpy(name, found.c_str());
 		file_handle = fopen(name, "rb");
-        }
+	}
+
+
 	if (!file_handle)
 	{
 		err.run("[File::file_open] error opening file %s: %s\n", name, strerror(errno));

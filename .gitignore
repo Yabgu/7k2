@@ -28,3 +28,4 @@ install-sh
 missing
 m4/pkg.m4
 m4/sdl2.m4
+/build/
