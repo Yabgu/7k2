@@ -60,7 +60,20 @@ static boost::filesystem::path findRelativeFileCaseInsensitive(const boost::file
 			}
 		}
 	}
-	throw std::runtime_error("cant find file");
+
+	for (auto& entry : boost::make_iterator_range(recursive_directory_iterator(path.parent_path()), {}))
+	{
+		if (is_regular_file(entry))
+		{
+			if (std::regex_match(entry.path().string(), pattern))
+			{
+				return entry;
+			}
+		}
+	}
+
+	//throw std::runtime_error("cant find file");
+	return path;
 }
 
 //-------- Begin of function File::file_open ----------//
@@ -113,7 +126,7 @@ int File::file_open(const char* fileName, int handleError, int fileType)
 
 	if (!file_handle)
 	{
-		err.run("[File::file_open] error opening file %s: %s\n", name, strerror(errno));
+		return 0;
 	}
 
 	strcpy(file_name, name);

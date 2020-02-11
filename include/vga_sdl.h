@@ -63,7 +63,7 @@ public:
 
 	void	handle_messages();
 	void	flag_redraw() {};
-	int	is_full_screen();
+	bool	is_full_screen() const;
 	int	is_input_grabbed();
 	void	set_full_screen_mode(int mode);
 	void	set_window_grab(int mode);

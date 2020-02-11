@@ -654,3 +654,7 @@ target_link_libraries (7k2
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
 )
+
+ADD_DEFINITIONS(-DDEBUG)
+SET(CMAKE_BUILD_TYPE Debug)
+

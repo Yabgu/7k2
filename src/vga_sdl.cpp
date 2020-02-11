@@ -372,7 +372,7 @@ void VgaSDL::init_color_table()
 
 
 //-------- Begin of function VgaSDL::is_full_screen --------//
-int VgaSDL::is_full_screen()
+bool VgaSDL::is_full_screen() const
 {
    return ((SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0);
 }

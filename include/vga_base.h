@@ -62,7 +62,7 @@ public:
 
 	virtual void handle_messages() =0;
 	virtual void flag_redraw() =0;
-	virtual int is_full_screen() =0;
+	virtual bool is_full_screen() const =0;
 	virtual int is_input_grabbed() =0;
 	virtual void set_full_screen_mode(int mode) =0;
 	virtual void set_window_grab(int mode) =0;

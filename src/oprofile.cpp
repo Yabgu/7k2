@@ -119,17 +119,10 @@ int PlayerProfile::save()
 int PlayerProfile::load(char *fileName)
 {
 	PlayerProfile tmp;
-
-	char full_path[MAX_PATH+1];
 	File f;
-	if( !misc.path_cat(full_path, sys.dir_config, fileName, MAX_PATH) )
-	{
-		ERR("Path to the player profile too long.\n");
-		return 0;
-	}
-	f.file_open(full_path);
+	f.file_open(fileName);
 
-	if( f.file_read(&tmp, sizeof(tmp)) && tmp.decrypt() )
+	if( f.file_handle != NULL && f.file_read(&tmp, sizeof(tmp)) && tmp.decrypt() )
 	{
 		*this = tmp;
 		// set file_name to fileName without extension

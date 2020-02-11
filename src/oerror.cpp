@@ -258,7 +258,10 @@ void Error::msg( const char *format, ... )
 // <....>  the argument list
 //
 void Error::run( const char *format, ... )
-{                                                                                                                                                                                                                                                                                                                                                
+{
+	// TODO !!!! Clean this mess up 
+	return;
+
 	if( error_flag )	// prevent error message dead loop
 		return;
 
