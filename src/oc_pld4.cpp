@@ -22,98 +22,90 @@
 // Description : campaign plot d4
 
 #include <all.h>
-#include <osite.h>
-#include <otech.h>
+#include <oc_east.h>
 #include <ogame.h>
-#include <otechres.h>
-#include <ostate.h>
-#include <oraceres.h>
-#include <onews.h>
-#include <otalkres.h>
 #include <omonsres.h>
 #include <onation2.h>
-#include <oc_east.h>
-
+#include <onews.h>
+#include <oraceres.h>
+#include <osite.h>
+#include <ostate.h>
+#include <otalkres.h>
+#include <otech.h>
+#include <otechres.h>
 
 /*
-Protect a town of yours until your reinforcement comes. Your city is poorly 
+Protect a town of yours until your reinforcement comes. Your city is poorly
 defended in the beginning and the attacking force are much more powerful
 than your defending force. You must hold off the attackers and await the
 arrival of your reinforcement. The objective is to destroy the enemy.
 */
 
-
-
-
 //---- Begin of function CampaignEastWest::plot_d4_create_game ----//
 
-void CampaignEastWest::plot_d4_create_game()
-{
-	// find place for reinforcement, place farthest away from your towns
+void CampaignEastWest::plot_d4_create_game() {
+  // find place for reinforcement, place farthest away from your towns
 
-	const int searchAreaWidth = 8;
-	const int searchAreaHeight = 8;
+  const int searchAreaWidth = 8;
+  const int searchAreaHeight = 8;
 
-	int avgDist = 0;
-	int countDist = 0;
+  int avgDist = 0;
+  int countDist = 0;
 
-	int trial;
+  int trial;
 
-	// maximize the distance between all towns
+  // maximize the distance between all towns
 
-	int bestXLoc, bestYLoc;
-	int bestSumDist2 = 0;
+  int bestXLoc, bestYLoc;
+  int bestSumDist2 = 0;
 
-	for( trial = 100; trial > 0; --trial )
-	{
-		int xLoc = misc.random(MAX_WORLD_X_LOC - searchAreaWidth);
-		int yLoc = misc.random(MAX_WORLD_Y_LOC - searchAreaHeight);
+  for (trial = 100; trial > 0; --trial) {
+    int xLoc = misc.random(MAX_WORLD_X_LOC - searchAreaWidth);
+    int yLoc = misc.random(MAX_WORLD_Y_LOC - searchAreaHeight);
 
-		if( !world.check_unit_space(xLoc, yLoc, xLoc+searchAreaWidth-1, yLoc+searchAreaHeight-1) )
-			continue;
+    if (!world.check_unit_space(xLoc, yLoc, xLoc + searchAreaWidth - 1,
+                                yLoc + searchAreaHeight - 1))
+      continue;
 
-		int sumDist2 = 0;
+    int sumDist2 = 0;
 
-		// find avg distance between each town
+    // find avg distance between each town
 
-		for(int t = 1; t <= town_array.size(); ++t )
-		{
-			if( town_array.is_deleted(t) )
-				continue;
+    for (int t = 1; t <= town_array.size(); ++t) {
+      if (town_array.is_deleted(t))
+        continue;
 
-			Town *townPtr = town_array[t];
+      Town *townPtr = town_array[t];
 
-			if( townPtr->is_own() )
-			{
-				int d = misc.points_distance( townPtr->center_x, townPtr->center_y, xLoc+searchAreaWidth/2, yLoc+searchAreaHeight/2 );
-				sumDist2 += d*d;
-			}
-		}
+      if (townPtr->is_own()) {
+        int d = misc.points_distance(townPtr->center_x, townPtr->center_y,
+                                     xLoc + searchAreaWidth / 2,
+                                     yLoc + searchAreaHeight / 2);
+        sumDist2 += d * d;
+      }
+    }
 
-		if( sumDist2 > bestSumDist2 )
-		{
-			bestSumDist2 = sumDist2;
-			bestXLoc = xLoc;
-			bestYLoc = yLoc;
-		}
-	}
+    if (sumDist2 > bestSumDist2) {
+      bestSumDist2 = sumDist2;
+      bestXLoc = xLoc;
+      bestYLoc = yLoc;
+    }
+  }
 
-	// ----- add reinforcement to -----------//
+  // ----- add reinforcement to -----------//
 
-	if( bestSumDist2 > 0 )
-	{
-		// create two groups
+  if (bestSumDist2 > 0) {
+    // create two groups
 
-		create_unit_group(nation_array.player_recno, MAX_TEAM_MEMBER, 0, 0, 0, bestXLoc, bestYLoc);
-		create_unit_group(nation_array.player_recno, MAX_TEAM_MEMBER, 0, 0, 0, bestXLoc, bestYLoc);
-	}
+    create_unit_group(nation_array.player_recno, MAX_TEAM_MEMBER, 0, 0, 0,
+                      bestXLoc, bestYLoc);
+    create_unit_group(nation_array.player_recno, MAX_TEAM_MEMBER, 0, 0, 0,
+                      bestXLoc, bestYLoc);
+  }
 }
 //---- End of function CampaignEastWest::plot_d4_create_game ----//
 
-
 //---- Begin of function CampaignEastWest::plot_d4_next_day ----//
 
-void CampaignEastWest::plot_d4_next_day()
-{
-}
+void CampaignEastWest::plot_d4_next_day() {}
 //---- End of function CampaignEastWest::plot_d4_next_day ----//

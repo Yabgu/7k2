@@ -22,21 +22,20 @@
 // Description : campaign plot c2
 
 #include <all.h>
-#include <osite.h>
-#include <otech.h>
+#include <itemid.h>
+#include <oc_east.h>
 #include <ogame.h>
-#include <otechres.h>
-#include <ostate.h>
-#include <oraceres.h>
-#include <onews.h>
-#include <otalkres.h>
+#include <oitemres.h>
 #include <omonsres.h>
 #include <onation2.h>
-#include <oc_east.h>
-#include <itemid.h>
-#include <oitemres.h>
+#include <onews.h>
 #include <opower.h>
-
+#include <oraceres.h>
+#include <osite.h>
+#include <ostate.h>
+#include <otalkres.h>
+#include <otech.h>
+#include <otechres.h>
 
 /*
 You start with units carrying items capable of turning an enemy
@@ -46,44 +45,37 @@ facilities. You start with a small troop. You must cause chaos
 in the enemy towns by using items to incite revolutions.
 */
 
-
 //---- Begin of function CampaignEastWest::plot_c2_create_game ----//
 
-void CampaignEastWest::plot_c2_create_game()
-{
-	// ------ other item ITEM_TOWN_FREE randomly on the map -------//
+void CampaignEastWest::plot_c2_create_game() {
+  // ------ other item ITEM_TOWN_FREE randomly on the map -------//
 
-	power.reset_selection();
+  power.reset_selection();
 
-	const int maxItemCount = 3;
-	int itemCreated = maxItemCount;
+  const int maxItemCount = 3;
+  int itemCreated = maxItemCount;
 
-	for( int i = 1; itemCreated > 0 && i <= unit_array.size(); ++i )
-	{
-		if( unit_array.is_deleted(i) )
-			continue;
+  for (int i = 1; itemCreated > 0 && i <= unit_array.size(); ++i) {
+    if (unit_array.is_deleted(i))
+      continue;
 
-		Unit *unitPtr = unit_array[i];
+    Unit *unitPtr = unit_array[i];
 
-		if( unitPtr->is_own() && !unitPtr->item.id
-			&& item_res.can_pick(ITEM_TOWN_FREE, i) )
-		{
-			unitPtr->item.set(ITEM_TOWN_FREE, item_res.random_para(ITEM_TOWN_FREE, misc.rand()));
+    if (unitPtr->is_own() && !unitPtr->item.id &&
+        item_res.can_pick(ITEM_TOWN_FREE, i)) {
+      unitPtr->item.set(ITEM_TOWN_FREE,
+                        item_res.random_para(ITEM_TOWN_FREE, misc.rand()));
 
-			// -------- select the unit ------//
-			unitPtr->select( itemCreated == maxItemCount );
+      // -------- select the unit ------//
+      unitPtr->select(itemCreated == maxItemCount);
 
-			--itemCreated;
-		}
-	}
+      --itemCreated;
+    }
+  }
 }
 //---- End of function CampaignEastWest::plot_c2_create_game ----//
 
-
 //---- Begin of function CampaignEastWest::plot_c2_next_day ----//
 //
-void CampaignEastWest::plot_c2_next_day()
-{
-}
+void CampaignEastWest::plot_c2_next_day() {}
 //---- End of function CampaignEastWest::plot_c2_next_day ----//
-

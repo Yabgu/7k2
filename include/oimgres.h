@@ -18,13 +18,13 @@
  *
  */
 
-//Filename    : OIMAGERES.H
-//Description : Object ImageRes
+// Filename    : OIMAGERES.H
+// Description : Object ImageRes
 
 #ifndef __OIMAGERES_H
 #define __OIMAGERES_H
 
-#ifndef  __ORESX_H
+#ifndef __ORESX_H
 #include <oresx.h>
 #endif
 
@@ -32,33 +32,34 @@
 
 class VgaBuf;
 
-class ImageRes : public ResourceIdx
-{
+class ImageRes : public ResourceIdx {
 public:
-	ImageRes()	{;}
-	ImageRes(const char* resFile, int readAll=0, int useVgaBuf=0);
+  ImageRes() { ; }
+  ImageRes(const char *resFile, int readAll = 0, int useVgaBuf = 0);
 
-	void  put_front(int,int,const char*, int compressFlag=0);
-	void  put_back(int,int,const char*, int compressFlag=0);
+  void put_front(int, int, const char *, int compressFlag = 0);
+  void put_back(int, int, const char *, int compressFlag = 0);
 
-	void  put_front(int,int,int, int compressFlag=0);
-	void  put_back(int,int,int, int compressFlag=0);
+  void put_front(int, int, int, int compressFlag = 0);
+  void put_back(int, int, int, int compressFlag = 0);
 
-	void  put_join(int,int,const char*);
+  void put_join(int, int, const char *);
 
-	char* get_ptr(const char* imageName)   { return ResourceIdx::read(imageName); }
+  char *get_ptr(const char *imageName) { return ResourceIdx::read(imageName); }
 
-	void  put_large(VgaBuf*,int,int,const char*);  // put a large image, over 64K
-	void  put_large(VgaBuf*,int,int,int);
+  void put_large(VgaBuf *, int, int,
+                 const char *); // put a large image, over 64K
+  void put_large(VgaBuf *, int, int, int);
 
-	void  put_to_buf(VgaBuf* vgaBufPtr, const char* imageName);
-	void  put_to_buf(VgaBuf* vgaBufPtr, int bitmapId);
+  void put_to_buf(VgaBuf *vgaBufPtr, const char *imageName);
+  void put_to_buf(VgaBuf *vgaBufPtr, int bitmapId);
 };
 
-extern ImageRes image_icon, image_interface, image_menu, image_button, image_spict, image_gameif;
+extern ImageRes image_icon, image_interface, image_menu, image_button,
+    image_spict, image_gameif;
 extern ImageRes image_encyc, image_tpict, image_tutorial;
 
-extern ImageRes& image_menu2;
+extern ImageRes &image_menu2;
 //--------------------------------------------//
 
 #endif

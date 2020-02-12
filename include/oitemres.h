@@ -28,8 +28,7 @@
 
 // ------- define constant -------//
 
-enum { MIN_RARITY = 0,
-		 MAX_RARITY = 3 };
+enum { MIN_RARITY = 0, MAX_RARITY = 3 };
 
 #define ITEM_ICON_WIDTH 40
 #define ITEM_ICON_HEIGHT 46
@@ -38,35 +37,34 @@ enum { MIN_RARITY = 0,
 
 //--------- define struct ItemInfo ----------//
 
-struct ItemInfo
-{
-	enum { ITEM_NAME_LEN = 25 };
+struct ItemInfo {
+  enum { ITEM_NAME_LEN = 25 };
 
-	short item_id;
-	const char	item_name[ITEM_NAME_LEN+1];
+  short item_id;
+  const char item_name[ITEM_NAME_LEN + 1];
 
-	char	rare;				// 0=ordinary, 1+ rare
-	long	cost;				// cost added to inn hire cost
+  char rare; // 0=ordinary, 1+ rare
+  long cost; // cost added to inn hire cost
 
-	int	ability_type;
-	int	ability_value;
+  int ability_type;
+  int ability_value;
 
-	int	para_type;
-	int	para_use_rate;
-	int	para_use_limit;
-	int	para_recover_rate;
-	int	para_max;
-	int	magic_id;		// cast magic
-	int	magic_para;
-	int	init_para_const;
-	int	init_para_random;
+  int para_type;
+  int para_use_rate;
+  int para_use_limit;
+  int para_recover_rate;
+  int para_max;
+  int magic_id; // cast magic
+  int magic_para;
+  int init_para_const;
+  int init_para_random;
 
-	const char	*bitmap_name;
-	int	bitmap_idx;
-	int	icon_idx;
-	int	interface_idx;
-	int	unit_interface_idx;
-	const char	*item_desc;
+  const char *bitmap_name;
+  int bitmap_idx;
+  int icon_idx;
+  int interface_idx;
+  int unit_interface_idx;
+  const char *item_desc;
 };
 
 struct Item;
@@ -74,52 +72,52 @@ class Skill;
 
 //--------- define class ItemRes ----------//
 
-class ItemRes
-{
+class ItemRes {
 public:
-	int	init_flag;
+  int init_flag;
 
-	ResourceIdx res_bitmap;
-	ResourceIdx res_icon;
-	ResourceIdx res_interface;
-	ResourceIdx res_unit_interface;
+  ResourceIdx res_bitmap;
+  ResourceIdx res_icon;
+  ResourceIdx res_interface;
+  ResourceIdx res_unit_interface;
 
 public:
-	ItemRes();
-	~ItemRes();
+  ItemRes();
+  ~ItemRes();
 
-	void	init();
-	void	deinit();
+  void init();
+  void deinit();
 
-	int 	random_item_id(int lowRare, int highRare);
+  int random_item_id(int lowRare, int highRare);
 
-	// -------- functions on each item --------//
+  // -------- functions on each item --------//
 
-	const char *item_name( short itemId, int itemPara );
-	const char *item_desc( short itemId, int itemPara );
-	int	item_cost( short itemId, int itemPara );
+  const char *item_name(short itemId, int itemPara);
+  const char *item_desc(short itemId, int itemPara);
+  int item_cost(short itemId, int itemPara);
 
-	int	ability( Item &, int itemAbilityId);
-	void	use_now( Item & );
-	void	next_day( Item &);
-	int	can_turn( Item &);
-	int	can_turn_on( Item &);
-	int	is_turn_on( Item &);
-	void	turn_on( Item &);
-	void	turn_off( Item &);
-	int	can_use_manually( Item &);
-	void	use_manually( Item &, int unitRecno, int targetBaseObjRecno=0, int para2=0);
+  int ability(Item &, int itemAbilityId);
+  void use_now(Item &);
+  void next_day(Item &);
+  int can_turn(Item &);
+  int can_turn_on(Item &);
+  int is_turn_on(Item &);
+  void turn_on(Item &);
+  void turn_off(Item &);
+  int can_use_manually(Item &);
+  void use_manually(Item &, int unitRecno, int targetBaseObjRecno = 0,
+                    int para2 = 0);
 
-	int	can_pick( short itemId, int unitRecno, int unitId=0 );
-	int	can_equip( short itemId, int unitRecno );
-	int	can_equip( short itemId, int unitId, Skill & );
-	char	rareness( short itemId );
-	int	random_para( short itemId, int random);
+  int can_pick(short itemId, int unitRecno, int unitId = 0);
+  int can_equip(short itemId, int unitRecno);
+  int can_equip(short itemId, int unitId, Skill &);
+  char rareness(short itemId);
+  int random_para(short itemId, int random);
 
-	char  *item_bitmap( short itemId );		// bitmap on map
-	char  *item_icon( short itemId );		// bitmap on interface area
-	char  *item_interface( short itemId );	// bitmap on interface area
-	char  *item_unit_interface( short itemId );     // bitmap on unit icon
+  char *item_bitmap(short itemId);         // bitmap on map
+  char *item_icon(short itemId);           // bitmap on interface area
+  char *item_interface(short itemId);      // bitmap on interface area
+  char *item_unit_interface(short itemId); // bitmap on unit icon
 };
 
 extern ItemRes item_res;
@@ -127,5 +125,3 @@ extern ItemRes item_res;
 //--------------------------------------------//
 
 #endif
-
-

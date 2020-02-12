@@ -23,162 +23,111 @@
 #include <file_reader.h>
 #include <file_writer.h>
 
-class FileReaderVisitor
-{
+class FileReaderVisitor {
 protected:
-   FileReader *reader;
+  FileReader *reader;
 
 public:
-   FileReaderVisitor()
-   {
-      this->reader = NULL;
-   }
+  FileReaderVisitor() { this->reader = NULL; }
 
-   ~FileReaderVisitor()
-   {
-      this->deinit();
-   }
+  ~FileReaderVisitor() { this->deinit(); }
 
-   void init(FileReader *reader)
-   {
-      this->reader = reader;
-   }
+  void init(FileReader *reader) { this->reader = reader; }
 
-   void deinit()
-   {
-      this->reader = NULL;
-   }
+  void deinit() { this->reader = NULL; }
 
-   bool skip(size_t len)
-   {
-      return this->reader->skip(len);
-   }
+  bool skip(size_t len) { return this->reader->skip(len); }
 
-   template <typename FileT, typename MemT>
-   bool visit(MemT *v)
-   {
-      return this->reader->read<FileT, MemT>(v);
-   }
+  template <typename FileT, typename MemT> bool visit(MemT *v) {
+    return this->reader->read<FileT, MemT>(v);
+  }
 
-   template <typename T>
-   bool visit(T **v)
-   {
-      return this->reader->read<T>(v);
-   }
+  template <typename T> bool visit(T **v) { return this->reader->read<T>(v); }
 
-   template <typename FileT, typename MemT>
-   bool visit_array(MemT *array, size_t len)
-   {
-      return this->reader->read_array<FileT, MemT>(array, len);
-   }
+  template <typename FileT, typename MemT>
+  bool visit_array(MemT *array, size_t len) {
+    return this->reader->read_array<FileT, MemT>(array, len);
+  }
 };
 
-
-class FileWriterVisitor
-{
+class FileWriterVisitor {
 protected:
-   FileWriter *writer;
+  FileWriter *writer;
 
 public:
-   FileWriterVisitor()
-   {
-      this->writer = NULL;
-   }
+  FileWriterVisitor() { this->writer = NULL; }
 
-   ~FileWriterVisitor()
-   {
-      this->deinit();
-   }
+  ~FileWriterVisitor() { this->deinit(); }
 
-   void init(FileWriter *writer)
-   {
-      this->writer = writer;
-   }
+  void init(FileWriter *writer) { this->writer = writer; }
 
-   void deinit()
-   {
-      this->writer = NULL;
-   }
+  void deinit() { this->writer = NULL; }
 
-   bool skip(size_t len)
-   {
-      return this->writer->skip(len);
-   }
+  bool skip(size_t len) { return this->writer->skip(len); }
 
-   template <typename FileT, typename MemT>
-   bool visit(MemT *v)
-   {
-      return this->writer->write<FileT, MemT>(*v);
-   }
+  template <typename FileT, typename MemT> bool visit(MemT *v) {
+    return this->writer->write<FileT, MemT>(*v);
+  }
 
-   template <typename T>
-   bool visit(T **v)
-   {
-      return this->writer->write<T>(const_cast<const T *>(*v));
-   }
+  template <typename T> bool visit(T **v) {
+    return this->writer->write<T>(const_cast<const T *>(*v));
+  }
 
-   template <typename FileT, typename MemT>
-   bool visit_array(MemT *array, size_t len)
-   {
-      return this->writer->write_array<FileT, MemT>(array, len);
-   }
+  template <typename FileT, typename MemT>
+  bool visit_array(MemT *array, size_t len) {
+    return this->writer->write_array<FileT, MemT>(array, len);
+  }
 };
 
-namespace FileIOVisitor
-{
-   template <typename FileT, typename MemT, typename Visitor>
-   bool visit(Visitor *vis, MemT *val)
-   {
-      return vis->template visit<FileT, MemT>(val);
-   }
+namespace FileIOVisitor {
+template <typename FileT, typename MemT, typename Visitor>
+bool visit(Visitor *vis, MemT *val) {
+  return vis->template visit<FileT, MemT>(val);
+}
 
-   template <typename FileT, typename MemT, typename Visitor>
-   bool visit_array(Visitor *vis, MemT *array, size_t len)
-   {
-      return vis->template visit_array<FileT, MemT>(array, len);
-   }
+template <typename FileT, typename MemT, typename Visitor>
+bool visit_array(Visitor *vis, MemT *array, size_t len) {
+  return vis->template visit_array<FileT, MemT>(array, len);
+}
 
-   template <typename T, typename Visitor>
-   bool visit_pointer(Visitor *vis, T **ptr)
-   {
-      return vis->visit(ptr);
-   }
+template <typename T, typename Visitor>
+bool visit_pointer(Visitor *vis, T **ptr) {
+  return vis->visit(ptr);
+}
 
-   template <typename T>
-   bool write_with_record_size(File *file, T *obj,
-			       void (*visit_obj)(FileWriterVisitor *v, T *obj),
-			       uint16_t rec_size)
-   {
-      FileWriter w;
-      FileWriterVisitor v;
+template <typename T>
+bool write_with_record_size(File *file, T *obj,
+                            void (*visit_obj)(FileWriterVisitor *v, T *obj),
+                            uint16_t rec_size) {
+  FileWriter w;
+  FileWriterVisitor v;
 
-      if (!w.init(file))
-	 return false;
+  if (!w.init(file))
+    return false;
 
-      w.write_record_size(rec_size);
-      v.init(&w);
-      visit_obj(&v, obj);
+  w.write_record_size(rec_size);
+  v.init(&w);
+  visit_obj(&v, obj);
 
-      return w.good();
-   }
+  return w.good();
+}
 
-   template <typename T>
-   bool read_with_record_size(File *file, T *obj,
-			      void (*visit_obj)(FileReaderVisitor *v, T *obj),
-			      uint16_t expected_rec_size)
-   {
-      FileReader r;
-      FileReaderVisitor v;
+template <typename T>
+bool read_with_record_size(File *file, T *obj,
+                           void (*visit_obj)(FileReaderVisitor *v, T *obj),
+                           uint16_t expected_rec_size) {
+  FileReader r;
+  FileReaderVisitor v;
 
-      if (!r.init(file))
-	 return false;
+  if (!r.init(file))
+    return false;
 
-      r.check_record_size(expected_rec_size);
-      v.init(&r);
-      visit_obj(&v, obj);
+  r.check_record_size(expected_rec_size);
+  v.init(&r);
+  visit_obj(&v, obj);
 
-      return r.good();
-   }
+  return r.good();
+}
 } /* namespace FileIOVisitor */
 
 /* vim: set ts=8 sw=3: */

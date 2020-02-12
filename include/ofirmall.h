@@ -18,36 +18,36 @@
  *
  */
 
-//Filename    : OFIRMALL.H
-//Description : Include header files of all firm types
+// Filename    : OFIRMALL.H
+// Description : Include header files of all firm types
 
 #ifndef __OFIRMALL_H
 #define __OFIRMALL_H
 
 //---------------------------------------//
 
-#include <of_work.h>
+#include <of_alch.h>
+#include <of_anim.h>
 #include <of_base.h>
 #include <of_camp.h>
-#include <of_fort.h>
 #include <of_fact.h>
-#include <of_inn.h>
-#include <of_mark.h> 
-#include <of_mine.h>
-#include <of_rese.h>
-#include <of_war.h>
-#include <of_spy.h>
-#include <of_spec.h>
-#include <of_lair.h>
-#include <of_mtrn.h>
-#include <of_lish.h>
-#include <of_alch.h>
-#include <of_mfort.h>
-#include <of_anim.h>
+#include <of_fort.h>
 #include <of_incu.h>
+#include <of_inn.h>
+#include <of_lair.h>
+#include <of_lish.h>
 #include <of_magi.h>
+#include <of_mark.h>
+#include <of_mfort.h>
+#include <of_mine.h>
+#include <of_mtrn.h>
 #include <of_off.h>
 #include <of_off2.h>
+#include <of_rese.h>
+#include <of_spec.h>
+#include <of_spy.h>
+#include <of_war.h>
+#include <of_work.h>
 
 //---------------------------------------//
 

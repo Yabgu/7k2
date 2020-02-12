@@ -21,52 +21,45 @@
 // Filename    : OF_SPEC.CPP
 // Description : Firm Stable
 
-#include <of_spec.h>
 #include <all.h>
-#include <oremote.h>
+#include <of_spec.h>
 #include <onation.h>
+#include <oraceres.h>
+#include <oremote.h>
+#include <otown.h>
 #include <ounit.h>
 #include <ounitres.h>
-#include <oraceres.h>
-#include <otown.h>
 
 //--------- Begin of function FirmSpecial::FirmSpecial() ------//
 
-FirmSpecial::FirmSpecial()
-{
-	memset( sizeof(FirmTrain)+(char *)this, 0, sizeof(FirmSpecial)-sizeof(FirmTrain) );
+FirmSpecial::FirmSpecial() {
+  memset(sizeof(FirmTrain) + (char *)this, 0,
+         sizeof(FirmSpecial) - sizeof(FirmTrain));
 }
 //--------- End of function FirmSpecial::FirmSpecial() ------//
-
-
 
 // ---------- Begin of function FirmSpecial::can_set_rally_point ------//
 //
 // whether the firm can set rally point
 //
-// [int] destBaseObjRecno		- destination base obj recno, 0 for setting position
+// [int] destBaseObjRecno		- destination base obj recno, 0 for setting
+// position
 //
-int FirmSpecial::can_set_rally_point(int destBaseObjRecno)
-{
-	if( destBaseObjRecno == 0 )
-	{
-		return 1;
-	}
-	else
-	{
-		if( base_obj_array.is_deleted(destBaseObjRecno) )
-			return 0;
+int FirmSpecial::can_set_rally_point(int destBaseObjRecno) {
+  if (destBaseObjRecno == 0) {
+    return 1;
+  } else {
+    if (base_obj_array.is_deleted(destBaseObjRecno))
+      return 0;
 
-		Firm *firmPtr = base_obj_array[destBaseObjRecno]->cast_to_Firm();
-		if( firmPtr )
-		{
-			if( firmPtr->cast_to_FirmCamp() )
-			{
-				return firmPtr->is_human();
-			}
-		}
-	}
+    Firm *firmPtr = base_obj_array[destBaseObjRecno]->cast_to_Firm();
+    if (firmPtr) {
+      if (firmPtr->cast_to_FirmCamp()) {
+        return firmPtr->is_human();
+      }
+    }
+  }
 
-	return 0;
+  return 0;
 }
 // ---------- End of function FirmSpecial::can_set_rally_point ------//

@@ -22,7 +22,6 @@
 // Description: constant for wall tiles
 // Ownership  : Gilbert
 
-
 #ifndef __WALLTILE_H
 #define __WALLTILE_H
 
@@ -113,16 +112,13 @@
 #define TOWER_DES2 0x61
 #define TOWER_DES3 0x62
 
-inline int is_wall_rubble(int w)
-{
-	return (w >= 0x51 && w <= 0x62);
-}
+inline int is_wall_rubble(int w) { return (w >= 0x51 && w <= 0x62); }
 
 // Gate tiles
 
 /*inline int is_gate(char wallId)
 {
-	return wallId > 0x30;
+        return wallId > 0x30;
 }
 */
 
@@ -145,7 +141,6 @@ inline int is_wall_rubble(int w)
 #define EGATE_BASE 0x49
 #define EGATE_N 0x49
 #define EGATE_S 0x4f
-
 
 #define GATE_LENGTH 8
 #define GATE_WIDTH 2

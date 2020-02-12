@@ -22,81 +22,69 @@
 
 DBGLOG_DEFAULT_CHANNEL(FileReader);
 
-FileReader::FileReader()
-{
-   this->file = NULL;
-   this->ok = true;
+FileReader::FileReader() {
+  this->file = NULL;
+  this->ok = true;
 }
 
-FileReader::~FileReader()
-{
-   this->deinit();
+FileReader::~FileReader() { this->deinit(); }
+
+bool FileReader::init(File *file) {
+  this->deinit();
+
+  if (!this->is.open(file, false))
+    return false;
+
+  this->file = file;
+  this->ok = true;
+  this->original_type = this->file->file_type;
+
+  /* We need raw file access */
+  if (this->file->file_type != File::FLAT)
+    this->file->file_type = File::FLAT;
+
+  return true;
 }
 
-bool FileReader::init(File *file)
-{
-   this->deinit();
+void FileReader::deinit() {
+  if (this->file == NULL)
+    return;
 
-   if (!this->is.open(file, false))
-      return false;
-
-   this->file = file;
-   this->ok = true;
-   this->original_type = this->file->file_type;
-
-   /* We need raw file access */
-   if (this->file->file_type != File::FLAT)
-      this->file->file_type = File::FLAT;
-
-   return true;
+  this->file->file_type = this->original_type;
+  this->is.close();
+  this->file = NULL;
 }
 
-void FileReader::deinit()
-{
-   if (this->file == NULL)
-      return;
+bool FileReader::good() const { return this->ok; }
 
-   this->file->file_type = this->original_type;
-   this->is.close();
-   this->file = NULL;
+bool FileReader::skip(size_t len) {
+  if (!this->ok)
+    return false;
+
+  if (!this->is.seek(len, SEEK_CUR))
+    this->ok = false;
+
+  return this->ok;
 }
 
-bool FileReader::good() const
-{
-   return this->ok;
-}
+bool FileReader::check_record_size(uint16_t expected_size) {
+  uint16_t rec_size;
 
-bool FileReader::skip(size_t len)
-{
-   if (!this->ok)
-      return false;
+  if (this->original_type != File::STRUCTURED)
+    return true;
 
-   if (!this->is.seek(len, SEEK_CUR))
-      this->ok = false;
+  if (!this->read<uint16_t>(&rec_size))
+    return false;
 
-   return this->ok;
-}
+  if (rec_size != expected_size) {
+    ERR("[FileReader] Bad record size %d in %s at 0x%lx, expecting %d.\n",
+        rec_size, this->file->file_name, this->is.tell(), expected_size);
 
-bool FileReader::check_record_size(uint16_t expected_size)
-{
-   uint16_t rec_size;
+    this->ok = false;
+    return false;
+  }
 
-   if (this->original_type != File::STRUCTURED)
-      return true;
-
-   if (!this->read<uint16_t>(&rec_size))
-      return false;
-
-   if (rec_size != expected_size)
-   {
-      ERR("[FileReader] Bad record size %d in %s at 0x%lx, expecting %d.\n",
-	  rec_size, this->file->file_name, this->is.tell(), expected_size);
-
-      this->ok = false;
-      return false;
-   }
-
-   return true;
+  return true;
 }
 
 /* vim: set ts=8 sw=3: */

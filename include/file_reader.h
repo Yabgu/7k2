@@ -22,66 +22,59 @@
 
 #include <file_input_stream.h>
 
-class FileReader
-{
+class FileReader {
 protected:
-   FileInputStream is;
-   File::FileType original_type;
-   File *file;
-   bool ok;
+  FileInputStream is;
+  File::FileType original_type;
+  File *file;
+  bool ok;
 
 public:
-   FileReader();
-   ~FileReader();
-   bool init(File *file);
-   void deinit();
-   bool good() const;
-   bool skip(size_t len);
-   bool check_record_size(uint16_t expected_size);
+  FileReader();
+  ~FileReader();
+  bool init(File *file);
+  void deinit();
+  bool good() const;
+  bool skip(size_t len);
+  bool check_record_size(uint16_t expected_size);
 
-   template <typename FileT, typename MemT>
-   bool read(MemT *v)
-   {
-      FileT val;
+  template <typename FileT, typename MemT> bool read(MemT *v) {
+    FileT val;
 
-      if (!this->ok)
-	 return false;
+    if (!this->ok)
+      return false;
 
-      if (read_le(&this->is, &val))
-	 *v = val;
-      else
-	 this->ok = false;
+    if (read_le(&this->is, &val))
+      *v = val;
+    else
+      this->ok = false;
 
-      return this->ok;
-   }
+    return this->ok;
+  }
 
-   template <typename T>
-   bool read(T **v)
-   {
-      uint32_t p;
+  template <typename T> bool read(T **v) {
+    uint32_t p;
 
-      if (!this->read<uint32_t>(&p))
-	 return false;
+    if (!this->read<uint32_t>(&p))
+      return false;
 
-      if (p != 0)
-	 *v = reinterpret_cast<T *>(uintptr_t(0xdeadbeefUL));
-      else
-	 *v = NULL;
+    if (p != 0)
+      *v = reinterpret_cast<T *>(uintptr_t(0xdeadbeefUL));
+    else
+      *v = NULL;
 
-      return true;
-   }
+    return true;
+  }
 
-   template <typename FileT, typename MemT>
-   bool read_array(MemT *array, size_t len)
-   {
-      for (size_t n = 0; n < len; n++)
-      {
-	 if (!this->read<FileT>(&array[n]))
-	    break;
-      }
+  template <typename FileT, typename MemT>
+  bool read_array(MemT *array, size_t len) {
+    for (size_t n = 0; n < len; n++) {
+      if (!this->read<FileT>(&array[n]))
+        break;
+    }
 
-      return this->ok;
-   }
+    return this->ok;
+  }
 };
 
 /* vim: set ts=8 sw=3: */

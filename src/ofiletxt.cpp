@@ -18,8 +18,8 @@
  *
  */
 
-//Filename    : OFILETXT.CPP
-//Description : Object Text file
+// Filename    : OFILETXT.CPP
+// Description : Object Text file
 
 #include <stdlib.h>
 
@@ -27,37 +27,35 @@
 #include <key.h>
 #include <ofiletxt.h>
 
+//---- marco function for advancing to next token, bypassing space, ',' and ':'
+//---//
 
-//---- marco function for advancing to next token, bypassing space, ',' and ':' ---//
-
-#define next_token()  for( ; *data_ptr==' ' || *data_ptr==',' || *data_ptr==':' ; data_ptr++ )
-
+#define next_token()                                                           \
+  for (; *data_ptr == ' ' || *data_ptr == ',' || *data_ptr == ':'; data_ptr++)
 
 //-------- Begin of function FileTxt::FileTxt ----------//
 //
 // <char*> fileName = name of the file
 //
-FileTxt::FileTxt(char* fileName)
-{
-   file_open(fileName);
+FileTxt::FileTxt(char *fileName) {
+  file_open(fileName);
 
-   //-----------------------------------//
+  //-----------------------------------//
 
-   file_length = File::file_size();
+  file_length = File::file_size();
 
-   data_buf = mem_add( file_length+1 );
+  data_buf = mem_add(file_length + 1);
 
-   data_buf[file_length] = CHAR_EOF;
-   data_ptr = data_buf;
+  data_buf[file_length] = CHAR_EOF;
+  data_ptr = data_buf;
 
-   //-----------------------------------//
+  //-----------------------------------//
 
-   file_read( data_buf, file_length );
+  file_read(data_buf, file_length);
 
-   file_close();
+  file_close();
 }
 //---------- End of function FileTxt::FileTxt ----------//
-
 
 //-------- Begin of function FileTxt::FileTxt ----------//
 //
@@ -66,61 +64,54 @@ FileTxt::FileTxt(char* fileName)
 // <File*> filePtr  = pointer to a file class for reading in the text
 // <int>	  dataSize = size of the data.
 //
-FileTxt::FileTxt(File* filePtr, int dataSize)
-{
-	//-----------------------------------//
+FileTxt::FileTxt(File *filePtr, int dataSize) {
+  //-----------------------------------//
 
-	file_length = dataSize;
+  file_length = dataSize;
 
-	data_buf = mem_add( file_length+1 );
+  data_buf = mem_add(file_length + 1);
 
-	data_buf[file_length] = CHAR_EOF;
-	data_ptr = data_buf;
+  data_buf[file_length] = CHAR_EOF;
+  data_ptr = data_buf;
 
-	//-----------------------------------//
+  //-----------------------------------//
 
-	filePtr->file_read( data_buf, file_length );
+  filePtr->file_read(data_buf, file_length);
 }
 //---------- End of function FileTxt::FileTxt ----------//
 
-
 //-------- Begin of function FileTxt::~FileTxt ----------//
 //
-FileTxt::~FileTxt()
-{
-   mem_del( data_buf );
-}
+FileTxt::~FileTxt() { mem_del(data_buf); }
 //---------- End of function FileTxt::~FileTxt ----------//
-
 
 //--------- Begin of function FileTxt::get_char ------//
 //
 // Get one character from the file stream
 //
-// [int] advancePointer = whether advance the text pointer after getting the char or not
-//                        set this to 0, if you only want to get a char for testing only
-//                        (default : 1)
+// [int] advancePointer = whether advance the text pointer after getting the
+// char or not
+//                        set this to 0, if you only want to get a char for
+//                        testing only (default : 1)
 //
 // return : <char> the character gotten
 //          if EOF, return NULL
 //
-char FileTxt::get_char(int advancePointer)
-{
-   while( *data_ptr == CHAR_RETURN )
-      next_line();
+char FileTxt::get_char(int advancePointer) {
+  while (*data_ptr == CHAR_RETURN)
+    next_line();
 
-   if( *data_ptr == CHAR_EOF )
-      return 0;
+  if (*data_ptr == CHAR_EOF)
+    return 0;
 
-   char dataChar = *data_ptr;
+  char dataChar = *data_ptr;
 
-   if( advancePointer )
-      data_ptr++;
+  if (advancePointer)
+    data_ptr++;
 
-   return dataChar;
+  return dataChar;
 }
 //----------- End of function FileTxt::get_char ------//
-
 
 //--------- Begin of function FileTxt::next_line ------//
 //
@@ -130,26 +121,24 @@ char FileTxt::get_char(int advancePointer)
 // Return : <int> 1 - jump to next line
 //                0 - end of file
 //
-char* FileTxt::next_line()
-{
-   for( ; *data_ptr != CHAR_RETURN && *data_ptr != CHAR_EOF ; data_ptr++ );
+char *FileTxt::next_line() {
+  for (; *data_ptr != CHAR_RETURN && *data_ptr != CHAR_EOF; data_ptr++)
+    ;
 
-   if( *data_ptr == CHAR_RETURN )
-      data_ptr++;
+  if (*data_ptr == CHAR_RETURN)
+    data_ptr++;
 
-   if( *data_ptr == CHAR_LINE_FEED )
-      data_ptr++;
+  if (*data_ptr == CHAR_LINE_FEED)
+    data_ptr++;
 
-   next_token();
+  next_token();
 
-   if( *data_ptr == CHAR_EOF )
-      return NULL;
-   else
-      return data_ptr;
+  if (*data_ptr == CHAR_EOF)
+    return NULL;
+  else
+    return data_ptr;
 }
 //----------- End of function FileTxt::next_line ------//
-
-
 
 //----------- End of function FileTxt::locate_word ------//
 //
@@ -160,26 +149,23 @@ char* FileTxt::next_line()
 // Return : the pointer to next word
 //          NULL if not found, now pointed to EOF
 //
-char* FileTxt::locate_word(char* wordPtr)
-{
-   for( ; *data_ptr != CHAR_EOF ; data_ptr++ )
-   {
-      if( *data_ptr == *wordPtr )       // match first character first
-      {
-         for( ; *data_ptr == *wordPtr && *wordPtr ; data_ptr++, wordPtr++ );
+char *FileTxt::locate_word(char *wordPtr) {
+  for (; *data_ptr != CHAR_EOF; data_ptr++) {
+    if (*data_ptr == *wordPtr) // match first character first
+    {
+      for (; *data_ptr == *wordPtr && *wordPtr; data_ptr++, wordPtr++)
+        ;
 
-         if( *wordPtr == '\0' )
-         {
-            next_token();
-            return data_ptr;
-         }
+      if (*wordPtr == '\0') {
+        next_token();
+        return data_ptr;
       }
-   }
+    }
+  }
 
-   return NULL;
+  return NULL;
 }
 //----------- End of function FileTxt::locate_word ------//
-
 
 //--------- Begin of function FileTxt::get_token ------//
 //
@@ -191,68 +177,60 @@ char* FileTxt::locate_word(char* wordPtr)
 // Return : the pointer to token buffer
 //          NULL if not found, now pointed to EOF
 //
-char* FileTxt::get_token(int advancePointer)
-{
-   int   i;
-   char  pc;
-   char* savePtr, *tokenPtr = token_buf;
+char *FileTxt::get_token(int advancePointer) {
+  int i;
+  char pc;
+  char *savePtr, *tokenPtr = token_buf;
 
-   if( !advancePointer )
-       savePtr = data_ptr;
+  if (!advancePointer)
+    savePtr = data_ptr;
 
-   next_token();
+  next_token();
 
-   while( *data_ptr == CHAR_RETURN )    // bypass all space lines
-   {
-      if( !next_line() )         // End of File
-         return NULL;
-   }
+  while (*data_ptr == CHAR_RETURN) // bypass all space lines
+  {
+    if (!next_line()) // End of File
+      return NULL;
+  }
 
-   //.........................................//
+  //.........................................//
 
-   for( i=0 ; ; i++,data_ptr++ )
-   {
-      pc = *data_ptr;
+  for (i = 0;; i++, data_ptr++) {
+    pc = *data_ptr;
 
-      if ( pc == ' ' || pc == '=' || pc == ',' || pc == ':' || pc==CHAR_RETURN )
-         break;
+    if (pc == ' ' || pc == '=' || pc == ',' || pc == ':' || pc == CHAR_RETURN)
+      break;
 
-      else if( pc == CHAR_EOF )
-      {
-         if( !advancePointer )    // don't advance the pointer after getting the token
-            data_ptr = savePtr;
+    else if (pc == CHAR_EOF) {
+      if (!advancePointer) // don't advance the pointer after getting the token
+        data_ptr = savePtr;
 
-         return NULL;
-      }
+      return NULL;
+    }
 
-      if ( i<MAX_TOKEN_LEN )
-         *tokenPtr++ = *data_ptr;
-   }
+    if (i < MAX_TOKEN_LEN)
+      *tokenPtr++ = *data_ptr;
+  }
 
-   //................................//
+  //................................//
 
-   *tokenPtr = '\0';
+  *tokenPtr = '\0';
 
-   next_token();
+  next_token();
 
-   if( !advancePointer )
-      data_ptr = savePtr;
+  if (!advancePointer)
+    data_ptr = savePtr;
 
-   return token_buf;
+  return token_buf;
 }
 //----------- End of function FileTxt::get_token ------//
-
 
 //----------- End of function FileTxt::get_num ------//
 //
 // Convert current token to number and return the number
 //
-double FileTxt::get_num()
-{
-   return atof( get_token() );
-}
+double FileTxt::get_num() { return atof(get_token()); }
 //----------- End of function FileTxt::get_num ------//
-
 
 //--------- Begin of function FileTxt::read_line ------//
 //
@@ -261,26 +239,25 @@ double FileTxt::get_num()
 // <char*> textBuf = a pre-allocated text buffer with a len of bufLen+1
 // <int>   bufLen  = max no. of chars the buffer can store
 //
-void FileTxt::read_line(char* textBuf, int bufLen)
-{
-   next_token();        // skip all leading space
+void FileTxt::read_line(char *textBuf, int bufLen) {
+  next_token(); // skip all leading space
 
-   if( *data_ptr == CHAR_RETURN )
-      next_line();
+  if (*data_ptr == CHAR_RETURN)
+    next_line();
 
-   //-----------------------------------------//
+  //-----------------------------------------//
 
-   int i;
+  int i;
 
-   for( i=0 ; *data_ptr!=CHAR_RETURN && *data_ptr!=CHAR_EOF && i<bufLen ; i++ )
-      *textBuf++ = *data_ptr++;
+  for (i = 0; *data_ptr != CHAR_RETURN && *data_ptr != CHAR_EOF && i < bufLen;
+       i++)
+    *textBuf++ = *data_ptr++;
 
-   *textBuf='\0';
+  *textBuf = '\0';
 
-   next_line();
+  next_line();
 }
 //----------- End of function FileTxt::read_line ------//
-
 
 //--------- Begin of function FileTxt::read_paragraph ------//
 //
@@ -292,75 +269,74 @@ void FileTxt::read_line(char* textBuf, int bufLen)
 //
 // return : <int> textReadLen = the length of text actually read into textPtr
 //
-int FileTxt::read_paragraph(char* textPtr, int bufLen)
-{
-   next_token();        // skip all leading space
+int FileTxt::read_paragraph(char *textPtr, int bufLen) {
+  next_token(); // skip all leading space
 
-   if( *data_ptr == CHAR_RETURN )
-      next_line();
+  if (*data_ptr == CHAR_RETURN)
+    next_line();
 
-   //-----------------------------------------//
+  //-----------------------------------------//
 
-   char ch;
-   int  textReadLen=0;
+  char ch;
+  int textReadLen = 0;
 
-   while( *data_ptr != CHAR_EOF )
-   {
-      ch = *data_ptr++;
+  while (*data_ptr != CHAR_EOF) {
+    ch = *data_ptr++;
 
-#if(defined(CHINESE) && defined(TRADITIONAL) )
-//SXM:For Tra
-//	  if( (ch==CHAR_PAGE_BREAK || ch=='~' )&& (*(data_ptr+1)==0x0d
-//		  ||*(data_ptr+1)==0x0a||*(data_ptr+1)==0x0))
-//SXM:For Tra
-		// data_ptr has been increase
-		if( (ch==CHAR_PAGE_BREAK || ch=='~') && (*data_ptr==CHAR_RETURN||*data_ptr==CHAR_LINE_FEED||*data_ptr==0) )
+#if (defined(CHINESE) && defined(TRADITIONAL))
+    // SXM:For Tra
+    //	  if( (ch==CHAR_PAGE_BREAK || ch=='~' )&& (*(data_ptr+1)==0x0d
+    //		  ||*(data_ptr+1)==0x0a||*(data_ptr+1)==0x0))
+    // SXM:For Tra
+    // data_ptr has been increase
+    if ((ch == CHAR_PAGE_BREAK || ch == '~') &&
+        (*data_ptr == CHAR_RETURN || *data_ptr == CHAR_LINE_FEED ||
+         *data_ptr == 0))
 #else
-		if( ch==CHAR_PAGE_BREAK || ch=='~' )
+    if (ch == CHAR_PAGE_BREAK || ch == '~')
 #endif
-			break;
+      break;
 
-      // RETURN + LINE_FEED = word wrap
-      // LINE_FEED only     = new line
+    // RETURN + LINE_FEED = word wrap
+    // LINE_FEED only     = new line
 
-      if( ch==CHAR_RETURN )
-      {
-         if( *data_ptr==CHAR_LINE_FEED )
-         {
-            data_ptr++;
-            ch = ' ';      // Convert RETURN + LINE_FEED to a space
-         }
-		}
+    if (ch == CHAR_RETURN) {
+      if (*data_ptr == CHAR_LINE_FEED) {
+        data_ptr++;
+        ch = ' '; // Convert RETURN + LINE_FEED to a space
+      }
+    }
 
-		// ##### begin Gilbert 24/7 #######//
-		if( ch== 0xb ) //KEY_CTRL_K )
-		// ##### end Gilbert 24/7 #######//
-		{
-			ch = '\n';          // CTRL-K means new line (CTRL-J)
+    // ##### begin Gilbert 24/7 #######//
+    if (ch == 0xb) // KEY_CTRL_K )
+    // ##### end Gilbert 24/7 #######//
+    {
+      ch = '\n'; // CTRL-K means new line (CTRL-J)
 
-			if( *data_ptr == CHAR_RETURN )    // by pass RETURN + LINE_FEED which may be turned into space if not cancelled
-				data_ptr++;
+      if (*data_ptr == CHAR_RETURN) // by pass RETURN + LINE_FEED which may be
+                                    // turned into space if not cancelled
+        data_ptr++;
 
-			if( *data_ptr == CHAR_LINE_FEED )
-				data_ptr++;
-		}
+      if (*data_ptr == CHAR_LINE_FEED)
+        data_ptr++;
+    }
 
-		*textPtr++ = ch;
-		textReadLen++;
+    *textPtr++ = ch;
+    textReadLen++;
 
-		if( textReadLen>=bufLen-1 )       // when in non-debug mode
-			break;
-	}
+    if (textReadLen >= bufLen - 1) // when in non-debug mode
+      break;
+  }
 
-   *textPtr++ = '\0';
-   textReadLen++;
+  *textPtr++ = '\0';
+  textReadLen++;
 
-#if(!defined(CHINESE))
-	//SXM:Risk
-	err_when( data_ptr-data_buf > file_length );
-	//SXM:Risk
+#if (!defined(CHINESE))
+  // SXM:Risk
+  err_when(data_ptr - data_buf > file_length);
+  // SXM:Risk
 #endif
 
-   return textReadLen;
+  return textReadLen;
 }
 //----------- End of function FileTxt::read_paragraph ------//

@@ -18,8 +18,8 @@
  *
  */
 
-//Filename        : ALL.H
-//Description : General-purpose header file
+// Filename        : ALL.H
+// Description : General-purpose header file
 
 #ifndef __ALL_H
 #define __ALL_H
@@ -27,12 +27,12 @@
 //--------- Include other headers -------//
 
 #include <cstddef>
-#include <win32_compat.h>
-#include <omisc.h>
-#include <ostr.h>
-#include <ofile.h>
 #include <gamedef.h>
 #include <oerror.h>
+#include <ofile.h>
+#include <omisc.h>
+#include <ostr.h>
+#include <win32_compat.h>
 
 //-------- define standard type ---------//
 
@@ -41,36 +41,37 @@ typedef void *LPVOID;
 
 //-------- Define macro functions -------//
 
-#define MAX(a,b)        (((a) > (b)) ? (a) : (b))
-#define MIN(a,b)        (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 //---------- define class Mem ----------//
 
 struct MemInfo;
 
-class Mem
-{
+class Mem {
 public:
-	MemInfo*	info_array;
-	short		ptr_num;
-	short		ptr_used;
+  MemInfo *info_array;
+  short ptr_num;
+  short ptr_used;
 
 public:
-	Mem();
-	~Mem();
+  Mem();
+  ~Mem();
 
-	char*		add(unsigned,const char*,int);
-	char*		add_clear(unsigned,const char*,int);
+  char *add(unsigned, const char *, int);
+  char *add_clear(unsigned, const char *, int);
 
-	char*		resize(void*,unsigned,const char*,int);
-	char*		resize_keep_data(void *orgPtr, unsigned orgSize, unsigned newSize, const char* fileName, int fileLine);
+  char *resize(void *, unsigned, const char *, int);
+  char *resize_keep_data(void *orgPtr, unsigned orgSize, unsigned newSize,
+                         const char *fileName, int fileLine);
 
-	void		del(void*,const char*,int);
+  void del(void *, const char *, int);
 
-	int		get_mem_size(void *memPtr);
+  int get_mem_size(void *memPtr);
 };
 
-char* mem_resize_keep_data(void*,unsigned,unsigned);    // called when DEBUG mode is off
+char *mem_resize_keep_data(void *, unsigned,
+                           unsigned); // called when DEBUG mode is off
 
 extern Mem mem;
 
@@ -78,22 +79,23 @@ extern Mem mem;
 
 #ifndef NO_MEM_CLASS
 
-	#define mem_add(memSize)             mem.add(memSize, __FILE__, __LINE__)
-	#define mem_add_clear(memSize)       mem.add_clear(memSize, __FILE__, __LINE__)
-	#define mem_resize(orgPtr,newSize)   mem.resize(orgPtr, newSize, __FILE__, __LINE__)
-	#define mem_del(memPtr)              mem.del(memPtr, __FILE__, __LINE__)
+#define mem_add(memSize) mem.add(memSize, __FILE__, __LINE__)
+#define mem_add_clear(memSize) mem.add_clear(memSize, __FILE__, __LINE__)
+#define mem_resize(orgPtr, newSize)                                            \
+  mem.resize(orgPtr, newSize, __FILE__, __LINE__)
+#define mem_del(memPtr) mem.del(memPtr, __FILE__, __LINE__)
 
-	#define mem_resize_keep_data(orgPtr, orgSize, newSize) \
-								  mem.resize_keep_data(orgPtr, orgSize, newSize, __FILE__, __LINE__)
+#define mem_resize_keep_data(orgPtr, orgSize, newSize)                         \
+  mem.resize_keep_data(orgPtr, orgSize, newSize, __FILE__, __LINE__)
 #else
-	#include <stdlib.h>
+#include <stdlib.h>
 
-	#define mem_add(memSize)            ((char*)malloc(memSize))
-	#define mem_add_clear(memSize)      ((char*)calloc(1,memSize))
-	#define mem_resize(orgPtr, newSize) ((char*)realloc(orgPtr,newSize))
-	#define mem_del(memPtr)             free(memPtr)
+#define mem_add(memSize) ((char *)malloc(memSize))
+#define mem_add_clear(memSize) ((char *)calloc(1, memSize))
+#define mem_resize(orgPtr, newSize) ((char *)realloc(orgPtr, newSize))
+#define mem_del(memPtr) free(memPtr)
 
-	// mem_resize_keep_data() will be called directly when not in DEBUG mode
+// mem_resize_keep_data() will be called directly when not in DEBUG mode
 
 #endif
 

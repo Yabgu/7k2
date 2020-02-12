@@ -18,53 +18,50 @@
  *
  */
 
-//Filename    : OFILE.H
-//Description : Header file for file object
+// Filename    : OFILE.H
+// Description : Header file for file object
 
 #ifndef __OFILE_H
 #define __OFILE_H
 
-#include <win32_compat.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <win32_compat.h>
 
 //--------------------------------------//
 
-class File
-{
+class File {
 public:
+  enum FileType { FLAT = 0, STRUCTURED = 1 };
 
-	enum  FileType { FLAT = 0, STRUCTURED = 1 };
-
-	char     file_name[MAX_PATH+1];
-	FILE*    file_handle;
-	int      handle_error;
-	FileType file_type;
+  char file_name[MAX_PATH + 1];
+  FILE *file_handle;
+  int handle_error;
+  FileType file_type;
 
 public:
+  File() : file_handle(NULL) {}
+  ~File();
 
-	File(): file_handle(NULL) {}
-	~File();
+  int file_open(const char *, int = 1, int = 0);
+  int file_create(const char *, int = 1, int = 0);
+  void file_close();
 
-	int   file_open(const char*, int=1, int=0);
-	int   file_create(const char*, int=1, int=0);
-	void  file_close();
+  long file_size();
+  long file_seek(long, int = SEEK_SET);
+  long file_pos();
 
-	long  file_size();
-	long  file_seek(long, int = SEEK_SET);
-	long  file_pos();
+  int file_read(void *, unsigned);
+  int file_write(void *, unsigned);
 
-	int   file_read(void*, unsigned);
-	int   file_write(void*, unsigned);
+  int file_put_short(int16_t);
+  int16_t file_get_short();
 
-	int     file_put_short(int16_t);
-	int16_t file_get_short();
+  int file_put_unsigned_short(uint16_t);
+  uint16_t file_get_unsigned_short();
 
-	int      file_put_unsigned_short(uint16_t);
-	uint16_t file_get_unsigned_short();
-
-	int     file_put_long(int32_t);
-	int32_t file_get_long();
+  int file_put_long(int32_t);
+  int32_t file_get_long();
 };
 
 #endif

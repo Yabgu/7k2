@@ -21,9 +21,9 @@
 // Filename   : OW_SOUND.CPP
 // Description: Ambient Sound Functions
 
-#include <osys.h>
 #include <oaudio.h>
 #include <ose.h>
+#include <osys.h>
 #include <ovolume.h>
 #include <oweather.h>
 #include <oworld.h>
@@ -34,25 +34,25 @@
 
 //------- Begin of function World::process_ambient_sound -------//
 //
-void World::process_ambient_sound()
-{
-	int temp = weather.temp_c();
-	if( weather.rain_scale() == 0 && temp >= 15 && misc.random(temp) >= 12)
-	{
-		int bird = misc.random(MAX_BIRD) + 1;
-		char sndFile[] = "BIRDS00";
-		err_when( bird > 99 );
-		sndFile[5] = (bird / 10) + '0';
-		sndFile[6] = (bird % 10) + '0';
+void World::process_ambient_sound() {
+  int temp = weather.temp_c();
+  if (weather.rain_scale() == 0 && temp >= 15 && misc.random(temp) >= 12) {
+    int bird = misc.random(MAX_BIRD) + 1;
+    char sndFile[] = "BIRDS00";
+    err_when(bird > 99);
+    sndFile[5] = (bird / 10) + '0';
+    sndFile[6] = (bird % 10) + '0';
 
-		int xLoc = misc.random(max_x_loc) - (zoom_matrix->top_x_loc + zoom_matrix->center_x);
-		int yLoc = misc.random(max_y_loc) - (zoom_matrix->top_y_loc + zoom_matrix->center_y);
-		PosVolume p(PosVolume(xLoc, yLoc));
-                RelVolume relVolume(p, 200, MAX_MAP_WIDTH);
-		if( relVolume.rel_vol < 80)
-			relVolume.rel_vol = 80;
+    int xLoc = misc.random(max_x_loc) -
+               (zoom_matrix->top_x_loc + zoom_matrix->center_x);
+    int yLoc = misc.random(max_y_loc) -
+               (zoom_matrix->top_y_loc + zoom_matrix->center_y);
+    PosVolume p(PosVolume(xLoc, yLoc));
+    RelVolume relVolume(p, 200, MAX_MAP_WIDTH);
+    if (relVolume.rel_vol < 80)
+      relVolume.rel_vol = 80;
 
-		se_ctrl.request(sndFile, relVolume);
-	}
+    se_ctrl.request(sndFile, relVolume);
+  }
 }
 //-------- End of function World::process_ambient_sound --------//

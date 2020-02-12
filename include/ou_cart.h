@@ -27,28 +27,27 @@
 #include <ounit.h>
 
 #pragma pack(1)
-class UnitExpCart : public Unit
-{
+class UnitExpCart : public Unit {
 public:
-	char	triggered;
+  char triggered;
 
 public:
-	UnitExpCart();
-	~UnitExpCart();
+  UnitExpCart();
+  ~UnitExpCart();
 
-	virtual int is_camouflage(int viewerNation);				// same result across all players
+  virtual int is_camouflage(int viewerNation); // same result across all players
 
-	int	process_die();
-	void	trigger_explode();
+  int process_die();
+  void trigger_explode();
 
-	//-------------- multiplayer checking codes ---------------//
+  //-------------- multiplayer checking codes ---------------//
 
-	virtual	UCHAR crc8();
-	virtual	void	clear_ptr();
+  virtual UCHAR crc8();
+  virtual void clear_ptr();
 
-	//--------- casting function ----------//
+  //--------- casting function ----------//
 
-	UnitExpCart*	cast_to_UnitExpCart()	{ return this; }
+  UnitExpCart *cast_to_UnitExpCart() { return this; }
 };
 #pragma pack()
 

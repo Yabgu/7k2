@@ -18,69 +18,63 @@
  *
  */
 
-//Filename    : OBOX.CPP
-//Description : A collection of box objects
+// Filename    : OBOX.CPP
+// Description : A collection of box objects
 
-#include <obox.h>
 #include <key.h>
-#include <osys.h>
-#include <ovga.h>
+#include <obox.h>
+#include <obutton.h>
+#include <ofont.h>
 #include <omodeid.h>
 #include <omouse.h>
-#include <ofont.h>
-#include <obutton.h>
 #include <opower.h>
+#include <osys.h>
 #include <ot_basic.h>
+#include <ovga.h>
 
-#include <string.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 //----------- Define constant -------------//
 
-enum { BOX_LINE_SPACE    = 8,
-       MAX_BOX_WIDTH     = 600,
-       BOX_X_MARGIN      = 30,      // Horizontal margin
-       BOX_TOP_MARGIN    = 20,
-       BOX_BUTTON_MARGIN = 32,
-		 BOX_BOTTOM_MARGIN = 42   };  // margin for display the box button
+enum {
+  BOX_LINE_SPACE = 8,
+  MAX_BOX_WIDTH = 600,
+  BOX_X_MARGIN = 30, // Horizontal margin
+  BOX_TOP_MARGIN = 20,
+  BOX_BUTTON_MARGIN = 32,
+  BOX_BOTTOM_MARGIN = 42
+}; // margin for display the box button
 
 //------- constant for arrow box ----------//
 
-enum { ARROW_HEIGHT     = 20,   // Height of the thick end of the arrow
-       ARROW_MARGIN     = 10,   // Y margin of the arrow between the box top
-       ARROW_X_DISTANCE = 40,   // X distance of the object to the box
-       ARROW_Y_DISTANCE = 35 }; // Y distance of the object to the box
-
+enum {
+  ARROW_HEIGHT = 20,     // Height of the thick end of the arrow
+  ARROW_MARGIN = 10,     // Y margin of the arrow between the box top
+  ARROW_X_DISTANCE = 40, // X distance of the object to the box
+  ARROW_Y_DISTANCE = 35
+}; // Y distance of the object to the box
 
 //----- Define static member variables ------//
 
-char Box::opened_flag=0;
-
+char Box::opened_flag = 0;
 
 //----------- Begin of function Box::Box ---------//
 //
-Box::Box()
-{
-	save_scr_area = NULL;
-}
+Box::Box() { save_scr_area = NULL; }
 //----------- End of function Box::Box ---------//
-
 
 //----------- Begin of function Box::~Box ---------//
 //
-Box::~Box()
-{
-	if( save_scr_area )
-	{
-		mem_del( save_scr_area );
-		save_scr_area = NULL;
-	}
+Box::~Box() {
+  if (save_scr_area) {
+    mem_del(save_scr_area);
+    save_scr_area = NULL;
+  }
 }
 //----------- End of function Box::~Box ---------//
-
-
 
 //----------- Begin of function Box::open ---------//
 //
@@ -92,17 +86,15 @@ Box::~Box()
 // [int] downCentre     - whether paint down the center of the box
 //                        (default : 1)
 //
-void Box::open(int inX1, int inY1, int inX2, int inY2, int downCentre)
-{
-	box_x1 = inX1;
-	box_y1 = inY1;
-	box_x2 = inX2;
-	box_y2 = inY2;
+void Box::open(int inX1, int inY1, int inX2, int inY2, int downCentre) {
+  box_x1 = inX1;
+  box_y1 = inY1;
+  box_x2 = inX2;
+  box_y2 = inY2;
 
-	paint( downCentre );
+  paint(downCentre);
 }
 //------------ End of function Box::open -----------//
-
 
 //----------- Begin of function Box::open ---------//
 //
@@ -113,60 +105,56 @@ void Box::open(int inX1, int inY1, int inX2, int inY2, int downCentre)
 // [int] downCentre - whether paint down the center of the box
 //                    (default : 1)
 //
-void Box::open(int boxWidth, int boxHeight, int downCentre)
-{
-	box_x1 = (VGA_WIDTH-boxWidth) / 2;
-	box_x2 = box_x1 + boxWidth - 1;
+void Box::open(int boxWidth, int boxHeight, int downCentre) {
+  box_x1 = (VGA_WIDTH - boxWidth) / 2;
+  box_x2 = box_x1 + boxWidth - 1;
 
-	box_y1 = (VGA_HEIGHT-boxHeight) / 2;
-	box_y2 = box_y1 + boxHeight - 1;
+  box_y1 = (VGA_HEIGHT - boxHeight) / 2;
+  box_y2 = box_y1 + boxHeight - 1;
 
-	paint( downCentre );
+  paint(downCentre);
 }
 //------------ End of function Box::open -----------//
 
-
 //----------- Begin of function Box::paint ---------//
 
-void Box::paint(int downCentre)
-{
-	err_when(opened_flag);		// double open
+void Box::paint(int downCentre) {
+  err_when(opened_flag); // double open
 
-	// vga_front.save_area_common_buf( box_x1, box_y1, box_x2, box_y2 );   // save to Vga::image_buf
-	save_scr_area = vga_front.save_area( box_x1, box_y1, box_x2, box_y2, save_scr_area );
+  // vga_front.save_area_common_buf( box_x1, box_y1, box_x2, box_y2 );   // save
+  // to Vga::image_buf
+  save_scr_area =
+      vga_front.save_area(box_x1, box_y1, box_x2, box_y2, save_scr_area);
 
-	vga_front.d3_panel_up( box_x1, box_y1, box_x2, box_y2, 2 );
+  vga_front.d3_panel_up(box_x1, box_y1, box_x2, box_y2, 2);
 
-	if( downCentre )
-		vga_front.d3_panel_down( box_x1+4, box_y1+4, box_x2-4, box_y2-4, 1 );
+  if (downCentre)
+    vga_front.d3_panel_down(box_x1 + 4, box_y1 + 4, box_x2 - 4, box_y2 - 4, 1);
 
-	opened_flag = 1;
+  opened_flag = 1;
 }
 //------------ End of function Box::paint -----------//
-
 
 //----------- Begin of function Box::close --------//
 //
 // Close the previously opened box
 //
-void Box::close()
-{
-	err_when(!opened_flag);		// double open
+void Box::close() {
+  err_when(!opened_flag); // double open
 
-	// vga_front.rest_area_common_buf();
-	vga_front.rest_area( save_scr_area, 1 );	// 1-released
-	save_scr_area = NULL;		// since it is released
+  // vga_front.rest_area_common_buf();
+  vga_front.rest_area(save_scr_area, 1); // 1-released
+  save_scr_area = NULL;                  // since it is released
 
-	mouse.get_event();   // post the click, prevent effect on other windows
+  mouse.get_event(); // post the click, prevent effect on other windows
 
 #ifndef NO_REAL_TIME_UPDATE
-	sys.blt_virtual_buf();
+  sys.blt_virtual_buf();
 #endif
 
-	opened_flag = 0;
+  opened_flag = 0;
 }
 //------------ End of function Box::close -----------//
-
 
 //----------- Begin of function Box::calc_size ------//
 //
@@ -177,27 +165,23 @@ void Box::close()
 // <int>   minHeight = minimum height of the box
 // [int]   x1, y1    = the top left corner of the box
 //
-void Box::calc_size(const char* msgStr, int minHeight, int x1, int y1)
-{
-	int width  = BOX_X_MARGIN*2 + font_bld.text_width(msgStr, -1, MAX_BOX_WIDTH-BOX_X_MARGIN*2);
-	int height = minHeight + font_bld.text_height(BOX_LINE_SPACE);
+void Box::calc_size(const char *msgStr, int minHeight, int x1, int y1) {
+  int width = BOX_X_MARGIN * 2 +
+              font_bld.text_width(msgStr, -1, MAX_BOX_WIDTH - BOX_X_MARGIN * 2);
+  int height = minHeight + font_bld.text_height(BOX_LINE_SPACE);
 
-   if( x1 < 0 )
-   {
-      box_x1 = (VGA_WIDTH  - width)  / 2;
-      box_y1 = (VGA_HEIGHT - height) / 2;
-   }
-   else
-   {
-      box_x1 = x1;
-      box_y1 = y1;
-   }
+  if (x1 < 0) {
+    box_x1 = (VGA_WIDTH - width) / 2;
+    box_y1 = (VGA_HEIGHT - height) / 2;
+  } else {
+    box_x1 = x1;
+    box_y1 = y1;
+  }
 
-   box_x2 = box_x1+width-1;
-   box_y2 = box_y1+height-1;
+  box_x2 = box_x1 + width - 1;
+  box_y2 = box_y1 + height - 1;
 }
 //---------- End of function Box::calc_size -------------//
-
 
 //---------- Begin of function Box::ok_button ---------//
 //
@@ -205,20 +189,19 @@ void Box::calc_size(const char* msgStr, int minHeight, int x1, int y1)
 //                 0=disable inactive timeout
 //                 (default : 1 )
 //
-void Box::ok_button(int timeOut)
-{
-	Button button;
+void Box::ok_button(int timeOut) {
+  Button button;
 
-	char* okStr = text_basic.is_inited() ? text_basic.str_box_ok() : (char*)"Ok";
-   button.paint_text( box_x1+(box_x2-box_x1+1)/2-10, box_y2-BOX_BUTTON_MARGIN, okStr );
-	
-//	if( sys.debug_session )
-	sys.blt_virtual_buf();
+  char *okStr = text_basic.is_inited() ? text_basic.str_box_ok() : (char *)"Ok";
+  button.paint_text(box_x1 + (box_x2 - box_x1 + 1) / 2 - 10,
+                    box_y2 - BOX_BUTTON_MARGIN, okStr);
 
-   button.wait_press(timeOut);
+  //	if( sys.debug_session )
+  sys.blt_virtual_buf();
+
+  button.wait_press(timeOut);
 }
 //------------ End of function Box::ok_button ---------//
-
 
 //---------- Begin of function Box::ask_button ---------//
 //
@@ -226,66 +209,67 @@ void Box::ok_button(int timeOut)
 //
 // [char*] buttonDes1      = the description of button 1 (default : "Ok")
 // [char*] buttonDes2 	   = the description of button 2 (default : "Cancel")
-// [int]   rightClickClose = whether pressing the right button will close the window
+// [int]   rightClickClose = whether pressing the right button will close the
+// window
 //			     (default: 1)
 //
-int Box::ask_button(const char* buttonDes1, const char* buttonDes2, int rightClickClose)
-{
-   int width;
+int Box::ask_button(const char *buttonDes1, const char *buttonDes2,
+                    int rightClickClose) {
+  int width;
 
-   width = box_x2-box_x1+1;
+  width = box_x2 - box_x1 + 1;
 
-   Button buttonOk, buttonCancel;
+  Button buttonOk, buttonCancel;
 
-	if( !buttonDes1 )
-	{
-		if( text_basic.is_inited() )
-			buttonDes1 = text_basic.str_box_ok();
-		else
-			buttonDes1 = "Ok";
-	}
-   int buttonWidth1 = 20 + font_bld.text_width(buttonDes1);
-   buttonOk.create_text( box_x1+width/2-buttonWidth1, box_y2-BOX_BUTTON_MARGIN, buttonDes1 );
+  if (!buttonDes1) {
+    if (text_basic.is_inited())
+      buttonDes1 = text_basic.str_box_ok();
+    else
+      buttonDes1 = "Ok";
+  }
+  int buttonWidth1 = 20 + font_bld.text_width(buttonDes1);
+  buttonOk.create_text(box_x1 + width / 2 - buttonWidth1,
+                       box_y2 - BOX_BUTTON_MARGIN, buttonDes1);
 
-	if( !buttonDes2 )
-	{
-		if( text_basic.is_inited() )
-			buttonDes2 = text_basic.str_box_cancel();
-		else
-			buttonDes2 = "Cancel";
-	}
-   buttonCancel.create_text( box_x1+width/2+2 , box_y2-BOX_BUTTON_MARGIN, buttonDes2 );
+  if (!buttonDes2) {
+    if (text_basic.is_inited())
+      buttonDes2 = text_basic.str_box_cancel();
+    else
+      buttonDes2 = "Cancel";
+  }
+  buttonCancel.create_text(box_x1 + width / 2 + 2, box_y2 - BOX_BUTTON_MARGIN,
+                           buttonDes2);
 
-   buttonOk.paint();      // paint button
-   buttonCancel.paint();
+  buttonOk.paint(); // paint button
+  buttonCancel.paint();
 
-//	if( sys.debug_session )
-	sys.blt_virtual_buf();
+  //	if( sys.debug_session )
+  sys.blt_virtual_buf();
 
-   //..........................................//
+  //..........................................//
 
-   while( 1 )
-	{
-		sys.yield();
-		mouse.get_event();
+  while (1) {
+    sys.yield();
+    mouse.get_event();
 
-//		if( sys.debug_session )
-		sys.blt_virtual_buf();
+    //		if( sys.debug_session )
+    sys.blt_virtual_buf();
 
-      if( buttonOk.detect(buttonOk.str_buf[0], KEY_RETURN) )
-		
-			return 1;
+    if (buttonOk.detect(buttonOk.str_buf[0], KEY_RETURN))
 
-		if( buttonCancel.detect(buttonCancel.str_buf[0], KEY_ESC)
-			 || (rightClickClose && mouse.any_click(1)) ) 	  // detect right button only when the button is "Cancel"
-		{
-			mouse.get_event();
-			return 0;
-		}
-	}
+      return 1;
+
+    if (buttonCancel.detect(buttonCancel.str_buf[0], KEY_ESC) ||
+        (rightClickClose &&
+         mouse.any_click(
+             1))) // detect right button only when the button is "Cancel"
+    {
+      mouse.get_event();
+      return 0;
+    }
+  }
 }
 //--------- End of function Box::ask_button --------//
-
 
 //---------- Begin of function Box::ask_button ---------//
 //
@@ -295,38 +279,37 @@ int Box::ask_button(const char* buttonDes1, const char* buttonDes2, int rightCli
 // [char*]   strOk, strCancel       = the string of the button Ok & Cancel
 //                                 ( default : "Ok" & "Cancel" )
 //
-void Box::ask_button(Button& buttonOk, Button& buttonCancel, const char* strOk, const char* strCancel )
-{
-   int width;
+void Box::ask_button(Button &buttonOk, Button &buttonCancel, const char *strOk,
+                     const char *strCancel) {
+  int width;
 
-   width = box_x2-box_x1+1;
+  width = box_x2 - box_x1 + 1;
 
-	if( !strOk )
-	{
-		if( text_basic.is_inited() )
-			strOk = text_basic.str_box_ok();
-		else
-			strOk = "Ok";
-	}
-   buttonOk.create_text( box_x1+width/2-36, box_y2-BOX_BUTTON_MARGIN, strOk );
+  if (!strOk) {
+    if (text_basic.is_inited())
+      strOk = text_basic.str_box_ok();
+    else
+      strOk = "Ok";
+  }
+  buttonOk.create_text(box_x1 + width / 2 - 36, box_y2 - BOX_BUTTON_MARGIN,
+                       strOk);
 
-	if( !strCancel )
-	{
-		if( text_basic.is_inited() )
-			strCancel = text_basic.str_box_cancel();
-		else
-			strCancel = "Cancel";
-	}
-   buttonCancel.create_text( box_x1+width/2+2 , box_y2-BOX_BUTTON_MARGIN, strCancel );
+  if (!strCancel) {
+    if (text_basic.is_inited())
+      strCancel = text_basic.str_box_cancel();
+    else
+      strCancel = "Cancel";
+  }
+  buttonCancel.create_text(box_x1 + width / 2 + 2, box_y2 - BOX_BUTTON_MARGIN,
+                           strCancel);
 
-   buttonOk.paint();      // paint button
-   buttonCancel.paint();
+  buttonOk.paint(); // paint button
+  buttonCancel.paint();
 
-//	if( sys.debug_session )
-	sys.blt_virtual_buf();
+  //	if( sys.debug_session )
+  sys.blt_virtual_buf();
 }
 //--------- End of function Box::ask_button ---------//
-
 
 //------- Begin of function Box::ask ----------//
 //
@@ -344,25 +327,26 @@ void Box::ask_button(Button& buttonOk, Button& buttonCancel, const char* strOk, 
 //          0 - if user select "Cancel" button
 //
 //
-int Box::ask(const char* msgStr, const char* buttonDes1, const char* buttonDes2, int x1, int y1)
-{
-   int rc;
+int Box::ask(const char *msgStr, const char *buttonDes1, const char *buttonDes2,
+             int x1, int y1) {
+  int rc;
 
-   calc_size(msgStr,BOX_TOP_MARGIN+BOX_BOTTOM_MARGIN,x1,y1);   // calculate x1, y1, x2, y2 depended on the msgStr
+  calc_size(msgStr, BOX_TOP_MARGIN + BOX_BOTTOM_MARGIN, x1,
+            y1); // calculate x1, y1, x2, y2 depended on the msgStr
 
-   paint(1);
+  paint(1);
 
-	font_bld.put_paragraph( box_x1+BOX_X_MARGIN, box_y1+BOX_TOP_MARGIN, box_x2-BOX_X_MARGIN,
-			   box_y2-BOX_BOTTOM_MARGIN, msgStr, BOX_LINE_SPACE );
+  font_bld.put_paragraph(box_x1 + BOX_X_MARGIN, box_y1 + BOX_TOP_MARGIN,
+                         box_x2 - BOX_X_MARGIN, box_y2 - BOX_BOTTOM_MARGIN,
+                         msgStr, BOX_LINE_SPACE);
 
-   rc = ask_button(buttonDes1, buttonDes2);
+  rc = ask_button(buttonDes1, buttonDes2);
 
-   close();
+  close();
 
-   return rc;
+  return rc;
 }
 //---------- End of function Box::ask ----------//
-
 
 //------- Begin of function Box::msg ----------//
 //
@@ -371,34 +355,35 @@ int Box::ask(const char* msgStr, const char* buttonDes1, const char* buttonDes2,
 // Syntax :: msg( <char*> )
 //
 // <char*> msgStr 		 = pointer to the message, use '\n' to
-//									seperate lines.
+//									seperate
+//lines.
 // [int]   enableTimeOut = enable time out or not (default: 1)
 // [int]   x1, y1 		 = the left corner of the box, if not given
 //                  		   center the box on the screen.
 //
-void Box::msg(const char* msgStr, int enableTimeOut, int x1, int y1)
-{
-	int savedUseBack = vga.use_back_buf;
+void Box::msg(const char *msgStr, int enableTimeOut, int x1, int y1) {
+  int savedUseBack = vga.use_back_buf;
 
-	vga.use_front();
+  vga.use_front();
 
-	calc_size(msgStr,BOX_TOP_MARGIN+BOX_BOTTOM_MARGIN,x1,y1);   // calculate x1, y1, x2, y2 depended on the msgStr
+  calc_size(msgStr, BOX_TOP_MARGIN + BOX_BOTTOM_MARGIN, x1,
+            y1); // calculate x1, y1, x2, y2 depended on the msgStr
 
-	paint(1);
+  paint(1);
 
-	font_bld.put_paragraph( box_x1+BOX_X_MARGIN, box_y1+BOX_TOP_MARGIN, box_x2-BOX_X_MARGIN,
-				box_y2-BOX_BOTTOM_MARGIN, msgStr, BOX_LINE_SPACE );
+  font_bld.put_paragraph(box_x1 + BOX_X_MARGIN, box_y1 + BOX_TOP_MARGIN,
+                         box_x2 - BOX_X_MARGIN, box_y2 - BOX_BOTTOM_MARGIN,
+                         msgStr, BOX_LINE_SPACE);
 
-	sys.blt_virtual_buf();		// blt tihe vrtual front buffer to the screen
+  sys.blt_virtual_buf(); // blt tihe vrtual front buffer to the screen
 
-	ok_button(enableTimeOut);
-	close();
+  ok_button(enableTimeOut);
+  close();
 
-	if( savedUseBack )
-		vga.use_back();
+  if (savedUseBack)
+    vga.use_back();
 }
 //---------- End of function Box::msg ----------//
-
 
 //------- Begin of function Box::print ----------//
 //
@@ -407,28 +392,30 @@ void Box::msg(const char* msgStr, int enableTimeOut, int x1, int y1)
 // <char*> formatStr - formated message with % argument
 // <....>  the argument list
 //
-void Box::print(char* formatStr, ... )
-{
-   //---- format the message and the arguments into one message ----//
+void Box::print(char *formatStr, ...) {
+  //---- format the message and the arguments into one message ----//
 
-   enum { RESULT_STR_LEN=200 };
+  enum { RESULT_STR_LEN = 200 };
 
-   static char resultStr[RESULT_STR_LEN+1];
+  static char resultStr[RESULT_STR_LEN + 1];
 
-   err_when( strlen(formatStr) > RESULT_STR_LEN/2 );   // the length of the format string cannot > 1/2 of the result string buffer length, the remaining 1/2 is reserved for substituted values.
+  err_when(strlen(formatStr) >
+           RESULT_STR_LEN /
+               2); // the length of the format string cannot > 1/2 of the result
+                   // string buffer length, the remaining 1/2 is reserved for
+                   // substituted values.
 
-   va_list argPtr;        // the argument list structure
+  va_list argPtr; // the argument list structure
 
-   va_start( argPtr, formatStr );
-   vsprintf( resultStr, formatStr, argPtr );
-   va_end( argPtr );
+  va_start(argPtr, formatStr);
+  vsprintf(resultStr, formatStr, argPtr);
+  va_end(argPtr);
 
-   //------------ display msg --------------//
+  //------------ display msg --------------//
 
-   msg(resultStr);
+  msg(resultStr);
 }
 //---------- End of function Box::print ----------//
-
 
 //------- Begin of function Box::tell ----------//
 //
@@ -440,16 +427,17 @@ void Box::print(char* formatStr, ... )
 // [int]   x1, y1 = the left corner of the box, if not given
 //                  center the box on the screen
 //
-void Box::tell(const char* tellStr, int x1, int y1)
-{
-   calc_size(tellStr,BOX_TOP_MARGIN+BOX_BOTTOM_MARGIN,x1,y1);   // calculate x1, y1, x2, y2 depended on the tellStr
+void Box::tell(const char *tellStr, int x1, int y1) {
+  calc_size(tellStr, BOX_TOP_MARGIN + BOX_BOTTOM_MARGIN, x1,
+            y1); // calculate x1, y1, x2, y2 depended on the tellStr
 
-   paint(1);
+  paint(1);
 
-	font_bld.put_paragraph( box_x1+BOX_X_MARGIN, box_y1+BOX_TOP_MARGIN, box_x2-BOX_X_MARGIN,
-			   box_y2-BOX_BOTTOM_MARGIN, tellStr, BOX_LINE_SPACE );
+  font_bld.put_paragraph(box_x1 + BOX_X_MARGIN, box_y1 + BOX_TOP_MARGIN,
+                         box_x2 - BOX_X_MARGIN, box_y2 - BOX_BOTTOM_MARGIN,
+                         tellStr, BOX_LINE_SPACE);
 
-	sys.blt_virtual_buf();
+  sys.blt_virtual_buf();
 }
 //---------- End of function Box::tell ----------//
 
@@ -475,9 +463,10 @@ void Box::arrow_box(char* boxText, char* boxTitle, int saveScrFlag)
    if( saveScrFlag )
    {
       if( arrow_x == 0 )
-			vga_front.save_scr( box_x1, box_y1, box_x2, box_y2 );
-		else
-			vga_front.save_scr( MIN(box_x1,arrow_x), MIN(box_y1,arrow_y), MAX(box_x2,arrow_x), MAX(box_y2,arrow_y) );
+                        vga_front.save_scr( box_x1, box_y1, box_x2, box_y2 );
+                else
+                        vga_front.save_scr( MIN(box_x1,arrow_x),
+MIN(box_y1,arrow_y), MAX(box_x2,arrow_x), MAX(box_y2,arrow_y) );
    }
 
    //------- Draw box (and arrow if specified object) ------//
@@ -485,28 +474,33 @@ void Box::arrow_box(char* boxText, char* boxTitle, int saveScrFlag)
    if( arrow_x )
       draw_arrow();
 
-	vga_front.bar( box_x1, box_y1, box_x2, box_y2, V_WHITE );
+        vga_front.bar( box_x1, box_y1, box_x2, box_y2, V_WHITE );
 
-	vga_front.bar( box_x1, box_y1, box_x2, box_y1+1, V_BLACK );        // Top border
-	vga_front.bar( box_x1, box_y2-1, box_x2, box_y2, V_BLACK );        // Bottom border
-	vga_front.bar( box_x1, box_y1, box_x1+1, box_y2, V_BLACK );        // Left border
-	vga_front.bar( box_x2-1, box_y1, box_x2, box_y2, V_BLACK );        // Right border
+        vga_front.bar( box_x1, box_y1, box_x2, box_y1+1, V_BLACK );        //
+Top border vga_front.bar( box_x1, box_y2-1, box_x2, box_y2, V_BLACK );        //
+Bottom border vga_front.bar( box_x1, box_y1, box_x1+1, box_y2, V_BLACK ); //
+Left border vga_front.bar( box_x2-1, box_y1, box_x2, box_y2, V_BLACK ); // Right
+border
 
    //--------- display description and text -----------//
 
    if( boxTitle && boxTitle[0] )  // has tutor title
    {
-		font_bld.put( box_x1+10, box_y1+10, boxTitle );
+                font_bld.put( box_x1+10, box_y1+10, boxTitle );
 
-		vga_front.bar( box_x1, box_y1+ARROW_BOX_TITLE_HEIGHT, box_x2, box_y1+ARROW_BOX_TITLE_HEIGHT+1, V_BLACK );  // line between description and tutor text
+                vga_front.bar( box_x1, box_y1+ARROW_BOX_TITLE_HEIGHT, box_x2,
+box_y1+ARROW_BOX_TITLE_HEIGHT+1, V_BLACK );  // line between description and
+tutor text
 
-		font_bld.put_paragraph( box_x1+ARROW_BOX_X_MARGIN, box_y1+ARROW_BOX_TITLE_HEIGHT+ARROW_BOX_Y_MARGIN,
-			      box_x2-ARROW_BOX_X_MARGIN, box_y2-ARROW_BOX_Y_MARGIN, boxText, ARROW_BOX_LINE_SPACE );
+                font_bld.put_paragraph( box_x1+ARROW_BOX_X_MARGIN,
+box_y1+ARROW_BOX_TITLE_HEIGHT+ARROW_BOX_Y_MARGIN, box_x2-ARROW_BOX_X_MARGIN,
+box_y2-ARROW_BOX_Y_MARGIN, boxText, ARROW_BOX_LINE_SPACE );
    }
    else
    {
-		font_bld.put_paragraph( box_x1+ARROW_BOX_X_MARGIN, box_y1+ARROW_BOX_Y_MARGIN, box_x2-ARROW_BOX_X_MARGIN,
-			      box_y2-ARROW_BOX_Y_MARGIN, boxText, ARROW_BOX_LINE_SPACE );
+                font_bld.put_paragraph( box_x1+ARROW_BOX_X_MARGIN,
+box_y1+ARROW_BOX_Y_MARGIN, box_x2-ARROW_BOX_X_MARGIN, box_y2-ARROW_BOX_Y_MARGIN,
+boxText, ARROW_BOX_LINE_SPACE );
    }
 }
 //---------- End of function Box::arrow_box ---------//
@@ -518,7 +512,7 @@ void Box::close_arrow_box()
 {
    if( save_scr_flag )
    {
-		vga_front.rest_scr();
+                vga_front.rest_scr();
       save_scr_flag = 0;
    }
 }
@@ -535,9 +529,12 @@ void Box::close_arrow_box()
 //
 void Box::calc_arrow_box(char* textPtr, int arrowX, int arrowY, int extraHeight)
 {
-	int winWidth  = font_bld.text_width( textPtr, -1, ARROW_BOX_WIDTH-ARROW_BOX_X_MARGIN*2) + ARROW_BOX_X_MARGIN*2;
+        int winWidth  = font_bld.text_width( textPtr, -1,
+ARROW_BOX_WIDTH-ARROW_BOX_X_MARGIN*2) + ARROW_BOX_X_MARGIN*2;
 
-	int winHeight = ARROW_BOX_Y_MARGIN*2+font_bld.text_height(ARROW_BOX_LINE_SPACE);    // text_width() must be called before calling text_height()
+        int winHeight =
+ARROW_BOX_Y_MARGIN*2+font_bld.text_height(ARROW_BOX_LINE_SPACE);    //
+text_width() must be called before calling text_height()
 
    calc_arrow_box( winWidth, winHeight+extraHeight, arrowX, arrowY );
 }
@@ -564,13 +561,13 @@ void Box::calc_arrow_box(int boxWidth, int boxHeight, int arrowX, int arrowY)
 
       if( arrow_y < VGA_HEIGHT/2 )
       {
-	 box_x1  = arrow_x + ARROW_X_DISTANCE;
-	 box_y1  = arrow_y + ARROW_Y_DISTANCE;
+         box_x1  = arrow_x + ARROW_X_DISTANCE;
+         box_y1  = arrow_y + ARROW_Y_DISTANCE;
       }
       else //----- Lower left part of the screen -------//
       {
-	 box_x1  = arrow_x + ARROW_X_DISTANCE;
-	 box_y1  = arrow_y - ARROW_Y_DISTANCE - boxHeight;
+         box_x1  = arrow_x + ARROW_X_DISTANCE;
+         box_y1  = arrow_y - ARROW_Y_DISTANCE - boxHeight;
       }
    }
    else
@@ -579,13 +576,13 @@ void Box::calc_arrow_box(int boxWidth, int boxHeight, int arrowX, int arrowY)
 
       if( arrow_y < VGA_HEIGHT/2 )
       {
-	 box_x1  = arrow_x - ARROW_X_DISTANCE - boxWidth;
-	 box_y1  = arrow_y + ARROW_Y_DISTANCE;
+         box_x1  = arrow_x - ARROW_X_DISTANCE - boxWidth;
+         box_y1  = arrow_y + ARROW_Y_DISTANCE;
       }
       else //----- Lower right part of the screen -------//
-		{
-	 box_x1  = arrow_x - ARROW_X_DISTANCE - boxWidth;
-	 box_y1  = arrow_y - ARROW_Y_DISTANCE - boxHeight;
+                {
+         box_x1  = arrow_x - ARROW_X_DISTANCE - boxWidth;
+         box_y1  = arrow_y - ARROW_Y_DISTANCE - boxHeight;
       }
    }
 
@@ -639,13 +636,13 @@ void Box::draw_arrow()
 
       if( arrow_y < VGA_HEIGHT/2 )
       {
-	 tx2 = box_x1+1;
-	 ty2 = box_y1+ARROW_MARGIN;
+         tx2 = box_x1+1;
+         ty2 = box_y1+ARROW_MARGIN;
       }
       else //----- Lower left part of the screen -------//
       {
-	 tx2 = box_x1+1;
-	 ty2 = box_y2-ARROW_MARGIN-ARROW_HEIGHT;
+         tx2 = box_x1+1;
+         ty2 = box_y2-ARROW_MARGIN-ARROW_HEIGHT;
       }
    }
    else
@@ -654,13 +651,13 @@ void Box::draw_arrow()
 
       if( arrow_y < VGA_HEIGHT/2 )
       {
-	 tx2 = box_x2-1;
-	 ty2 = box_y1+ARROW_MARGIN;
+         tx2 = box_x2-1;
+         ty2 = box_y1+ARROW_MARGIN;
       }
       else //----- Lower right part of the screen -------//
       {
-	 tx2 = box_x2-1;
-	 ty2 = box_y2-ARROW_MARGIN-ARROW_HEIGHT;
+         tx2 = box_x2-1;
+         ty2 = box_y2-ARROW_MARGIN-ARROW_HEIGHT;
       }
    }
 
@@ -673,7 +670,7 @@ void Box::draw_arrow()
    for( ty=ty2 ; ty<=ty2+ARROW_HEIGHT ; ty++ )
       VGAline( arrow_x, arrow_y, tx2, ty, V_WHITE );
 
-	VGAline( arrow_x, arrow_y, tx2, ty2, V_BLACK );
+        VGAline( arrow_x, arrow_y, tx2, ty2, V_BLACK );
    VGAline( arrow_x, arrow_y, tx2, ty2+ARROW_HEIGHT, V_BLACK );
 
    mouse.show();

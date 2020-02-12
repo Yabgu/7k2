@@ -24,21 +24,19 @@
  * type AliasT.
  */
 template <typename T, typename AliasT>
-bool write_le_alias(OutputStream *os, T val)
-{
-   union { T val; AliasT al; } u;
-   u.val = val;
-   return write_le_integer<AliasT>(os, u.al);
+bool write_le_alias(OutputStream *os, T val) {
+  union {
+    T val;
+    AliasT al;
+  } u;
+  u.val = val;
+  return write_le_integer<AliasT>(os, u.al);
 }
 
-template <>
-bool write_le<float>(OutputStream *os, float val)
-{
-   return write_le_alias<float, uint32_t>(os, val);
+template <> bool write_le<float>(OutputStream *os, float val) {
+  return write_le_alias<float, uint32_t>(os, val);
 }
 
-template <>
-bool write_le<double>(OutputStream *os, double val)
-{
-   return write_le_alias<double, uint64_t>(os, val);
+template <> bool write_le<double>(OutputStream *os, double val) {
+  return write_le_alias<double, uint64_t>(os, val);
 }

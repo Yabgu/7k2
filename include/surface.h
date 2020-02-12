@@ -18,9 +18,8 @@
  *
  */
 
-//Filename    : surface.h
-//Description : Registers the selected backend for the surface class
-
+// Filename    : surface.h
+// Description : Registers the selected backend for the surface class
 
 #ifndef __SURFACE_H
 #define __SURFACE_H

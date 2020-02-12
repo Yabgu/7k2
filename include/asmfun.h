@@ -18,12 +18,11 @@
  *
  */
 
-//Filename    : asmfun.h
-//Description : Header file for asm compilation
+// Filename    : asmfun.h
+// Description : Header file for asm compilation
 
 #ifndef _ASMFUN_H
 #define _ASMFUN_H
-
 
 #if (defined(NO_ASM))
 
@@ -35,12 +34,11 @@
 #ifdef ASM_FOR_MSVC
 #define __asmsym__(s)
 #define IMGcall _stdcall
-#else  // GCC with JWasm
+#else // GCC with JWasm
 #define __asmsym__(s) __asm__(s)
 #define IMGcall __attribute__((stdcall))
 #endif
 
 #endif
-
 
 #endif // _ASMFUN_H

@@ -21,7 +21,6 @@
 // Filename    : MPTYPES.H
 // Description : Multiplayer header, define symbols
 
-
 #ifndef __MPTYPES_H
 #define __MPTYPES_H
 

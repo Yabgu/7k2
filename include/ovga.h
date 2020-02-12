@@ -19,8 +19,8 @@
  *
  */
 
-//Filename    : OVGA.H
-//Description : Video display management class
+// Filename    : OVGA.H
+// Description : Video display management class
 
 #ifndef __OVGA_H
 #define __OVGA_H

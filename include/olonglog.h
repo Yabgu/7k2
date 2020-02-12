@@ -19,20 +19,19 @@
  */
 
 // Filename    : OLONGLOG.H
-// Description : 
+// Description :
 
 #ifndef __OLONGLOG_H
 #define __OLONGLOG_H
 
 #include <ofile.h>
 
-class LongLog : public File
-{
+class LongLog : public File {
 public:
-	LongLog(char suffix);
-	~LongLog();
+  LongLog(char suffix);
+  ~LongLog();
 
-	void printf(const char*,...);
+  void printf(const char *, ...);
 };
 
 #ifdef DEBUG

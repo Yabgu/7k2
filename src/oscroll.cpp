@@ -18,27 +18,26 @@
  *
  */
 
-//Filename    : OSCROLL.CPP
-//Description : Object scroll bar
+// Filename    : OSCROLL.CPP
+// Description : Object scroll bar
 
-#include <oscroll.h>
 #include <all.h>
 #include <key.h>
-#include <osys.h>
+#include <oimgres.h>
+#include <oinfo.h>
 #include <omouse.h>
+#include <oscroll.h>
+#include <osys.h>
 #include <ovga.h>
 #include <vga_util.h>
-#include <oinfo.h>
-#include <oimgres.h>
-
 
 //------- Define constant -----------//
 
-#define PRESS_INT_TIME  200      // Press interval time, prevent too fast
-											// and uncontrollable scrolling, 200ms
+#define PRESS_INT_TIME                                                         \
+  200 // Press interval time, prevent too fast
+      // and uncontrollable scrolling, 200ms
 
 #define MINI_INDICATOR_HEIGHT 10 // Minimum height of scroll bar indicator
-
 
 //------ Begin of function ScrollBar::init -------//
 //
@@ -52,107 +51,102 @@
 // <int> totalRec    = total no. of records
 // [int] pageType    = yes or no, refered when down button is pressed
 //                     (default : 1)
-// [int] ifFlag   = if call vga_util.d3_panel_down instead of VgaBuf::d3_panel_down
+// [int] ifFlag   = if call vga_util.d3_panel_down instead of
+// VgaBuf::d3_panel_down
 //						  (default: 0)
 // [int] vgaFrontOnly = do all the bitmap processing on the front buffer only
 //								(default: 0)
 void ScrollBar::init(int itype, int ix1, int iy1, int ix2, int iy2,
-							int pageSkipRec, int dispMaxRec, int totalRec, int pageType, int ifFlag, int vgaFrontOnly)
-{
-	x1 = ix1;
-	y1 = iy1;
-	x2 = ix2;
-	y2 = iy2;
+                     int pageSkipRec, int dispMaxRec, int totalRec,
+                     int pageType, int ifFlag, int vgaFrontOnly) {
+  x1 = ix1;
+  y1 = iy1;
+  x2 = ix2;
+  y2 = iy2;
 
-	type = itype;
+  type = itype;
 
-	skip_rec_num  = pageSkipRec;
-	disp_rec_num  = dispMaxRec;
-	total_rec_num = totalRec;
-	page_type     = pageType;
-	if_flag		  = ifFlag;
-   vga_front_only = vgaFrontOnly;
+  skip_rec_num = pageSkipRec;
+  disp_rec_num = dispMaxRec;
+  total_rec_num = totalRec;
+  page_type = pageType;
+  if_flag = ifFlag;
+  vga_front_only = vgaFrontOnly;
 
-	if( total_rec_num==0 )       // at must at least be 1, otherwise divided by zero error will appear
-		total_rec_num=1;
+  if (total_rec_num ==
+      0) // at must at least be 1, otherwise divided by zero error will appear
+    total_rec_num = 1;
 
-	if( type == VERTICAL )
-		slot_height = y2-y1-28;
-	else
-		slot_height = x2-x1-28;
+  if (type == VERTICAL)
+    slot_height = y2 - y1 - 28;
+  else
+    slot_height = x2 - x1 - 28;
 
-	indicator_height = slot_height * disp_rec_num / total_rec_num;
+  indicator_height = slot_height * disp_rec_num / total_rec_num;
 
-	if( indicator_height < MINI_INDICATOR_HEIGHT )
-		indicator_height = MINI_INDICATOR_HEIGHT;
+  if (indicator_height < MINI_INDICATOR_HEIGHT)
+    indicator_height = MINI_INDICATOR_HEIGHT;
 
-	next_press_time = 0;
+  next_press_time = 0;
 }
 //------- End of function ScrollBar::init -------//
-
 
 //------- Begin of function ScrollBar::paint -------//
 //
 // [int] topRecNo = the top record no. (default : 1)
 //
-void ScrollBar::paint(int topRecNo)
-{
-	err_when( type == -1 );      // haven't been init()
+void ScrollBar::paint(int topRecNo) {
+  err_when(type == -1); // haven't been init()
 
-	if( if_flag )
-	{
-		vga_util.d3_panel_down( x1, y1, x2, y2, vga_front_only );      // scroll panel
+  if (if_flag) {
+    vga_util.d3_panel_down(x1, y1, x2, y2, vga_front_only); // scroll panel
 
-		//-------- cursor button --------//
+    //-------- cursor button --------//
 
-		if( type == VERTICAL )
-		{
-			vga_util.d3_panel_up( x1+2, y1+2 , x2-2, y1+13, vga_front_only);  // up button
-			vga_util.d3_panel_up( x1+2, y2-13, x2-2, y2-2 , vga_front_only);  // down button
-		}
-		else
-		{
-			vga_util.d3_panel_up( x1+2 , y1+2, x1+13, y2-2, vga_front_only);  // left button
-			vga_util.d3_panel_up( x2-13, y1+2, x2-2, y2-2 , vga_front_only);  // right button
-		}
-	}
-	else
-	{
-		Vga::active_buf->d3_panel_down( x1, y1, x2, y2 );      // scroll panel
+    if (type == VERTICAL) {
+      vga_util.d3_panel_up(x1 + 2, y1 + 2, x2 - 2, y1 + 13,
+                           vga_front_only); // up button
+      vga_util.d3_panel_up(x1 + 2, y2 - 13, x2 - 2, y2 - 2,
+                           vga_front_only); // down button
+    } else {
+      vga_util.d3_panel_up(x1 + 2, y1 + 2, x1 + 13, y2 - 2,
+                           vga_front_only); // left button
+      vga_util.d3_panel_up(x2 - 13, y1 + 2, x2 - 2, y2 - 2,
+                           vga_front_only); // right button
+    }
+  } else {
+    Vga::active_buf->d3_panel_down(x1, y1, x2, y2); // scroll panel
 
-		//-------- cursor button --------//
+    //-------- cursor button --------//
 
-		if( type == VERTICAL )
-		{
-			Vga::active_buf->d3_panel_up( x1+2, y1+2 , x2-2, y1+13);  // up button
-			Vga::active_buf->d3_panel_up( x1+2, y2-13, x2-2, y2-2 );  // down button
-		}
-		else
-		{
-			Vga::active_buf->d3_panel_up( x1+2 , y1+2, x1+13, y2-2);  // left button
-			Vga::active_buf->d3_panel_up( x2-13, y1+2, x2-2, y2-2 );  // right button
-		}
-	}
+    if (type == VERTICAL) {
+      Vga::active_buf->d3_panel_up(x1 + 2, y1 + 2, x2 - 2,
+                                   y1 + 13); // up button
+      Vga::active_buf->d3_panel_up(x1 + 2, y2 - 13, x2 - 2,
+                                   y2 - 2); // down button
+    } else {
+      Vga::active_buf->d3_panel_up(x1 + 2, y1 + 2, x1 + 13,
+                                   y2 - 2); // left button
+      Vga::active_buf->d3_panel_up(x2 - 13, y1 + 2, x2 - 2,
+                                   y2 - 2); // right button
+    }
+  }
 
-	//--------- display cursor bitmap ----------//
+  //--------- display cursor bitmap ----------//
 
-	if( type == VERTICAL )
-	{
-		image_icon.put_front( x1+4, y1+4 , "SCROLL_U" );
-		image_icon.put_front( x1+4, y2-11, "SCROLL_D" );
-	}
-	else
-	{
-		image_icon.put_front( x1+4 , y1+4, "SCROLL_L" );
-		image_icon.put_front( x2-11, y1+4, "SCROLL_R" );
-	}
+  if (type == VERTICAL) {
+    image_icon.put_front(x1 + 4, y1 + 4, "SCROLL_U");
+    image_icon.put_front(x1 + 4, y2 - 11, "SCROLL_D");
+  } else {
+    image_icon.put_front(x1 + 4, y1 + 4, "SCROLL_L");
+    image_icon.put_front(x2 - 11, y1 + 4, "SCROLL_R");
+  }
 
 #ifndef NO_REAL_TIME_UPDATE
-	sys.blt_virtual_buf_area( x1, y1, x2, y2 );
+  sys.blt_virtual_buf_area(x1, y1, x2, y2);
 #endif
 }
 //--------- End of function ScrollBar::paint ------------//
-
 
 //------- Begin of function ScrollBar::refresh -------//
 //
@@ -167,83 +161,77 @@ void ScrollBar::paint(int topRecNo)
 // [int] totalRec    = total no. of records
 //		       ( default: no change for the above 3 parameters )
 //
-void ScrollBar::refresh(int topRecNo, int forceRefresh, int pageSkipRec, int dispMaxRec, int totalRec)
-{
-	int oldTotalRec = total_rec_num;
+void ScrollBar::refresh(int topRecNo, int forceRefresh, int pageSkipRec,
+                        int dispMaxRec, int totalRec) {
+  int oldTotalRec = total_rec_num;
 
-	err_when( type == -1 );      // haven't been init()
+  err_when(type == -1); // haven't been init()
 
-   if( pageSkipRec >= 0 )
-      skip_rec_num  = pageSkipRec;
+  if (pageSkipRec >= 0)
+    skip_rec_num = pageSkipRec;
 
-   if( dispMaxRec >= 0 )
-      disp_rec_num  = dispMaxRec;
+  if (dispMaxRec >= 0)
+    disp_rec_num = dispMaxRec;
 
-   if( totalRec >= 0 )
-		total_rec_num = totalRec;
+  if (totalRec >= 0)
+    total_rec_num = totalRec;
 
-   if( total_rec_num==0 )       // at must at least be 1, otherwise divided by zero error will appear
-		total_rec_num=1;
+  if (total_rec_num ==
+      0) // at must at least be 1, otherwise divided by zero error will appear
+    total_rec_num = 1;
 
-   if( type == VERTICAL )
-      slot_height = y2-y1-28;
-   else
-      slot_height = x2-x1-28;
+  if (type == VERTICAL)
+    slot_height = y2 - y1 - 28;
+  else
+    slot_height = x2 - x1 - 28;
 
-	indicator_height = slot_height * disp_rec_num / total_rec_num;
+  indicator_height = slot_height * disp_rec_num / total_rec_num;
 
-	if( indicator_height < MINI_INDICATOR_HEIGHT )
-		indicator_height = MINI_INDICATOR_HEIGHT;
+  if (indicator_height < MINI_INDICATOR_HEIGHT)
+    indicator_height = MINI_INDICATOR_HEIGHT;
 
-	//------------- refresh display ----------------//
+  //------------- refresh display ----------------//
 
-	int newY;
+  int newY;
 
-	if( (newY=rec_to_y(topRecNo)) != indicator_y ||
-		 total_rec_num != oldTotalRec || forceRefresh )
-	{
-		indicator_y = newY;
+  if ((newY = rec_to_y(topRecNo)) != indicator_y ||
+      total_rec_num != oldTotalRec || forceRefresh) {
+    indicator_y = newY;
 
-		if( if_flag )
-		{
-			if( type == VERTICAL )
-			{
-				if( !vga.use_back_buf && !vga_front_only )
-					vga_util.blt_buf( x1, y1+12, x2, y2-13, 0 );
+    if (if_flag) {
+      if (type == VERTICAL) {
+        if (!vga.use_back_buf && !vga_front_only)
+          vga_util.blt_buf(x1, y1 + 12, x2, y2 - 13, 0);
 
-				Vga::active_buf->draw_d3_up_border( x1+2, indicator_y, x2-2, indicator_y+indicator_height-1 );
-			}
-			else
-			{
-				if( !vga.use_back_buf && !vga_front_only )
-					vga_util.blt_buf( x1+12, y1, x2-13, y2, 0 );
+        Vga::active_buf->draw_d3_up_border(x1 + 2, indicator_y, x2 - 2,
+                                           indicator_y + indicator_height - 1);
+      } else {
+        if (!vga.use_back_buf && !vga_front_only)
+          vga_util.blt_buf(x1 + 12, y1, x2 - 13, y2, 0);
 
-				Vga::active_buf->draw_d3_up_border( indicator_y, y1+2, indicator_y+indicator_height-1, y2-2 );
-			}
-		}
-		else
-		{
-			if( type == VERTICAL )
-			{
-				Vga::active_buf->d3_panel_down_clear( x1, y1+12, x2, y2-13 );
-				Vga::active_buf->d3_panel_up( x1+2, indicator_y, x2-2, indicator_y+indicator_height-1 );
-			}
-			else
-			{
-				Vga::active_buf->d3_panel_down_clear( x1+12, y1, x2-13, y2 );
-				Vga::active_buf->d3_panel_up( indicator_y, y1+2, indicator_y+indicator_height-1, y2-2 );
-			}
-		}
+        Vga::active_buf->draw_d3_up_border(
+            indicator_y, y1 + 2, indicator_y + indicator_height - 1, y2 - 2);
+      }
+    } else {
+      if (type == VERTICAL) {
+        Vga::active_buf->d3_panel_down_clear(x1, y1 + 12, x2, y2 - 13);
+        Vga::active_buf->d3_panel_up(x1 + 2, indicator_y, x2 - 2,
+                                     indicator_y + indicator_height - 1);
+      } else {
+        Vga::active_buf->d3_panel_down_clear(x1 + 12, y1, x2 - 13, y2);
+        Vga::active_buf->d3_panel_up(
+            indicator_y, y1 + 2, indicator_y + indicator_height - 1, y2 - 2);
+      }
+    }
 
-      top_rec_no = topRecNo;
-   }
+    top_rec_no = topRecNo;
+  }
 
 #ifndef NO_REAL_TIME_UPDATE
 //	sys.blt_virtual_buf_area( x1, y1, x2, y2 );
 #endif
 }
 //--------- End of function ScrollBar::refresh ------------//
-
 
 //------- Begin of function ScrollBar::update -------//
 //
@@ -258,184 +246,171 @@ void ScrollBar::refresh(int topRecNo, int forceRefresh, int pageSkipRec, int dis
 // [int] totalRec    = total no. of records
 //		       ( default: no change for the above 3 parameters )
 //
-void ScrollBar::update(int topRecNo)
-{
-  top_rec_no = topRecNo;
-}
+void ScrollBar::update(int topRecNo) { top_rec_no = topRecNo; }
 //--------- End of function ScrollBar::update ------------//
-
 
 //------- Begin of function ScrollBar::detect -------//
 //
 // Return : =0 if not pressed on scroll bar
 //          >0 the top record no.
 //
-int ScrollBar::detect()
-{
-   int pos, topRecNo=top_rec_no;
+int ScrollBar::detect() {
+  int pos, topRecNo = top_rec_no;
 
-   top_rec_flag = 1;   // whether the recno returned by detect()
-                       // is the top_recno or only current recno, is returned by detect_is_top()
+  top_rec_flag = 1; // whether the recno returned by detect()
+                    // is the top_recno or only current recno, is returned by
+                    // detect_is_top()
 
-   //----------- detect for pressing up button --------------//
+  //----------- detect for pressing up button --------------//
 
-	if( type==VERTICAL   && mouse.any_click( x1+2, y1+2, x2-2 , y1+13 ) ||
-		 type==HORIZONTAL && mouse.any_click( x1+2, y1+2, x1+13, y2-2  ) )
-	{
-		if( --topRecNo < 1 )
-			 topRecNo = 1;
+  if (type == VERTICAL && mouse.any_click(x1 + 2, y1 + 2, x2 - 2, y1 + 13) ||
+      type == HORIZONTAL && mouse.any_click(x1 + 2, y1 + 2, x1 + 13, y2 - 2)) {
+    if (--topRecNo < 1)
+      topRecNo = 1;
 
-		top_rec_flag=0;   // return by detect_is_top()
-	}
+    top_rec_flag = 0; // return by detect_is_top()
+  }
 
-	//----------- detect for pressing down button ------------//
+  //----------- detect for pressing down button ------------//
 
-	if( type==VERTICAL   && mouse.any_click( x1+2, y2-13, x2-2, y2-2 ) ||
-		 type==HORIZONTAL && mouse.any_click( x2-13,y1+2 , x2-2, y2-2 ) )
-	{
-		 if( page_type )  // top record can't be the last record
-		 {
-			  if( ++topRecNo > total_rec_num - disp_rec_num+1 )
-				  topRecNo = total_rec_num - disp_rec_num + 1;
-		 }
-		 else             // top record can be the last record
-		 {
-			  if( ++topRecNo > total_rec_num )
-				  topRecNo = total_rec_num;
-		 }
+  if (type == VERTICAL && mouse.any_click(x1 + 2, y2 - 13, x2 - 2, y2 - 2) ||
+      type == HORIZONTAL && mouse.any_click(x2 - 13, y1 + 2, x2 - 2, y2 - 2)) {
+    if (page_type) // top record can't be the last record
+    {
+      if (++topRecNo > total_rec_num - disp_rec_num + 1)
+        topRecNo = total_rec_num - disp_rec_num + 1;
+    } else // top record can be the last record
+    {
+      if (++topRecNo > total_rec_num)
+        topRecNo = total_rec_num;
+    }
 
-		 top_rec_flag=0;
-	}
+    top_rec_flag = 0;
+  }
 
-	//------ detect for pressing on scroll slot but not indicator -------//
+  //------ detect for pressing on scroll slot but not indicator -------//
 
-	if( type==VERTICAL   && mouse.any_click( x1+2 , y1+14, x2-2 , y2-14 ) ||
-		 type==HORIZONTAL && mouse.any_click( x1+14, y1+2 , x2-14, y2-2  ) ||
-		 mouse.key_code == KEY_PGUP || mouse.key_code == KEY_PGDN )
-	{
-		if( type==VERTICAL )
-			pos = mouse.click_y();
-		else
-			pos = mouse.click_x();
+  if (type == VERTICAL && mouse.any_click(x1 + 2, y1 + 14, x2 - 2, y2 - 14) ||
+      type == HORIZONTAL && mouse.any_click(x1 + 14, y1 + 2, x2 - 14, y2 - 2) ||
+      mouse.key_code == KEY_PGUP || mouse.key_code == KEY_PGDN) {
+    if (type == VERTICAL)
+      pos = mouse.click_y();
+    else
+      pos = mouse.click_x();
 
-		if( pos < indicator_y || mouse.key_code == KEY_PGUP )   // page up
-		{
-			if( ( topRecNo -= skip_rec_num ) < 1 )
-				topRecNo = 1;
-		}
+    if (pos < indicator_y || mouse.key_code == KEY_PGUP) // page up
+    {
+      if ((topRecNo -= skip_rec_num) < 1)
+        topRecNo = 1;
+    }
 
-		else if( pos >= indicator_y+indicator_height || mouse.key_code == KEY_PGDN )   // page down
-		{
-			if( (topRecNo += skip_rec_num) > total_rec_num - disp_rec_num+1 )
-			{
-				topRecNo = total_rec_num - disp_rec_num + 1;
+    else if (pos >= indicator_y + indicator_height ||
+             mouse.key_code == KEY_PGDN) // page down
+    {
+      if ((topRecNo += skip_rec_num) > total_rec_num - disp_rec_num + 1) {
+        topRecNo = total_rec_num - disp_rec_num + 1;
 
-				if ( topRecNo < 1 )
-					topRecNo = 1;
-			}
-		}
-   }
+        if (topRecNo < 1)
+          topRecNo = 1;
+      }
+    }
+  }
 
-   //--------- check if display all needed -----------//
+  //--------- check if display all needed -----------//
 
-   if( topRecNo != top_rec_no )
-   {
-		if( misc.get_time() >= next_press_time )  // prevent too fast scrolling
-		{
-			refresh(topRecNo,1);
+  if (topRecNo != top_rec_no) {
+    if (misc.get_time() >= next_press_time) // prevent too fast scrolling
+    {
+      refresh(topRecNo, 1);
 
-			next_press_time = misc.get_time() + PRESS_INT_TIME;
+      next_press_time = misc.get_time() + PRESS_INT_TIME;
 
-			return topRecNo;
-		}
-   }
+      return topRecNo;
+    }
+  }
 
+  //-------- detect for pulling indicator ------------//
 
-   //-------- detect for pulling indicator ------------//
+  if (type == VERTICAL && mouse.any_click(x1 + 2, indicator_y, x2 - 2,
+                                          indicator_y + indicator_height - 1) ||
+      type == HORIZONTAL &&
+          mouse.any_click(indicator_y, y1 + 2,
+                          indicator_y + indicator_height - 1, y2 - 2)) {
+    int lastMouseY = -1;
 
-   if( type==VERTICAL   && mouse.any_click( x1+2 , indicator_y, x2-2, indicator_y+indicator_height-1 ) ||
-       type==HORIZONTAL && mouse.any_click( indicator_y, y1+2, indicator_y+indicator_height-1, y2-2  ) )
-   {
-      int lastMouseY = -1;
+    while (mouse.left_press) {
+      sys.yield();
 
-      while( mouse.left_press )
-		{
-			sys.yield();
+      if (type == VERTICAL) {
+        if (mouse.left_press && lastMouseY != mouse.cur_y) {
+          indicator_y = mouse.cur_y - indicator_height / 2;
 
-			if( type==VERTICAL )
-         {
-				if( mouse.left_press && lastMouseY != mouse.cur_y )
-            {
-					indicator_y = mouse.cur_y-indicator_height/2;
+          if (indicator_y < y1 + 14)
+            indicator_y = y1 + 14;
 
-               if( indicator_y < y1+14 )
-                  indicator_y = y1+14;
+          if (indicator_y > y2 - 14 - indicator_height)
+            indicator_y = y2 - 14 - indicator_height;
 
-               if( indicator_y > y2-14-indicator_height )
-						indicator_y = y2-14-indicator_height;
+          if (if_flag) {
+            if (!vga.use_back_buf && !vga_front_only)
+              vga_util.blt_buf(x1, y1 + 12, x2, y2 - 13, 0);
 
-					if( if_flag )
-					{
-						if( !vga.use_back_buf && !vga_front_only )
-							vga_util.blt_buf( x1, y1+12, x2, y2-13, 0 );
+            Vga::active_buf->draw_d3_up_border(x1 + 2, indicator_y, x2 - 2,
+                                               indicator_y + indicator_height -
+                                                   1);
+          } else {
+            Vga::active_buf->d3_panel_down_clear(x1, y1 + 12, x2,
+                                                 y2 - 13); // scroll panel
+            Vga::active_buf->d3_panel_down(x1 + 2, indicator_y, x2 - 2,
+                                           indicator_y + indicator_height - 1);
+          }
 
-						Vga::active_buf->draw_d3_up_border( x1+2, indicator_y, x2-2, indicator_y+indicator_height-1 );
-					}
-					else
-					{
-						Vga::active_buf->d3_panel_down_clear( x1, y1+12, x2, y2-13 );      // scroll panel
-						Vga::active_buf->d3_panel_down( x1+2, indicator_y, x2-2, indicator_y+indicator_height-1 );
-					}
+          lastMouseY = mouse.cur_y;
+        }
+      } else {
+        if (mouse.left_press && lastMouseY != mouse.cur_x) {
+          indicator_y = mouse.cur_x - indicator_height / 2;
 
-					lastMouseY = mouse.cur_y;
-				}
-			}
-			else
-			{
-				if( mouse.left_press && lastMouseY != mouse.cur_x )
-				{
-					indicator_y = mouse.cur_x-indicator_height/2;
+          if (indicator_y < x1 + 14)
+            indicator_y = x1 + 14;
 
-					if( indicator_y < x1+14 )
-						indicator_y = x1+14;
+          if (indicator_y > x2 - 14 - indicator_height)
+            indicator_y = x2 - 14 - indicator_height;
 
-					if( indicator_y > x2-14-indicator_height )
-						indicator_y = x2-14-indicator_height;
+          if (if_flag) {
+            if (!vga.use_back_buf && !vga_front_only)
+              vga_util.blt_buf(x1 + 12, y1, x2 - 13, y2, 0);
 
-					if( if_flag )
-					{
-						if( !vga.use_back_buf && !vga_front_only )
-							vga_util.blt_buf( x1+12, y1, x2-13, y2, 0 );
+            Vga::active_buf->draw_d3_up_border(
+                indicator_y, y1 + 2, indicator_y + indicator_height - 1,
+                y2 - 2);
+          } else {
+            Vga::active_buf->d3_panel_down_clear(x1 + 12, y1, x2 - 13, y2);
+            Vga::active_buf->d3_panel_down(indicator_y, y1 + 2,
+                                           indicator_y + indicator_height - 1,
+                                           y2 - 2);
+          }
 
-						Vga::active_buf->draw_d3_up_border( indicator_y, y1+2, indicator_y+indicator_height-1, y2-2 );
-					}
-					else
-					{
-						Vga::active_buf->d3_panel_down_clear( x1+12, y1, x2-13, y2 );
-						Vga::active_buf->d3_panel_down ( indicator_y, y1+2, indicator_y+indicator_height-1, y2-2 );
-					}
-
-					lastMouseY = mouse.cur_x;
-				}
-			}
+          lastMouseY = mouse.cur_x;
+        }
+      }
 
 #ifndef NO_REAL_TIME_UPDATE
-			if( !Vga::use_back_buf )
-				sys.blt_virtual_buf_area( x1, y1, x2, y2 );
+      if (!Vga::use_back_buf)
+        sys.blt_virtual_buf_area(x1, y1, x2, y2);
 #endif
-		}
+    }
 
-		refresh(y_to_rec(indicator_y),1);
+    refresh(y_to_rec(indicator_y), 1);
 
-		return top_rec_no;
-	}
+    return top_rec_no;
+  }
 
-	//-----------------------------------------------------------//
+  //-----------------------------------------------------------//
 
-	return 0;
+  return 0;
 }
 //--------- End of function ScrollBar::detect ------------//
-
 
 //--------- Begin of function ScrollBar::page_up -------//
 //
@@ -449,20 +424,17 @@ int ScrollBar::detect()
 //
 // return : <int> the top recno after scrolling
 //
-int ScrollBar::page_up(int skipLess)
-{
-   if( top_rec_no > 1 )
-   {
-      if( (top_rec_no-=skip_rec_num-skipLess) < 1 )
-         top_rec_no = 1;
+int ScrollBar::page_up(int skipLess) {
+  if (top_rec_no > 1) {
+    if ((top_rec_no -= skip_rec_num - skipLess) < 1)
+      top_rec_no = 1;
 
-      refresh(top_rec_no,1);
-	}
+    refresh(top_rec_no, 1);
+  }
 
-	return top_rec_no;
+  return top_rec_no;
 }
 //--------- End of function ScrollBar::page_up ----------//
-
 
 //--------- Begin of function ScrollBar::page_down -------//
 //
@@ -476,94 +448,83 @@ int ScrollBar::page_up(int skipLess)
 //
 // return : <int> the top recno after scrolling
 //
-int ScrollBar::page_down(int skipLess)
-{
-   if( top_rec_no < total_rec_num - disp_rec_num + 1 )
-   {
-      if( (top_rec_no += skip_rec_num-skipLess) > total_rec_num - disp_rec_num + 1 )
-      {
-         top_rec_no = total_rec_num - disp_rec_num + 1;
+int ScrollBar::page_down(int skipLess) {
+  if (top_rec_no < total_rec_num - disp_rec_num + 1) {
+    if ((top_rec_no += skip_rec_num - skipLess) >
+        total_rec_num - disp_rec_num + 1) {
+      top_rec_no = total_rec_num - disp_rec_num + 1;
 
-         if( top_rec_no < 1 )
-            top_rec_no = 1;
-      }
+      if (top_rec_no < 1)
+        top_rec_no = 1;
+    }
 
-		refresh(top_rec_no,1);
-	}
+    refresh(top_rec_no, 1);
+  }
 
-   return top_rec_no;
+  return top_rec_no;
 }
 //--------- End of function ScrollBar::page_down ----------//
-
 
 //--------- Begin of function ScrollBar::detect_top_rec -------//
 //
 // return whether the recno returned by detect()
 // is the top_recno or only current recno
 //
-int ScrollBar::detect_top_rec()
-{
-   if( top_rec_flag )
-   {
-      if( top_rec_no > total_rec_num - disp_rec_num+1 )
-         return total_rec_num - disp_rec_num + 1;
-      else
-         return top_rec_no;
-   }
-   else
-      return 0;
+int ScrollBar::detect_top_rec() {
+  if (top_rec_flag) {
+    if (top_rec_no > total_rec_num - disp_rec_num + 1)
+      return total_rec_num - disp_rec_num + 1;
+    else
+      return top_rec_no;
+  } else
+    return 0;
 }
 //--------- End of function ScrollBar::detect_top_rec ----------//
-
 
 //--------- Begin of function ScrollBar::rec_to_y -------//
 //
 // Convert from record no. to y position of scroll bar indicator
 //
-int ScrollBar::rec_to_y(int recNo)
-{
-   int t;
+int ScrollBar::rec_to_y(int recNo) {
+  int t;
 
-   if( total_rec_num <= 1 || disp_rec_num == total_rec_num )
-      t = 0;
-   else
-   {
-      t = (slot_height-indicator_height) * (recNo-1) / (total_rec_num-disp_rec_num);
+  if (total_rec_num <= 1 || disp_rec_num == total_rec_num)
+    t = 0;
+  else {
+    t = (slot_height - indicator_height) * (recNo - 1) /
+        (total_rec_num - disp_rec_num);
 
-		if( t+indicator_height > slot_height )
-			t = slot_height-indicator_height;
-	}
+    if (t + indicator_height > slot_height)
+      t = slot_height - indicator_height;
+  }
 
-	if( type == VERTICAL )
-		return y1 + 14 + t;
-	else
-		return x1 + 14 + t;
+  if (type == VERTICAL)
+    return y1 + 14 + t;
+  else
+    return x1 + 14 + t;
 }
 //---------- End of function ScrollBar::rec_to_y ----------//
-
-
 
 //--------- Begin of function ScrollBar::y_to_rec -------//
 //
 // Convert from y position of scroll bar indicator to record no.
 //
-int ScrollBar::y_to_rec(int y)
-{
+int ScrollBar::y_to_rec(int y) {
   int t;
 
-  if( total_rec_num == 0 )
-     return 0;
+  if (total_rec_num == 0)
+    return 0;
 
-  if( slot_height-indicator_height == 0 || disp_rec_num == total_rec_num )
-	  return 1;
+  if (slot_height - indicator_height == 0 || disp_rec_num == total_rec_num)
+    return 1;
 
-  if( type == VERTICAL )
-     t = y1;
+  if (type == VERTICAL)
+    t = y1;
   else
-     t = x1;
+    t = x1;
 
-  return (y-t-14) * (total_rec_num-disp_rec_num) / (slot_height-indicator_height) + 1;
+  return (y - t - 14) * (total_rec_num - disp_rec_num) /
+             (slot_height - indicator_height) +
+         1;
 }
 //---------- End of function ScrollBar::y_to_rec ----------//
-
-

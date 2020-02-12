@@ -18,8 +18,8 @@
  *
  */
 
-//Filename    : OFIRMA.H
-//Description : Object Firm Array
+// Filename    : OFIRMA.H
+// Description : Object Firm Array
 
 #ifndef __OFIRMA_H
 #define __OFIRMA_H
@@ -32,58 +32,61 @@
 
 class Firm;
 
-class FirmArray : public DynArrayB
-{
+class FirmArray : public DynArrayB {
 public:
-	int	 selected_recno;		// the firm current being selected
+  int selected_recno; // the firm current being selected
 
 private:
-	int    process_recno;
+  int process_recno;
 
 public:
-   FirmArray();
-   ~FirmArray();
+  FirmArray();
+  ~FirmArray();
 
-	void  init();
-   void  deinit();
+  void init();
+  void deinit();
 
-	int 	build_firm(int xLoc, int yLoc, int nationRecno, int firmId, char* buildCode=NULL, short builderRecno=0, bool isUpgrade=false, bool noCost=false);
-	int 	generate_firm(int xLoc, int yLoc, int nationRecno, int firmId, char* buildCode=NULL);
-	int   create_firm(int);
-   void  del_firm(int);
-	int   firm_class_size(int);
-	void 	upgrade_firm(int oldFirmRecno, int newFirmId);
+  int build_firm(int xLoc, int yLoc, int nationRecno, int firmId,
+                 char *buildCode = NULL, short builderRecno = 0,
+                 bool isUpgrade = false, bool noCost = false);
+  int generate_firm(int xLoc, int yLoc, int nationRecno, int firmId,
+                    char *buildCode = NULL);
+  int create_firm(int);
+  void del_firm(int);
+  int firm_class_size(int);
+  void upgrade_firm(int oldFirmRecno, int newFirmId);
 
-	int   process();
-	void  next_day();
-	void  next_month();
-	void  next_year();
+  int process();
+  void next_day();
+  void next_month();
+  void next_year();
 
-	void	draw_dot(int filterFirmId=0);
-	void	draw_profile();
-	void  skip(int);
+  void draw_dot(int filterFirmId = 0);
+  void draw_profile();
+  void skip(int);
 
-	int   write_file(File*);
-	int   read_file(File*);
+  int write_file(File *);
+  int read_file(File *);
 
-	#ifdef DEBUG
-		Firm* operator()();             // reference to current Firm record
-		Firm* operator[](int recNo);
-	#else
-		Firm* operator()()	    		{ return (Firm*) get_ptr(); }
-		Firm* operator[](int recNo)   { return (Firm*) get_ptr(recNo); }
-	#endif
+#ifdef DEBUG
+  Firm *operator()(); // reference to current Firm record
+  Firm *operator[](int recNo);
+#else
+  Firm *operator()() { return (Firm *)get_ptr(); }
+  Firm *operator[](int recNo) { return (Firm *)get_ptr(recNo); }
+#endif
 
-	int   is_deleted(int recNo)    // whether the item is deleted or not
-			{ return get_ptr(recNo) == NULL; }
-
+  int is_deleted(int recNo) // whether the item is deleted or not
+  {
+    return get_ptr(recNo) == NULL;
+  }
 };
 
 //---------------------------------------------//
 
-class  MLink;
+class MLink;
 
-extern MLink     firm_mlink;
+extern MLink firm_mlink;
 extern FirmArray firm_array;
 
 //---------------------------------------------//

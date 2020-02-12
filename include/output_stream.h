@@ -23,37 +23,31 @@
 #include <stdint.h>
 #include <stdio.h>
 
-class OutputStream
-{
+class OutputStream {
 public:
-   virtual ~OutputStream() {}
-   virtual long write(const void *data, long length) = 0;
-   virtual bool seek(long offset, int whence) = 0;
-   virtual long tell() = 0;
-   virtual void close() = 0;
+  virtual ~OutputStream() {}
+  virtual long write(const void *data, long length) = 0;
+  virtual bool seek(long offset, int whence) = 0;
+  virtual long tell() = 0;
+  virtual void close() = 0;
 };
 
 /* Writes a little-endian integer */
-template <typename T>
-bool write_le_integer(OutputStream *os, T val)
-{
-   unsigned char c;
+template <typename T> bool write_le_integer(OutputStream *os, T val) {
+  unsigned char c;
 
-   for (int n = 0; n < static_cast<int>(sizeof(T)); n++)
-   {
-      c = val >> (8 * n);
+  for (int n = 0; n < static_cast<int>(sizeof(T)); n++) {
+    c = val >> (8 * n);
 
-      if (os->write(&c, 1) != 1)
-	 return false;
-   }
+    if (os->write(&c, 1) != 1)
+      return false;
+  }
 
-   return true;
+  return true;
 }
 
-template <typename T>
-bool write_le(OutputStream *os, T val)
-{
-   return write_le_integer<T>(os, val);
+template <typename T> bool write_le(OutputStream *os, T val) {
+  return write_le_integer<T>(os, val);
 }
 
 template <> bool write_le<float>(OutputStream *os, float val);

@@ -24,51 +24,38 @@
 // Mainly used by ODPLAY.CPP to separate OVGA.H
 // some GUID initialization problems exist if OVGA.H is included in ODPLAY.CPP
 
-#include <ovgalock.h>
-#include <ovgabuf.h>
 #include <omouse.h>
+#include <ovgabuf.h>
+#include <ovgalock.h>
 
-
-VgaFrontLock::VgaFrontLock()
-{
-	if( vga_front.is_inited() )
-		vga_front.temp_unlock();
-	if( vga_back.is_inited() )
-		vga_back.temp_unlock();
+VgaFrontLock::VgaFrontLock() {
+  if (vga_front.is_inited())
+    vga_front.temp_unlock();
+  if (vga_back.is_inited())
+    vga_back.temp_unlock();
 }
 
-VgaFrontLock::~VgaFrontLock()
-{
-	if( vga_back.is_inited() )
-		vga_back.temp_restore_lock();
-	if( vga_front.is_inited() )
-		vga_front.temp_restore_lock();
+VgaFrontLock::~VgaFrontLock() {
+  if (vga_back.is_inited())
+    vga_back.temp_restore_lock();
+  if (vga_front.is_inited())
+    vga_front.temp_restore_lock();
 }
 
-VgaFrontReLock::VgaFrontReLock()
-{
-	if( vga_front.is_inited() )
-		vga_front.temp_lock();
-	if( vga_back.is_inited() )
-		vga_back.temp_lock();
+VgaFrontReLock::VgaFrontReLock() {
+  if (vga_front.is_inited())
+    vga_front.temp_lock();
+  if (vga_back.is_inited())
+    vga_back.temp_lock();
 }
 
-VgaFrontReLock::~VgaFrontReLock()
-{
-	if( vga_back.is_inited() )
-		vga_back.temp_restore_unlock();
-	if( vga_front.is_inited() )
-		vga_front.temp_restore_unlock();
+VgaFrontReLock::~VgaFrontReLock() {
+  if (vga_back.is_inited())
+    vga_back.temp_restore_unlock();
+  if (vga_front.is_inited())
+    vga_front.temp_restore_unlock();
 }
 
+MouseDispCount::MouseDispCount() { mouse.disp_count_start(); }
 
-MouseDispCount::MouseDispCount()
-{
-	mouse.disp_count_start();
-}
-
-MouseDispCount::~MouseDispCount()
-{
-	mouse.disp_count_end();
-}
-
+MouseDispCount::~MouseDispCount() { mouse.disp_count_end(); }

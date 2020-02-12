@@ -18,17 +18,16 @@
  *
  */
 
-//Filename    : OIMGES.CPP
-//Description : Object ImageRes
+// Filename    : OIMGES.CPP
+// Description : Object ImageRes
 
 #include <string.h>
 
 #include <all.h>
-#include <ovga.h>
-#include <omouse.h>
-#include <oimgres.h>
 #include <obitmap.h>
-
+#include <oimgres.h>
+#include <omouse.h>
+#include <ovga.h>
 
 //--------- Format of RES file ------------//
 //
@@ -42,21 +41,19 @@
 //
 //--------------------------------------------//
 
-
 //------- Start of function ImageRes::ImageRes -------//
 //
 // <char*> resName   = name of the resource file (e.g. "GIF.RES")
-// [int]   readAll   = whether read all data into the buffer or read one each time
+// [int]   readAll   = whether read all data into the buffer or read one each
+// time
 //                     (default:0)
-// [int]   useCommonBuf = whether use the sys common buffer to store the data or not
+// [int]   useCommonBuf = whether use the sys common buffer to store the data or
+// not
 //                     (default:0)
 //
-ImageRes::ImageRes(const char* resFile, int readAll, int useCommonBuf) :
-					  ResourceIdx(resFile, readAll, useCommonBuf)
-{
-}
+ImageRes::ImageRes(const char *resFile, int readAll, int useCommonBuf)
+    : ResourceIdx(resFile, readAll, useCommonBuf) {}
 //--------- End of function ImageRes::ImageRes -------//
-
 
 //-------- Start of function ImageRes::put_front --------//
 //
@@ -65,24 +62,24 @@ ImageRes::ImageRes(const char* resFile, int readAll, int useCommonBuf) :
 // [int] compressFlag = compress flag
 //								(default: 0)
 //
-void ImageRes::put_front(int x, int y, const char* imageName, int compressFlag)
-{
-	char* bitmapPtr = ResourceIdx::read(imageName);
+void ImageRes::put_front(int x, int y, const char *imageName,
+                         int compressFlag) {
+  char *bitmapPtr = ResourceIdx::read(imageName);
 
-	if(!bitmapPtr)
-		return;
+  if (!bitmapPtr)
+    return;
 
-	mouse.hide_area( x, y, x+*((short*)bitmapPtr)-1, y+*(((short*)bitmapPtr)+1)-1 );
+  mouse.hide_area(x, y, x + *((short *)bitmapPtr) - 1,
+                  y + *(((short *)bitmapPtr) + 1) - 1);
 
-	if( compressFlag )
-		vga_front.put_bitmap_trans_decompress( x, y, bitmapPtr );
-	else
-		vga_front.put_bitmap_trans( x, y, bitmapPtr );
+  if (compressFlag)
+    vga_front.put_bitmap_trans_decompress(x, y, bitmapPtr);
+  else
+    vga_front.put_bitmap_trans(x, y, bitmapPtr);
 
-	mouse.show_area();
+  mouse.show_area();
 }
 //---------- End of function ImageRes::put_front --------//
-
 
 //-------- Start of function ImageRes::put_back --------//
 //
@@ -91,20 +88,17 @@ void ImageRes::put_front(int x, int y, const char* imageName, int compressFlag)
 // [int] compressFlag = compress flag
 //								(default: 0)
 //
-void ImageRes::put_back(int x, int y, const char* imageName, int compressFlag)
-{
-	char* bitmapPtr = ResourceIdx::read(imageName);
+void ImageRes::put_back(int x, int y, const char *imageName, int compressFlag) {
+  char *bitmapPtr = ResourceIdx::read(imageName);
 
-	if( bitmapPtr )
-	{
-		if( compressFlag )
-			vga_back.put_bitmap_trans_decompress( x, y, bitmapPtr );
-		else
-			vga_back.put_bitmap_trans( x, y, bitmapPtr );
-	}
+  if (bitmapPtr) {
+    if (compressFlag)
+      vga_back.put_bitmap_trans_decompress(x, y, bitmapPtr);
+    else
+      vga_back.put_bitmap_trans(x, y, bitmapPtr);
+  }
 }
 //---------- End of function ImageRes::put_back --------//
-
 
 //-------- Start of function ImageRes::put_front --------//
 //
@@ -113,24 +107,23 @@ void ImageRes::put_back(int x, int y, const char* imageName, int compressFlag)
 // [int] compressFlag = compress flag
 //								(default: 0)
 //
-void ImageRes::put_front(int x, int y, int bitmapId, int compressFlag)
-{
-	char* bitmapPtr = ResourceIdx::get_data(bitmapId);
+void ImageRes::put_front(int x, int y, int bitmapId, int compressFlag) {
+  char *bitmapPtr = ResourceIdx::get_data(bitmapId);
 
-	if( !bitmapPtr )
-		return;
+  if (!bitmapPtr)
+    return;
 
-	mouse.hide_area( x, y, x+*((short*)bitmapPtr)-1, y+*(((short*)bitmapPtr)+1)-1 );
+  mouse.hide_area(x, y, x + *((short *)bitmapPtr) - 1,
+                  y + *(((short *)bitmapPtr) + 1) - 1);
 
-	if( compressFlag )
-		vga_front.put_bitmap_trans_decompress( x, y, bitmapPtr );
-	else
-		vga_front.put_bitmap_trans( x, y, bitmapPtr );
+  if (compressFlag)
+    vga_front.put_bitmap_trans_decompress(x, y, bitmapPtr);
+  else
+    vga_front.put_bitmap_trans(x, y, bitmapPtr);
 
-	mouse.show_area();
+  mouse.show_area();
 }
 //---------- End of function ImageRes::put_front --------//
-
 
 //-------- Start of function ImageRes::put_back --------//
 //
@@ -139,42 +132,38 @@ void ImageRes::put_front(int x, int y, int bitmapId, int compressFlag)
 // [int] compressFlag = compress flag
 //								(default: 0)
 //
-void ImageRes::put_back(int x, int y, int bitmapId, int compressFlag)
-{
-	char* bitmapPtr = ResourceIdx::get_data(bitmapId);
+void ImageRes::put_back(int x, int y, int bitmapId, int compressFlag) {
+  char *bitmapPtr = ResourceIdx::get_data(bitmapId);
 
-	if( bitmapPtr )
-	{
-		if( compressFlag )
-			vga_back.put_bitmap_trans_decompress( x, y, bitmapPtr );
-		else
-			vga_back.put_bitmap_trans( x, y, bitmapPtr );
-	}
+  if (bitmapPtr) {
+    if (compressFlag)
+      vga_back.put_bitmap_trans_decompress(x, y, bitmapPtr);
+    else
+      vga_back.put_bitmap_trans(x, y, bitmapPtr);
+  }
 }
 //---------- End of function ImageRes::put_back --------//
-
 
 //-------- Start of function ImageRes::put_join --------//
 //
 // int 	x,y       = the location of the image
 // char* imageName = name of the image
 //
-void ImageRes::put_join(int x, int y, const char* imageName)
-{
-	char* bitmapPtr = ResourceIdx::read(imageName);
+void ImageRes::put_join(int x, int y, const char *imageName) {
+  char *bitmapPtr = ResourceIdx::read(imageName);
 
-	if( !bitmapPtr )
-		return;
+  if (!bitmapPtr)
+    return;
 
-	mouse.hide_area( x, y, x+((Bitmap *)bitmapPtr)->get_width()-1, y+((Bitmap *)bitmapPtr)->get_height()-1 );
+  mouse.hide_area(x, y, x + ((Bitmap *)bitmapPtr)->get_width() - 1,
+                  y + ((Bitmap *)bitmapPtr)->get_height() - 1);
 
-	if( bitmapPtr )
-		vga_front.join_trans( &vga_back, x, y, bitmapPtr );
+  if (bitmapPtr)
+    vga_front.join_trans(&vga_back, x, y, bitmapPtr);
 
-	mouse.show_area();
+  mouse.show_area();
 }
 //---------- End of function ImageRes::put_join --------//
-
 
 //-------- Start of function ImageRes::put_large --------//
 //
@@ -188,14 +177,12 @@ void ImageRes::put_join(int x, int y, const char* imageName)
 // <int>	    x,y       = the location of the image
 // <char*>   imageName = name of the image
 //
-void ImageRes::put_large(VgaBuf* vgaBuf, int x, int y, const char* imageName)
-{
-	int dataSize;
+void ImageRes::put_large(VgaBuf *vgaBuf, int x, int y, const char *imageName) {
+  int dataSize;
 
-	vgaBuf->put_large_bitmap( x, y, ResourceIdx::get_file(imageName, dataSize) );
+  vgaBuf->put_large_bitmap(x, y, ResourceIdx::get_file(imageName, dataSize));
 }
 //---------- End of function ImageRes::put_large --------//
-
 
 //-------- Start of function ImageRes::put_large --------//
 //
@@ -207,38 +194,33 @@ void ImageRes::put_large(VgaBuf* vgaBuf, int x, int y, const char* imageName)
 //
 // <VgaBuf*> vgaBuf 	  = the vga buffer for display
 // <int>	    x,y       = the location of the image
-// <int>		 bitmapId  = id. of the bitmap in the bitmap resource file.
+// <int>		 bitmapId  = id. of the bitmap in the bitmap resource
+// file.
 //
-void ImageRes::put_large(VgaBuf* vgaBuf, int x, int y, int bitmapId)
-{
-	int dataSize;
+void ImageRes::put_large(VgaBuf *vgaBuf, int x, int y, int bitmapId) {
+  int dataSize;
 
-	vgaBuf->put_large_bitmap( x, y, ResourceIdx::get_file(bitmapId, dataSize) );
+  vgaBuf->put_large_bitmap(x, y, ResourceIdx::get_file(bitmapId, dataSize));
 }
 //---------- End of function ImageRes::put_large --------//
 
 //-------- Start of function ImageRes::put_to_buf --------//
 //
-// Put the image to the specified Vga buffer. 
+// Put the image to the specified Vga buffer.
 //
 // <VgaBuf*> vgaBufPtr = the pointer to the Vga buffer
 // <char*>	 imageName = name of the image
 //
-void ImageRes::put_to_buf(VgaBuf* vgaBufPtr, const char* imageName)
-{
-	if( read_all )
-	{
-		vgaBufPtr->put_bitmap(0, 0, get_ptr(imageName));
-	}
-	else
-	{
-		int	dataSize;
-		File* filePtr = get_file(imageName, dataSize);
-		vgaBufPtr->put_large_bitmap(0, 0, filePtr);
-	}
+void ImageRes::put_to_buf(VgaBuf *vgaBufPtr, const char *imageName) {
+  if (read_all) {
+    vgaBufPtr->put_bitmap(0, 0, get_ptr(imageName));
+  } else {
+    int dataSize;
+    File *filePtr = get_file(imageName, dataSize);
+    vgaBufPtr->put_large_bitmap(0, 0, filePtr);
+  }
 }
 //---------- End of function ImageRes::put_to_buf --------//
-
 
 //-------- Start of function ImageRes::put_to_buf --------//
 //
@@ -247,17 +229,13 @@ void ImageRes::put_to_buf(VgaBuf* vgaBufPtr, const char* imageName)
 // <VgaBuf*> vgaBufPtr = the pointer to the Vga buffer
 // <int>     bitmapId  = id. of the bitmap in the resource file.
 //
-void ImageRes::put_to_buf(VgaBuf* vgaBufPtr, int bitmapId)
-{
-	if( read_all )
-	{
-		vgaBufPtr->put_bitmap(0, 0, get_data(bitmapId));
-	}
-	else
-	{
-		int	dataSize;
-		File* filePtr = get_file(bitmapId, dataSize);
-		vgaBufPtr->put_large_bitmap(0, 0, filePtr);
-	}
+void ImageRes::put_to_buf(VgaBuf *vgaBufPtr, int bitmapId) {
+  if (read_all) {
+    vgaBufPtr->put_bitmap(0, 0, get_data(bitmapId));
+  } else {
+    int dataSize;
+    File *filePtr = get_file(bitmapId, dataSize);
+    vgaBufPtr->put_large_bitmap(0, 0, filePtr);
+  }
 }
 //---------- End of function ImageRes::put_to_buf --------//

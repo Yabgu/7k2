@@ -18,37 +18,35 @@
  *
  */
 
-//Filename    : ODIR.H
-//Description : Object Directory Header
+// Filename    : ODIR.H
+// Description : Object Directory Header
 
 #ifndef __ODIR_H
 #define __ODIR_H
 
-#include <win32_compat.h>
-#include <odynarr.h>
 #include <boost/filesystem/path.hpp>
+#include <odynarr.h>
+#include <win32_compat.h>
 
 //---------- Define struct FileInfo ----------//
 
-struct FileInfo
-{
-    char				name[MAX_PATH+1];
-    unsigned long size;
-	 FILETIME		time;
+struct FileInfo {
+  char name[MAX_PATH + 1];
+  unsigned long size;
+  FILETIME time;
 };
 
 //---------- Define class Directory ----------//
 
-class Directory : public DynArray
-{
+class Directory : public DynArray {
 private:
-   boost::filesystem::path base;
+  boost::filesystem::path base;
 
 public:
-   Directory(const boost::filesystem::path& base = ".");
+  Directory(const boost::filesystem::path &base = ".");
 
-   int       read(const char*, int=0);
-   FileInfo* operator[](int recNo)  { return (FileInfo*) get(recNo); }
+  int read(const char *, int = 0);
+  FileInfo *operator[](int recNo) { return (FileInfo *)get(recNo); }
 };
 
 //--------------------------------------------//

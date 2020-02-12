@@ -23,19 +23,18 @@
 #include <ofile.h>
 #include <output_stream.h>
 
-class FileOutputStream: public OutputStream
-{
+class FileOutputStream : public OutputStream {
 private:
-   File *file;
+  File *file;
 
 public:
-   FileOutputStream();
-   ~FileOutputStream();
-   bool open(File *file);
-   long write(const void *data, long length);
-   bool seek(long offset, int whence);
-   long tell();
-   void close();
+  FileOutputStream();
+  ~FileOutputStream();
+  bool open(File *file);
+  long write(const void *data, long length);
+  bool seek(long offset, int whence);
+  long tell();
+  void close();
 };
 
 /* vim: set ts=8 sw=3: */

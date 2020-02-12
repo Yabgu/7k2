@@ -21,40 +21,31 @@
 // Filename    : OF_OFF.CPP
 // Description : magic tower
 
-#include <of_off.h>
-#include <of_magi.h>
 #include <all.h>
-#include <osys.h>
+#include <obullet.h>
 #include <oconfig.h>
-#include <oremote.h>
-#include <oworld.h>
+#include <of_magi.h>
+#include <of_off.h>
 #include <onation.h>
+#include <onews.h>
+#include <oremote.h>
+#include <osys.h>
 #include <otech.h>
 #include <otechres.h>
 #include <ounit.h>
-#include <obullet.h>
-#include <onews.h>
-
+#include <oworld.h>
 
 // ----- begin of function FirmOffensive::FirmOffensive --------//
 //
-FirmOffensive::FirmOffensive() : FirmMagic()
-{
-}	
+FirmOffensive::FirmOffensive() : FirmMagic() {}
 // ----- end of function FirmOffensive::FirmOffensive --------//
-
 
 // ----- begin of function FirmOffensive::~FirmOffensive --------//
 //
-FirmOffensive::~FirmOffensive()
-{
-}
+FirmOffensive::~FirmOffensive() {}
 // ----- end of function FirmOffensive::~FirmOffensive --------//
 
 //--------- Begin of function FirmOffensive::is_operating ---------//
 //
-int FirmOffensive::is_operating()
-{
-	return (delayed_magic_count > 0);
-}
+int FirmOffensive::is_operating() { return (delayed_magic_count > 0); }
 //----------- End of function FirmOffensive::is_operating -----------//

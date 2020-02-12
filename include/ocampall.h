@@ -18,8 +18,8 @@
  *
  */
 
-//Filename    : OCAMPALL.H
-//Description : Include header files of all campaign classes
+// Filename    : OCAMPALL.H
+// Description : Include header files of all campaign classes
 
 #ifndef __OCAMPALL_H
 #define __OCAMPALL_H

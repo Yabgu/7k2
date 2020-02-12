@@ -22,21 +22,20 @@
 // Description : campaign plot c1
 
 #include <all.h>
-#include <osite.h>
-#include <otech.h>
+#include <itemid.h>
+#include <oc_east.h>
 #include <ogame.h>
-#include <otechres.h>
-#include <ostate.h>
-#include <oraceres.h>
-#include <onews.h>
-#include <otalkres.h>
+#include <oitemres.h>
 #include <omonsres.h>
 #include <onation2.h>
-#include <oc_east.h>
-#include <itemid.h>
-#include <oitemres.h>
+#include <onews.h>
 #include <opower.h>
-
+#include <oraceres.h>
+#include <osite.h>
+#include <ostate.h>
+#include <otalkres.h>
+#include <otech.h>
+#include <otechres.h>
 
 /*
 Your units has the item to convert a unit to yours. (that means
@@ -46,61 +45,53 @@ enemy general and the troop led by him. You have little cash in this
 game and there are no independent towns to assimilate.
 */
 
-
 //---- Begin of function CampaignEastWest::plot_c1_create_game ----//
 
-void CampaignEastWest::plot_c1_create_game()
-{
-	power.reset_selection();
+void CampaignEastWest::plot_c1_create_game() {
+  power.reset_selection();
 
-	// create charm on any own unit
+  // create charm on any own unit
 
-	const int maxItemCount = 3;
-	int itemCreated = maxItemCount;
+  const int maxItemCount = 3;
+  int itemCreated = maxItemCount;
 
-	int i;
-	for( i = 1; itemCreated > 0 && i <= unit_array.size(); ++i )
-	{
-		if( unit_array.is_deleted(i) )
-			continue;
+  int i;
+  for (i = 1; itemCreated > 0 && i <= unit_array.size(); ++i) {
+    if (unit_array.is_deleted(i))
+      continue;
 
-		Unit *unitPtr = unit_array[i];
+    Unit *unitPtr = unit_array[i];
 
-		if( unitPtr->is_own() && !unitPtr->item.id
-			&& item_res.can_pick(ITEM_UNIT_CHANGE_NATION, i) )
-		{
-			unitPtr->item.set(ITEM_UNIT_CHANGE_NATION, item_res.random_para(ITEM_UNIT_CHANGE_NATION, misc.rand()));
+    if (unitPtr->is_own() && !unitPtr->item.id &&
+        item_res.can_pick(ITEM_UNIT_CHANGE_NATION, i)) {
+      unitPtr->item.set(
+          ITEM_UNIT_CHANGE_NATION,
+          item_res.random_para(ITEM_UNIT_CHANGE_NATION, misc.rand()));
 
-			// -------- select the unit ------//
-			unitPtr->select( itemCreated == maxItemCount );
+      // -------- select the unit ------//
+      unitPtr->select(itemCreated == maxItemCount);
 
-			--itemCreated;
-		}
-	}
+      --itemCreated;
+    }
+  }
 
-	// --------- remove all independent town ---------//
+  // --------- remove all independent town ---------//
 
-	for( i = town_array.size(); i > 0; --i )
-	{
-		if( town_array.is_deleted(i) )
-			continue;
+  for (i = town_array.size(); i > 0; --i) {
+    if (town_array.is_deleted(i))
+      continue;
 
-		Town *townPtr = town_array[i];
+    Town *townPtr = town_array[i];
 
-		if( townPtr->nation_recno == 0 )
-		{
-			town_array.del_town(i);
-			continue;		// townPtr is invalide continue immediately
-		}
-	}
+    if (townPtr->nation_recno == 0) {
+      town_array.del_town(i);
+      continue; // townPtr is invalide continue immediately
+    }
+  }
 }
 //---- End of function CampaignEastWest::plot_c1_create_game ----//
 
-
 //---- Begin of function CampaignEastWest::plot_c1_next_day ----//
 //
-void CampaignEastWest::plot_c1_next_day()
-{
-}
+void CampaignEastWest::plot_c1_next_day() {}
 //---- End of function CampaignEastWest::plot_c1_next_day ----//
-

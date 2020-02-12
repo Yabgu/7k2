@@ -21,52 +21,46 @@
 // Filename    : ORESPAL.H
 // Description : Palette ResourcePal
 
-
-
-#include <orespal.h>
 #include <all.h>
+#include <ocoltbl.h>
+#include <odb.h>
+#include <orespal.h>
 #include <osys.h>
 #include <ovga.h>
-#include <odb.h>
-#include <ocoltbl.h>
 #include <string.h>
-
-
 
 //---------- Begin of function ResourcePal::init ---------//
 //
-// <char*>     resName			= name of the resource file (e.g. "GIF.RES")
-// <Database*> dbObj				= name of the database      (e.g. Database db("PFILE.DBF"))
+// <char*>     resName			= name of the resource file (e.g.
+// "GIF.RES")
+// <Database*> dbObj				= name of the database      (e.g.
+// Database db("PFILE.DBF"))
 // <int>       indexOffset		= offset of the index field
-// [int]       useCommonBuf   = whether use the vga common buffer to store the data or not
+// [int]       useCommonBuf   = whether use the vga common buffer to store the
+// data or not
 //										  (default:0)
 //
-void ResourcePal::init(char* resName, Database* dbObj, int indexOffset, int useCommonBuf)
-{
-	ResourceDb::init( resName, dbObj, indexOffset, useCommonBuf );
+void ResourcePal::init(char *resName, Database *dbObj, int indexOffset,
+                       int useCommonBuf) {
+  ResourceDb::init(resName, dbObj, indexOffset, useCommonBuf);
 
-	if( init_flag )
-		generate_pal();
+  if (init_flag)
+    generate_pal();
 }
 //----------- End of function ResourcePal::init ------------//
 
-
 //---------- Begin of function ResourcePal::deinit ---------//
 //
-void ResourcePal::deinit()
-{
-   if( init_flag )
-   {
-		if( pal_data_buf )
-		{
-			mem_del(pal_data_buf);
-			pal_data_buf = NULL;
-		}
-		ResourceDb::deinit();
-   }
+void ResourcePal::deinit() {
+  if (init_flag) {
+    if (pal_data_buf) {
+      mem_del(pal_data_buf);
+      pal_data_buf = NULL;
+    }
+    ResourceDb::deinit();
+  }
 }
 //----------- End of function ResourcePal::deinit ----------//
-
 
 //---------- Begin of function ResourcePal::init_imported ----------//
 //
@@ -74,82 +68,76 @@ void ResourcePal::deinit()
 // tell ResourcePal the database name and the index offset
 //
 // <char*> resName   = name of the resource file (e.g. "GIF.RES")
-// <int>   readAll   = whether read all data into the buffer or read one each time
-// [int]   useCommonBuf = whether use the vga common buffer to store the data or not
+// <int>   readAll   = whether read all data into the buffer or read one each
+// time [int]   useCommonBuf = whether use the vga common buffer to store the
+// data or not
 //                     (default:0)
 //
-void ResourcePal::init_imported(char* resName, int readAll, int useCommonBuf)
-{
-	ResourceDb::init_imported(resName, readAll, useCommonBuf);
+void ResourcePal::init_imported(char *resName, int readAll, int useCommonBuf) {
+  ResourceDb::init_imported(resName, readAll, useCommonBuf);
 
-	if( init_flag )
-		generate_pal();
+  if (init_flag)
+    generate_pal();
 }
 //----------- End of function ResourcePal::init_imported -------------//
 
-
 //---------- Begin of function ResourcePal::generate_pal ---------//
-void ResourcePal::generate_pal()
-{
-	if( read_all )
-	{
-		pal_data_buf = (short *)mem_add( data_buf_size );
+void ResourcePal::generate_pal() {
+  if (read_all) {
+    pal_data_buf = (short *)mem_add(data_buf_size);
 
-		// process all palettes
+    // process all palettes
 
-		long offset = 0;
-		while( offset < data_buf_size )
-		{
-			// process each palette
-			long fileSize = *(long *)(data_buf + offset);
-			err_when( fileSize < 0 );
-			RGBColor *srcPtr = (RGBColor *)(offset + sizeof(uint32_t) + 8 + (char *)data_buf);	// skip length field and 8 byte header
-			short *destPtr = (short *)(offset + sizeof(uint32_t)  + (char *)pal_data_buf);
+    long offset = 0;
+    while (offset < data_buf_size) {
+      // process each palette
+      long fileSize = *(long *)(data_buf + offset);
+      err_when(fileSize < 0);
+      RGBColor *srcPtr =
+          (RGBColor *)(offset + sizeof(uint32_t) + 8 +
+                       (char *)data_buf); // skip length field and 8 byte header
+      short *destPtr =
+          (short *)(offset + sizeof(uint32_t) + (char *)pal_data_buf);
 
-			// process each entry
-			for( int j = 0; j < 0x100; ++j )
-				destPtr[j] = vga.make_pixel( &srcPtr[j] );
+      // process each entry
+      for (int j = 0; j < 0x100; ++j)
+        destPtr[j] = vga.make_pixel(&srcPtr[j]);
 
-			// proceed to next palette
-			offset += sizeof(uint32_t) + fileSize;			// skip length field
-		}
-	}
-	else
-	{
-		// read_all is false
+      // proceed to next palette
+      offset += sizeof(uint32_t) + fileSize; // skip length field
+    }
+  } else {
+    // read_all is false
 
-		pal_data_buf = (short *)mem_add( 0x100 * sizeof(short) );
-	}
+    pal_data_buf = (short *)mem_add(0x100 * sizeof(short));
+  }
 }
 //---------- End of function ResourcePal::generate_pal ---------//
-
 
 //---------- Begin of function ResourcePal::read_imported_pal ---------//
 //
 // similar to read_imported, but get the 16-bit palette
-// correspond to the 
+// correspond to the
 //
-short* ResourcePal::read_imported_pal(long offset)
-{
-	err_when( !init_flag );
+short *ResourcePal::read_imported_pal(long offset) {
+  err_when(!init_flag);
 
-	if( read_all )
-	{
-		err_when( offset<0 || offset>=data_buf_size );
-		return pal_data_buf + offset + sizeof(uint32_t);  // by pass the long parameters which is the size of the data
-	}
-	else
-	{
-		RGBColor *srcPtr = (RGBColor *)(8 + (char *)read_imported(offset));		// skip 8 byte header
-		short *destPtr = pal_data_buf;
+  if (read_all) {
+    err_when(offset < 0 || offset >= data_buf_size);
+    return pal_data_buf + offset +
+           sizeof(uint32_t); // by pass the long parameters which is the size of
+                             // the data
+  } else {
+    RGBColor *srcPtr =
+        (RGBColor *)(8 + (char *)read_imported(offset)); // skip 8 byte header
+    short *destPtr = pal_data_buf;
 
-		// process palette 
+    // process palette
 
-		for( int j = 0; j < 0x100; ++j )
-			destPtr[j] = vga.make_pixel( &srcPtr[j] );
+    for (int j = 0; j < 0x100; ++j)
+      destPtr[j] = vga.make_pixel(&srcPtr[j]);
 
-	   return destPtr;
-	}
+    return destPtr;
+  }
 }
 //---------- End of function ResourcePal::read_imported_pal ---------//
-

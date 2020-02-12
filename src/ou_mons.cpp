@@ -18,19 +18,18 @@
  *
  */
 
-//Filename   : OU_MONS.CPP
-//Description: Unit Monster
+// Filename   : OU_MONS.CPP
+// Description: Unit Monster
 
-#include <oworld.h>
-#include <osite.h>
-#include <onews.h>
-#include <otown.h>
 #include <ofirm.h>
-#include <onation.h>
 #include <omonsres.h>
-#include <ou_mons.h>
+#include <onation.h>
+#include <onews.h>
+#include <osite.h>
 #include <ot_unit.h>
-
+#include <otown.h>
+#include <ou_mons.h>
+#include <oworld.h>
 
 //--------- Begin of function UnitMonster::unit_name ---------//
 //
@@ -40,23 +39,18 @@
 // [int] firstNameOnly - whether return the first word of the name only
 //							(default: 0)
 //
-const char* UnitMonster::unit_name(int withTitle, int firstNameOnly)
-{
-	const char* monsterName;
+const char *UnitMonster::unit_name(int withTitle, int firstNameOnly) {
+  const char *monsterName;
 
-	if( rank_id == RANK_KING )		// use the player name
-		monsterName = nation_array[nation_recno]->king_name();
-	else
-		monsterName = monster_res.get_name(name_id);
+  if (rank_id == RANK_KING) // use the player name
+    monsterName = nation_array[nation_recno]->king_name();
+  else
+    monsterName = monster_res.get_name(name_id);
 
-	if (withTitle)
-	{		
-		return text_unit.str_unit_titled( race_id, monsterName, rank_id );
-	}
-	else
-	{
-		return monsterName;
-	}
+  if (withTitle) {
+    return text_unit.str_unit_titled(race_id, monsterName, rank_id);
+  } else {
+    return monsterName;
+  }
 }
 //--------- End of function UnitMonster::unit_name ---------//
-

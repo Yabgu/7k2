@@ -21,576 +21,552 @@
 // Filename    : OFIRMDIE.CPP
 // Description : destruting firm
 
-
-#include <ostr.h>
-#include <ofirmres.h>
-#include <ofirmdie.h>
-#include <ogameset.h>
-#include <ogame.h>
-#include <oresdb.h>
 #include <all.h>
-#include <oworldmt.h>
-#include <ovga.h>
 #include <ocoltbl.h>
-#include <omisc.h>
-#include <osys.h>
 #include <oconfig.h>
+#include <ofirmdie.h>
+#include <ofirmres.h>
+#include <ogame.h>
+#include <ogameset.h>
+#include <omisc.h>
+#include <oresdb.h>
 #include <oseres.h>
+#include <ostr.h>
+#include <osys.h>
+#include <ovga.h>
+#include <oworldmt.h>
 
-#define FIRM_BUILD_DB 	"FDBUILD"
-#define FIRM_FRAME_DB 	"FDFRAME"
-#define FIRM_BITMAP_DB 	"FDBITMAP"
+#define FIRM_BUILD_DB "FDBUILD"
+#define FIRM_FRAME_DB "FDFRAME"
+#define FIRM_BITMAP_DB "FDBITMAP"
 
-
-struct FirmDieBitmap : public FirmBitmap
-{
-	int	bitmap_offset;		// fill bitmap_ptr, width and height before draw()
+struct FirmDieBitmap : public FirmBitmap {
+  int bitmap_offset; // fill bitmap_ptr, width and height before draw()
 };
 
-FirmDieRes::FirmDieRes()
-{
-	firm_build_count = 0;
-	firm_bitmap_count = 0;
-	firm_build_array = NULL;
-	firm_bitmap_array = NULL;
-	init_flag = 0;
+FirmDieRes::FirmDieRes() {
+  firm_build_count = 0;
+  firm_bitmap_count = 0;
+  firm_build_array = NULL;
+  firm_bitmap_array = NULL;
+  init_flag = 0;
 }
 
-FirmDieRes::~FirmDieRes()
-{
-	deinit();
+FirmDieRes::~FirmDieRes() { deinit(); }
+
+void FirmDieRes::init() {
+  deinit();
+
+  //----- open firm material bitmap resource file -------//
+
+  String str;
+
+  //	str  = DIR_RES;
+  //	str += "I_FIRMDI.RES";
+
+  //	res_bitmap.init_imported(str,0,1);		// 0 - do not read all data
+  //into buffer
+  str = DIR_RES;
+  str += "PALFIRMD.RES";
+
+  res_pal.init_imported(str, 1); // 1-read all into buffer
+
+  //------- load database information --------//
+
+  load_bitmap_info(); // call load_firm_bitmap() first as load_firm_info() will
+                      // need info loaded by load_firm_bitmap()
+  load_build_info();
+
+  //----------------------------------------//
+
+  init_flag = 1;
 }
 
-void FirmDieRes::init()
-{
-	deinit();
+void FirmDieRes::deinit() {
+  if (init_flag) {
+    //		mem_del(firm_build_array);
+    delete[] firm_build_array;
+    mem_del(firm_bitmap_array);
 
-	//----- open firm material bitmap resource file -------//
+    //		res_bitmap.deinit();
+    res_pal.deinit();
 
-	String str;
-
-//	str  = DIR_RES;
-//	str += "I_FIRMDI.RES";
-
-//	res_bitmap.init_imported(str,0,1);		// 0 - do not read all data into buffer
-	str  = DIR_RES;
-	str += "PALFIRMD.RES";
-
-	res_pal.init_imported(str,1);		// 1-read all into buffer
-
-	//------- load database information --------//
-
-	load_bitmap_info();		// call load_firm_bitmap() first as load_firm_info() will need info loaded by load_firm_bitmap()
-	load_build_info();
-
-   //----------------------------------------//
-
-	init_flag=1;
+    init_flag = 0;
+  }
 }
-
-void FirmDieRes::deinit()
-{
-	if(init_flag)
-	{
-//		mem_del(firm_build_array);
-		delete[] firm_build_array;
-		mem_del(firm_bitmap_array);
-
-//		res_bitmap.deinit();
-		res_pal.deinit();
-
-		init_flag = 0;
-	}
-}
-
 
 //------- Begin of function FirmDieRes::load_firm_bitmap -------//
 //
 // Read in information of FDBITMAP.DBF into memory array
 //
-void FirmDieRes::load_bitmap_info()
-{
-	FirmBitmapRec  *firmBitmapRec;
-	FirmDieBitmap	*firmBitmap;
-	int      		i;
-//	long				bitmapOffset;
-	Database 		*dbFirmBitmap = game_set.open_db(FIRM_BITMAP_DB);
+void FirmDieRes::load_bitmap_info() {
+  FirmBitmapRec *firmBitmapRec;
+  FirmDieBitmap *firmBitmap;
+  int i;
+  //	long				bitmapOffset;
+  Database *dbFirmBitmap = game_set.open_db(FIRM_BITMAP_DB);
 
-	firm_bitmap_count = (short) dbFirmBitmap->rec_count();
-	firm_bitmap_array = (FirmDieBitmap*) mem_add( sizeof(FirmDieBitmap)*firm_bitmap_count );
+  firm_bitmap_count = (short)dbFirmBitmap->rec_count();
+  firm_bitmap_array =
+      (FirmDieBitmap *)mem_add(sizeof(FirmDieBitmap) * firm_bitmap_count);
 
-	//------ read in firm bitmap info array -------//
+  //------ read in firm bitmap info array -------//
 
-	memset( firm_bitmap_array, 0, sizeof(FirmDieBitmap) * firm_bitmap_count );
+  memset(firm_bitmap_array, 0, sizeof(FirmDieBitmap) * firm_bitmap_count);
 
-	for( i=0 ; i<firm_bitmap_count ; i++ )
-	{
-		firmBitmapRec = (FirmBitmapRec*) dbFirmBitmap->read(i+1);
-		firmBitmap    = firm_bitmap_array+i;
+  for (i = 0; i < firm_bitmap_count; i++) {
+    firmBitmapRec = (FirmBitmapRec *)dbFirmBitmap->read(i + 1);
+    firmBitmap = firm_bitmap_array + i;
 
-		memcpy( &firmBitmap->bitmap_ptr, firmBitmapRec->bitmap_ptr, sizeof(uint32_t) );
-	//	memcpy( &bitmapOffset, firmBitmapRec->bitmap_ptr, sizeof(long) );
-	//	firmBitmap->bitmap_ptr = NULL;
+    memcpy(&firmBitmap->bitmap_ptr, firmBitmapRec->bitmap_ptr,
+           sizeof(uint32_t));
+    //	memcpy( &bitmapOffset, firmBitmapRec->bitmap_ptr, sizeof(long) );
+    //	firmBitmap->bitmap_ptr = NULL;
 
-		firmBitmap->width  	  = misc.atoi( firmBitmapRec->width, firmBitmapRec->LOC_LEN );
-		firmBitmap->height 	  = misc.atoi( firmBitmapRec->height, firmBitmapRec->LOC_LEN );
+    firmBitmap->width = misc.atoi(firmBitmapRec->width, firmBitmapRec->LOC_LEN);
+    firmBitmap->height =
+        misc.atoi(firmBitmapRec->height, firmBitmapRec->LOC_LEN);
 
-		firmBitmap->offset_x = misc.atoi( firmBitmapRec->offset_x, firmBitmapRec->OFFSET_LEN );
-		firmBitmap->offset_y = misc.atoi( firmBitmapRec->offset_y, firmBitmapRec->OFFSET_LEN );
+    firmBitmap->offset_x =
+        misc.atoi(firmBitmapRec->offset_x, firmBitmapRec->OFFSET_LEN);
+    firmBitmap->offset_y =
+        misc.atoi(firmBitmapRec->offset_y, firmBitmapRec->OFFSET_LEN);
 
-		firmBitmap->loc_width  = misc.atoi( firmBitmapRec->loc_width , firmBitmapRec->LOC_LEN );
-		firmBitmap->loc_height = misc.atoi( firmBitmapRec->loc_height, firmBitmapRec->LOC_LEN );
-		
-		firmBitmap->delay = misc.atoi( firmBitmapRec->delay, firmBitmapRec->DELAY_LEN );
+    firmBitmap->loc_width =
+        misc.atoi(firmBitmapRec->loc_width, firmBitmapRec->LOC_LEN);
+    firmBitmap->loc_height =
+        misc.atoi(firmBitmapRec->loc_height, firmBitmapRec->LOC_LEN);
 
-		firmBitmap->ani_part = misc.atoi( firmBitmapRec->ani_part, firmBitmapRec->FRAME_ID_LEN );
-	//	firmBitmap->random_flag = firmBitmapRec->random_flag[0] == 'R' ? 1 : 0;
-		firmBitmap->random_flag = firmBitmapRec->random_flag[0];
+    firmBitmap->delay =
+        misc.atoi(firmBitmapRec->delay, firmBitmapRec->DELAY_LEN);
 
-		firmBitmap->display_layer = firmBitmapRec->layer - '0';
+    firmBitmap->ani_part =
+        misc.atoi(firmBitmapRec->ani_part, firmBitmapRec->FRAME_ID_LEN);
+    //	firmBitmap->random_flag = firmBitmapRec->random_flag[0] == 'R' ? 1 : 0;
+    firmBitmap->random_flag = firmBitmapRec->random_flag[0];
+
+    firmBitmap->display_layer = firmBitmapRec->layer - '0';
 
 #ifdef DEBUG
-		if( firmBitmap->loc_width >= 4 || firmBitmap->loc_height >= 4 )
-		{
-			// break point here
-			int x = 0;
-		}
+    if (firmBitmap->loc_width >= 4 || firmBitmap->loc_height >= 4) {
+      // break point here
+      int x = 0;
+    }
 #endif
-		// modify offset_x/y for 7k2
-		firmBitmap->offset_x += -firmBitmap->loc_width*LOCATE_WIDTH/2 - (-firmBitmap->loc_width*ZOOM_LOC_X_WIDTH/2 + -firmBitmap->loc_height*ZOOM_LOC_Y_WIDTH/2);
-		firmBitmap->offset_y += -firmBitmap->loc_height*LOCATE_HEIGHT/2 - (-firmBitmap->loc_width*ZOOM_LOC_X_HEIGHT/2 + -firmBitmap->loc_height*ZOOM_LOC_Y_HEIGHT/2);
-	}
+    // modify offset_x/y for 7k2
+    firmBitmap->offset_x += -firmBitmap->loc_width * LOCATE_WIDTH / 2 -
+                            (-firmBitmap->loc_width * ZOOM_LOC_X_WIDTH / 2 +
+                             -firmBitmap->loc_height * ZOOM_LOC_Y_WIDTH / 2);
+    firmBitmap->offset_y += -firmBitmap->loc_height * LOCATE_HEIGHT / 2 -
+                            (-firmBitmap->loc_width * ZOOM_LOC_X_HEIGHT / 2 +
+                             -firmBitmap->loc_height * ZOOM_LOC_Y_HEIGHT / 2);
+  }
 }
 //--------- End of function FirmDieRes::load_firm_bitmap ---------//
-
 
 //------- Begin of function FirmDieRes::load_firm_build -------//
 //
 // Read in information of FIRM.DBF into memory array
 //
-void FirmDieRes::load_build_info()
-{
-	FirmBuildRec *firmBuildRec;
-	FirmFrameRec *firmFrameRec;
-	FirmBuild 	 *firmBuild;
-	FirmBitmap   *firmBitmap;
-	int      	 i, j, k, frameRecno, bitmapRecno;
-	short			 *firstFrameArray;
+void FirmDieRes::load_build_info() {
+  FirmBuildRec *firmBuildRec;
+  FirmFrameRec *firmFrameRec;
+  FirmBuild *firmBuild;
+  FirmBitmap *firmBitmap;
+  int i, j, k, frameRecno, bitmapRecno;
+  short *firstFrameArray;
 
-	//---- read in firm count and initialize firm info array ----//
+  //---- read in firm count and initialize firm info array ----//
 
-	Database *dbFirmBuild = game_set.open_db(FIRM_BUILD_DB);	// only one database can be opened at a time, so we read FIRM.DBF first
+  Database *dbFirmBuild =
+      game_set.open_db(FIRM_BUILD_DB); // only one database can be opened at a
+                                       // time, so we read FIRM.DBF first
 
-	firm_build_count = (short) dbFirmBuild->rec_count();
-	firm_build_array = new FirmBuild[firm_build_count];
-//	firm_build_array = (FirmBuild*) mem_add( sizeof(FirmBuild)*firm_build_count );
-// memset( firm_build_array, 0, sizeof(FirmBuild) * firm_build_count );
+  firm_build_count = (short)dbFirmBuild->rec_count();
+  firm_build_array = new FirmBuild[firm_build_count];
+  //	firm_build_array = (FirmBuild*) mem_add(
+  //sizeof(FirmBuild)*firm_build_count );
+  // memset( firm_build_array, 0, sizeof(FirmBuild) * firm_build_count );
 
-	//------ allocate an array for storing firstFrameRecno -----//
+  //------ allocate an array for storing firstFrameRecno -----//
 
-	firstFrameArray = (short*) mem_add( sizeof(short) * firm_build_count );
+  firstFrameArray = (short *)mem_add(sizeof(short) * firm_build_count);
 
-	//---------- read in FDBUILD.DBF ---------//
+  //---------- read in FDBUILD.DBF ---------//
 
-	for( i=0 ; i<firm_build_count ; i++ )
-	{
-		firmBuildRec = (FirmBuildRec*) dbFirmBuild->read(i+1);
-		firmBuild	 = firm_build_array+i;
+  for (i = 0; i < firm_build_count; i++) {
+    firmBuildRec = (FirmBuildRec *)dbFirmBuild->read(i + 1);
+    firmBuild = firm_build_array + i;
 
-		firmBuild->group 	  = misc.atoi( firmBuildRec->group, firmBuildRec->GROUP_LEN );
-		
-		misc.rtrim_fld( firmBuild->name, firmBuildRec->name, firmBuild->NAME_LEN );
+    firmBuild->group = misc.atoi(firmBuildRec->group, firmBuildRec->GROUP_LEN);
 
-		misc.rtrim_fld( firmBuild->firm_resource_name, firmBuildRec->firm_resource_name, firmBuildRec->PAL_NAME_LEN );
+    misc.rtrim_fld(firmBuild->name, firmBuildRec->name, firmBuild->NAME_LEN);
 
-		firmBuild->animate_full_size = firmBuildRec->animate_full_size=='1';
+    misc.rtrim_fld(firmBuild->firm_resource_name,
+                   firmBuildRec->firm_resource_name,
+                   firmBuildRec->PAL_NAME_LEN);
 
-		firmBuild->use_first_frame = !(firmBuildRec->use_first_frame=='0');
+    firmBuild->animate_full_size = firmBuildRec->animate_full_size == '1';
 
-		firmBuild->frame_count = misc.atoi( firmBuildRec->frame_count, firmBuildRec->FRAME_COUNT_LEN );
-		
-		firmBuild->ani_part_count = misc.atoi( firmBuildRec->ani_part_count, firmBuildRec->FRAME_COUNT_LEN );
-		
-		if (firmBuild->animate_full_size == 1)
-			firmBuild->ani_part_count = 1;
+    firmBuild->use_first_frame = !(firmBuildRec->use_first_frame == '0');
 
-		if( firmBuildRec->pal_file_name[0] == ' ' || firmBuildRec->pal_file_name[0] == '\0' )
-		{
-			firmBuild->pal_ptr = NULL;
-		}
-		else
-		{
-			uint32_t paletteOffset;
-			memcpy(&paletteOffset, firmBuildRec->pal_offset, sizeof(uint32_t));
-			firmBuild->pal_ptr = 8+(BYTE *)res_pal.read_imported(paletteOffset);	// skip 8 bytes header
-		}
-		firmBuild->palw_ptr = NULL;
+    firmBuild->frame_count =
+        misc.atoi(firmBuildRec->frame_count, firmBuildRec->FRAME_COUNT_LEN);
 
-		firmBuild->under_construction_bitmap_recno = misc.atoi(firmBuildRec->under_construction_bitmap_recno, firmBuildRec->BITMAP_RECNO_LEN);
-		firmBuild->under_construction_bitmap_count =
-			misc.atoi(firmBuildRec->under_construction_bitmap_count, firmBuildRec->FRAME_COUNT_LEN);
-		firmBuild->idle_bitmap_recno 					 = misc.atoi(firmBuildRec->idle_bitmap_recno, firmBuildRec->BITMAP_RECNO_LEN);
-		firmBuild->ground_bitmap_recno             = misc.atoi(firmBuildRec->ground_bitmap_recno, firmBuildRec->BITMAP_RECNO_LEN);
-		
-		firmBuild->defense_attribute.init(misc.atoi(firmBuildRec->sturdiness, firmBuildRec->ATTRIBUTE_LEN), 0);
+    firmBuild->ani_part_count =
+        misc.atoi(firmBuildRec->ani_part_count, firmBuildRec->FRAME_COUNT_LEN);
 
-		firmBuild->bullet_sprite_id = misc.atoi(firmBuildRec->bullet_sprite_id, firmBuildRec->BULLET_ID_LEN);
-		misc.rtrim_fld( firmBuild->bullet_sprite_code, firmBuildRec->bullet_sprite_code, firmBuild->BULLET_SPRITE_LEN );
+    if (firmBuild->animate_full_size == 1)
+      firmBuild->ani_part_count = 1;
 
-		err_when( firmBuild->frame_count > MAX_FIRM_FRAME );
+    if (firmBuildRec->pal_file_name[0] == ' ' ||
+        firmBuildRec->pal_file_name[0] == '\0') {
+      firmBuild->pal_ptr = NULL;
+    } else {
+      uint32_t paletteOffset;
+      memcpy(&paletteOffset, firmBuildRec->pal_offset, sizeof(uint32_t));
+      firmBuild->pal_ptr = 8 + (BYTE *)res_pal.read_imported(
+                                   paletteOffset); // skip 8 bytes header
+    }
+    firmBuild->palw_ptr = NULL;
 
-		// the following variables are hard coded //
-		firmBuild->frame_count = 39;
-		firstFrameArray[i] = 1;
-	//	firstFrameArray[i] = misc.atoi( firmBuildRec->first_frame, firmBuildRec->FIRST_FRAME_LEN );
-	}
+    firmBuild->under_construction_bitmap_recno =
+        misc.atoi(firmBuildRec->under_construction_bitmap_recno,
+                  firmBuildRec->BITMAP_RECNO_LEN);
+    firmBuild->under_construction_bitmap_count =
+        misc.atoi(firmBuildRec->under_construction_bitmap_count,
+                  firmBuildRec->FRAME_COUNT_LEN);
+    firmBuild->idle_bitmap_recno = misc.atoi(firmBuildRec->idle_bitmap_recno,
+                                             firmBuildRec->BITMAP_RECNO_LEN);
+    firmBuild->ground_bitmap_recno = misc.atoi(
+        firmBuildRec->ground_bitmap_recno, firmBuildRec->BITMAP_RECNO_LEN);
 
-	//-------- read in FDFRAME.DBF --------//
+    firmBuild->defense_attribute.init(
+        misc.atoi(firmBuildRec->sturdiness, firmBuildRec->ATTRIBUTE_LEN), 0);
 
-	Database 	*dbFirmFrame = game_set.open_db(FIRM_FRAME_DB);
-	int 			minOffsetX, minOffsetY;
-	int			maxX2, maxY2;
+    firmBuild->bullet_sprite_id =
+        misc.atoi(firmBuildRec->bullet_sprite_id, firmBuildRec->BULLET_ID_LEN);
+    misc.rtrim_fld(firmBuild->bullet_sprite_code,
+                   firmBuildRec->bullet_sprite_code,
+                   firmBuild->BULLET_SPRITE_LEN);
 
-	for( i=0 ; i<firm_build_count ; i++ )
-	{
-		firmBuild  = firm_build_array+i;
-		frameRecno = firstFrameArray[i];
+    err_when(firmBuild->frame_count > MAX_FIRM_FRAME);
 
-		minOffsetX = minOffsetY = 0xFFFF;
-		maxX2 = maxY2 = 0;
+    // the following variables are hard coded //
+    firmBuild->frame_count = 39;
+    firstFrameArray[i] = 1;
+    //	firstFrameArray[i] = misc.atoi( firmBuildRec->first_frame,
+    //firmBuildRec->FIRST_FRAME_LEN );
+  }
 
-		for( j=0 ; j<firmBuild->frame_count ; j++, frameRecno++ )
-		{
-			firmFrameRec = (FirmFrameRec*) dbFirmFrame->read(frameRecno);
+  //-------- read in FDFRAME.DBF --------//
 
-			//------ following animation frames, bitmap sections -----//
+  Database *dbFirmFrame = game_set.open_db(FIRM_FRAME_DB);
+  int minOffsetX, minOffsetY;
+  int maxX2, maxY2;
 
-			firmBuild->first_bitmap_array[j] = misc.atoi( firmFrameRec->first_bitmap, firmFrameRec->FIRST_BITMAP_LEN );
-			firmBuild->bitmap_count_array[j] = misc.atoi( firmFrameRec->bitmap_count, firmFrameRec->BITMAP_COUNT_LEN );
+  for (i = 0; i < firm_build_count; i++) {
+    firmBuild = firm_build_array + i;
+    frameRecno = firstFrameArray[i];
 
-			firmBuild->frame_delay_array[j] = misc.atoi( firmFrameRec->delay, firmFrameRec->DELAY_LEN );
+    minOffsetX = minOffsetY = 0xFFFF;
+    maxX2 = maxY2 = 0;
 
-			//---- get the min offset_x, offset_y and max width, height ----//
-			//
-			// So we can get the largest area of all the frames in this building
-			// and this will serve as a normal size setting for this building,
-			// with variation from frame to frame
-			//
-			//--------------------------------------------------------------//
+    for (j = 0; j < firmBuild->frame_count; j++, frameRecno++) {
+      firmFrameRec = (FirmFrameRec *)dbFirmFrame->read(frameRecno);
 
-			firmBitmap = firm_bitmap_array + firmBuild->first_bitmap_array[j] - 1;
+      //------ following animation frames, bitmap sections -----//
 
-			for( k=firmBuild->bitmap_count_array[j] ; k>0 ; k--, firmBitmap++ )
-			{
-				if( firmBitmap->offset_x < minOffsetX )
-					minOffsetX = firmBitmap->offset_x;
+      firmBuild->first_bitmap_array[j] =
+          misc.atoi(firmFrameRec->first_bitmap, firmFrameRec->FIRST_BITMAP_LEN);
+      firmBuild->bitmap_count_array[j] =
+          misc.atoi(firmFrameRec->bitmap_count, firmFrameRec->BITMAP_COUNT_LEN);
 
-				if( firmBitmap->offset_y < minOffsetY )
-					minOffsetY = firmBitmap->offset_y;
+      firmBuild->frame_delay_array[j] =
+          misc.atoi(firmFrameRec->delay, firmFrameRec->DELAY_LEN);
 
-				if( firmBitmap->offset_x + firmBitmap->width > maxX2 )
-					maxX2 = firmBitmap->offset_x + firmBitmap->width;
+      //---- get the min offset_x, offset_y and max width, height ----//
+      //
+      // So we can get the largest area of all the frames in this building
+      // and this will serve as a normal size setting for this building,
+      // with variation from frame to frame
+      //
+      //--------------------------------------------------------------//
 
-				if( firmBitmap->offset_y + firmBitmap->height > maxY2 )
-					maxY2 = firmBitmap->offset_y + firmBitmap->height;
-			}
-		}
+      firmBitmap = firm_bitmap_array + firmBuild->first_bitmap_array[j] - 1;
 
-		//------- set FirmBuild Info -------//
+      for (k = firmBuild->bitmap_count_array[j]; k > 0; k--, firmBitmap++) {
+        if (firmBitmap->offset_x < minOffsetX)
+          minOffsetX = firmBitmap->offset_x;
 
-		bitmapRecno = firmBuild->first_bitmap_array[0];
+        if (firmBitmap->offset_y < minOffsetY)
+          minOffsetY = firmBitmap->offset_y;
 
-		//----- get the info of the first frame bitmap ----//
+        if (firmBitmap->offset_x + firmBitmap->width > maxX2)
+          maxX2 = firmBitmap->offset_x + firmBitmap->width;
 
-		firmBitmap = firm_bitmap_array + bitmapRecno - 1;
+        if (firmBitmap->offset_y + firmBitmap->height > maxY2)
+          maxY2 = firmBitmap->offset_y + firmBitmap->height;
+      }
+    }
 
-		firmBuild->loc_width  = firmBitmap->loc_width;
-		firmBuild->loc_height = firmBitmap->loc_height;
+    //------- set FirmBuild Info -------//
 
-		firmBuild->min_offset_x = minOffsetX;
-		firmBuild->min_offset_y = minOffsetY;
+    bitmapRecno = firmBuild->first_bitmap_array[0];
 
-		firmBuild->max_bitmap_width  = maxX2 - minOffsetX;
-		firmBuild->max_bitmap_height = maxY2 - minOffsetY;
+    //----- get the info of the first frame bitmap ----//
 
-		//------ set firmBuild's under construction and idle bitmap recno -----//
+    firmBitmap = firm_bitmap_array + bitmapRecno - 1;
 
-		if( firmBuild->under_construction_bitmap_recno==0 )
-		{
-			firmBuild->under_construction_bitmap_recno = bitmapRecno;
-			firmBuild->under_construction_bitmap_count = 1;
-		}
+    firmBuild->loc_width = firmBitmap->loc_width;
+    firmBuild->loc_height = firmBitmap->loc_height;
 
-		err_when(firmBuild->under_construction_bitmap_count == 0);
+    firmBuild->min_offset_x = minOffsetX;
+    firmBuild->min_offset_y = minOffsetY;
 
-		if( firmBuild->idle_bitmap_recno==0 )
-			firmBuild->idle_bitmap_recno = bitmapRecno;
-	}
+    firmBuild->max_bitmap_width = maxX2 - minOffsetX;
+    firmBuild->max_bitmap_height = maxY2 - minOffsetY;
 
-	//------ free up the temporary array -------//
+    //------ set firmBuild's under construction and idle bitmap recno -----//
 
-	mem_del( firstFrameArray );
+    if (firmBuild->under_construction_bitmap_recno == 0) {
+      firmBuild->under_construction_bitmap_recno = bitmapRecno;
+      firmBuild->under_construction_bitmap_count = 1;
+    }
+
+    err_when(firmBuild->under_construction_bitmap_count == 0);
+
+    if (firmBuild->idle_bitmap_recno == 0)
+      firmBuild->idle_bitmap_recno = bitmapRecno;
+  }
+
+  //------ free up the temporary array -------//
+
+  mem_del(firstFrameArray);
 }
 //--------- End of function FirmDieRes::load_firm_build ---------//
 
 //--------- Begin of function FirmDieRes::get_build ---------//
-FirmBuild*	FirmDieRes::get_build(int buildId)
-{
-	err_when( buildId < 1 || buildId > firm_build_count);
-	return firm_build_array+buildId-1;
+FirmBuild *FirmDieRes::get_build(int buildId) {
+  err_when(buildId < 1 || buildId > firm_build_count);
+  return firm_build_array + buildId - 1;
 }
 //--------- End of function FirmDieRes::get_build ---------//
 
-
 //--------- Begin of function FirmDieRes::get_bitmap ---------//
-FirmDieBitmap* FirmDieRes::get_bitmap(int bitmapId)
-{
-	err_when( bitmapId < 1 || bitmapId > firm_bitmap_count);
-	return firm_bitmap_array+bitmapId-1;
+FirmDieBitmap *FirmDieRes::get_bitmap(int bitmapId) {
+  err_when(bitmapId < 1 || bitmapId > firm_bitmap_count);
+  return firm_bitmap_array + bitmapId - 1;
 }
 //--------- End of function FirmDieRes::get_bitmap ---------//
 
-
 //--------- Begin of function FirmDie::init --------//
 void FirmDie::init(short firmId, short firmBuildId, short nationRecno,
-	short	locX1, short locY1, short locX2, short locY2, short alt)
-{
-	firm_id = firmId;
-	firm_build_id = firmBuildId;
-	nation_recno = nationRecno;
-	loc_x1 = locX1;
-	loc_y1 = locY1;
-	loc_x2 = locX2;
-	loc_y2 = locY2;
-	altitude = alt;
-	frame = 1;
+                   short locX1, short locY1, short locX2, short locY2,
+                   short alt) {
+  firm_id = firmId;
+  firm_build_id = firmBuildId;
+  nation_recno = nationRecno;
+  loc_x1 = locX1;
+  loc_y1 = locY1;
+  loc_x2 = locX2;
+  loc_y2 = locY2;
+  altitude = alt;
+  frame = 1;
 }
 
 // add before delete the firm
-void FirmDie::init(Firm *firmPtr, short dieFlag, int random)
-{
-	int x, y;
-	firm_id = firmPtr->firm_id;
-	firm_build_id = firmPtr->firm_build_id;
-	nation_recno = firmPtr->nation_recno;
-	loc_x1 = firmPtr->loc_x1;
-	loc_y1 = firmPtr->loc_y1;
-	loc_x2 = firmPtr->loc_x2;
-	loc_y2 = firmPtr->loc_y2;
+void FirmDie::init(Firm *firmPtr, short dieFlag, int random) {
+  int x, y;
+  firm_id = firmPtr->firm_id;
+  firm_build_id = firmPtr->firm_build_id;
+  nation_recno = firmPtr->nation_recno;
+  loc_x1 = firmPtr->loc_x1;
+  loc_y1 = firmPtr->loc_y1;
+  loc_x2 = firmPtr->loc_x2;
+  loc_y2 = firmPtr->loc_y2;
 
-	parent_loc_x1 = firmPtr->loc_x1;
-	parent_loc_y1 = firmPtr->loc_y1;
-	parent_loc_x2 = firmPtr->loc_x2;
-	parent_loc_y2 = firmPtr->loc_y2;
+  parent_loc_x1 = firmPtr->loc_x1;
+  parent_loc_y1 = firmPtr->loc_y1;
+  parent_loc_x2 = firmPtr->loc_x2;
+  parent_loc_y2 = firmPtr->loc_y2;
 
-	altitude = firmPtr->altitude;
-//	frame = 1;
-	frame_delay_count = 0;
-	die_flag = dieFlag;
-	start_frame = 0;
-	end_frame = 0;
-	frame_looping = 0;
+  altitude = firmPtr->altitude;
+  //	frame = 1;
+  frame_delay_count = 0;
+  die_flag = dieFlag;
+  start_frame = 0;
+  end_frame = 0;
+  frame_looping = 0;
 
-	if (die_flag == 6)
-		se_res.sound(firmPtr->center_x, firmPtr->center_y, 1, 'F', 0, "DIE" );
-	else
-		se_res.sound(firmPtr->center_x, firmPtr->center_y, 1, 'F', 0, "A1" );
-	
-	FirmBuild *firmBuild = firm_die_res.get_build(firm_build_id);
-	firmBuild->load_bitmap_res();
+  if (die_flag == 6)
+    se_res.sound(firmPtr->center_x, firmPtr->center_y, 1, 'F', 0, "DIE");
+  else
+    se_res.sound(firmPtr->center_x, firmPtr->center_y, 1, 'F', 0, "A1");
 
-	int bitmapCount;
-	int firstBitmap;
-	FirmBitmap* firmBitmap;
-	int frameCount = firmBuild->frame_count;
-	for ( int k=1; k <= frameCount; k++ )
-	{
-		firstBitmap = firmBuild->first_bitmap(k);
-		bitmapCount = firmBuild->bitmap_count(k);
-		for ( int j=0; j <bitmapCount; j++ )
-		{
-			firmBitmap = firm_die_res.get_bitmap(firstBitmap + j);
-			if( firmBitmap )
-			{
-				if (firmBitmap->ani_part == die_flag)
-				{
-					if (start_frame == 0)
-					{
-						start_frame = k;
-						end_frame = k;
-						frame_delay_count = firmBitmap->delay;
-						if (firmBitmap->random_flag == 'R' || (firmBitmap->random_flag >'0' && firmBitmap->random_flag <='9'))
-						{
-							x = (loc_x2 - loc_x1 + 1)/firmBitmap->loc_width;
-							y = (loc_y2 - loc_y1 + 1)/firmBitmap->loc_height;
-							random = random % (x * y);
-							loc_x1 = loc_x1 + random % x;
-							loc_y1 = loc_y1 + random / x;
-							loc_x2 = loc_x1 + firmBitmap->loc_width - 1;
-							loc_y2 = loc_y1 + firmBitmap->loc_height - 1;
-							//		altitude = world.get_corner( loc_x1, loc_y1 )->get_altitude();
-							if (firmBitmap->random_flag != 'R')
-								frame_looping = firmBitmap->random_flag - '0';
-						}
-					}
-					else
-						end_frame = k;
-					break;
-				}
-			}
-		}
-	}
+  FirmBuild *firmBuild = firm_die_res.get_build(firm_build_id);
+  firmBuild->load_bitmap_res();
 
-	err_when(end_frame < start_frame || end_frame == 0);
-		
-	frame = start_frame;
+  int bitmapCount;
+  int firstBitmap;
+  FirmBitmap *firmBitmap;
+  int frameCount = firmBuild->frame_count;
+  for (int k = 1; k <= frameCount; k++) {
+    firstBitmap = firmBuild->first_bitmap(k);
+    bitmapCount = firmBuild->bitmap_count(k);
+    for (int j = 0; j < bitmapCount; j++) {
+      firmBitmap = firm_die_res.get_bitmap(firstBitmap + j);
+      if (firmBitmap) {
+        if (firmBitmap->ani_part == die_flag) {
+          if (start_frame == 0) {
+            start_frame = k;
+            end_frame = k;
+            frame_delay_count = firmBitmap->delay;
+            if (firmBitmap->random_flag == 'R' ||
+                (firmBitmap->random_flag > '0' &&
+                 firmBitmap->random_flag <= '9')) {
+              x = (loc_x2 - loc_x1 + 1) / firmBitmap->loc_width;
+              y = (loc_y2 - loc_y1 + 1) / firmBitmap->loc_height;
+              random = random % (x * y);
+              loc_x1 = loc_x1 + random % x;
+              loc_y1 = loc_y1 + random / x;
+              loc_x2 = loc_x1 + firmBitmap->loc_width - 1;
+              loc_y2 = loc_y1 + firmBitmap->loc_height - 1;
+              //		altitude = world.get_corner( loc_x1, loc_y1
+              //)->get_altitude();
+              if (firmBitmap->random_flag != 'R')
+                frame_looping = firmBitmap->random_flag - '0';
+            }
+          } else
+            end_frame = k;
+          break;
+        }
+      }
+    }
+  }
+
+  err_when(end_frame < start_frame || end_frame == 0);
+
+  frame = start_frame;
 }
 
-
-void FirmDie::pre_process()
-{
-	//nothing
+void FirmDie::pre_process() {
+  // nothing
 }
 
-int FirmDie::process()
-{
-	FirmBuild *firmBuild = firm_die_res.get_build(firm_build_id);
+int FirmDie::process() {
+  FirmBuild *firmBuild = firm_die_res.get_build(firm_build_id);
 
-	if( --frame_delay_count < 1 )
-//	if( ++frame_delay_count > firmBuild->frame_delay_array[frame-1])
-	{
-	//	frame_delay_count = 0;
-	//	if( ++frame > 	firmBuild->frame_count)
-		if( ++frame > 	end_frame)
-		{
-			if (frame_looping >0)
-			{
-				frame_looping --;
-				frame = start_frame;
-				return 0;
-			}
-			firmBuild->free_bitmap_res();
-			return 1;
-		}
-	}
-	return 0;
+  if (--frame_delay_count < 1)
+  //	if( ++frame_delay_count > firmBuild->frame_delay_array[frame-1])
+  {
+    //	frame_delay_count = 0;
+    //	if( ++frame > 	firmBuild->frame_count)
+    if (++frame > end_frame) {
+      if (frame_looping > 0) {
+        frame_looping--;
+        frame = start_frame;
+        return 0;
+      }
+      firmBuild->free_bitmap_res();
+      return 1;
+    }
+  }
+  return 0;
 }
 
-void FirmDie::draw(int displayLayer)
-{
-	// get ground dirt from firm_res
-	FirmBuild* firmBuild = firm_res.get_build(firm_build_id);
+void FirmDie::draw(int displayLayer) {
+  // get ground dirt from firm_res
+  FirmBuild *firmBuild = firm_res.get_build(firm_build_id);
 
-	if( firmBuild->ground_bitmap_recno )
-	{
-//		firm_res.get_bitmap(firmBuild->ground_bitmap_recno)
-//			->draw_at(loc_x1*ZOOM_LOC_WIDTH, loc_y1*ZOOM_LOC_HEIGHT, NULL, displayLayer);
-	}
+  if (firmBuild->ground_bitmap_recno) {
+    //		firm_res.get_bitmap(firmBuild->ground_bitmap_recno)
+    //			->draw_at(loc_x1*ZOOM_LOC_WIDTH, loc_y1*ZOOM_LOC_HEIGHT, NULL,
+    //displayLayer);
+  }
 
-	//---------- draw animation now ------------//
+  //---------- draw animation now ------------//
 
-	firmBuild = firm_die_res.get_build(firm_build_id);
-	FirmDieBitmap* firmBitmap;
+  firmBuild = firm_die_res.get_build(firm_build_id);
+  FirmDieBitmap *firmBitmap;
 
-	int bitmapRecno, i;
-	int firstBitmap = firmBuild->first_bitmap(frame);
-	int bitmapCount = firmBuild->bitmap_count(frame);
-	
+  int bitmapRecno, i;
+  int firstBitmap = firmBuild->first_bitmap(frame);
+  int bitmapCount = firmBuild->bitmap_count(frame);
 
-	short* colorRemapTable = firmBuild->get_color_remap_table(nation_recno, 0);
+  short *colorRemapTable = firmBuild->get_color_remap_table(nation_recno, 0);
 
-	for( i=0, bitmapRecno=firstBitmap ; i<bitmapCount ; i++, bitmapRecno++ )
-	{
-		firmBitmap = firm_die_res.get_bitmap(bitmapRecno);
+  for (i = 0, bitmapRecno = firstBitmap; i < bitmapCount; i++, bitmapRecno++) {
+    firmBitmap = firm_die_res.get_bitmap(bitmapRecno);
 
-		if( firmBitmap )
-		{
-		//	char *bitmapPtr;
-		//	firmBitmap->bitmap_ptr = bitmapPtr = firm_die_res.res_bitmap.read_imported(firmBitmap->bitmap_ptr);
-		//	firmBitmap->width = *(short *)bitmapPtr;
-		//	firmBitmap->height= *(1+(short *)bitmapPtr);
-			firmBitmap->draw_at(loc_x1 * LOCATE_WIDTH, loc_y1 * LOCATE_HEIGHT, altitude, colorRemapTable, displayLayer, firmBuild);
-		}
-	}
+    if (firmBitmap) {
+      //	char *bitmapPtr;
+      //	firmBitmap->bitmap_ptr = bitmapPtr =
+      //firm_die_res.res_bitmap.read_imported(firmBitmap->bitmap_ptr);
+      //	firmBitmap->width = *(short *)bitmapPtr;
+      //	firmBitmap->height= *(1+(short *)bitmapPtr);
+      firmBitmap->draw_at(loc_x1 * LOCATE_WIDTH, loc_y1 * LOCATE_HEIGHT,
+                          altitude, colorRemapTable, displayLayer, firmBuild);
+    }
+  }
 }
 
 // ------ Begin of function Place::is_stealth -------//
 //
-int FirmDie::is_stealth()
-{
-	return config.blacken_map && !world.is_explored_quick( loc_x1, loc_y1, loc_x2, loc_y2 );
+int FirmDie::is_stealth() {
+  return config.blacken_map &&
+         !world.is_explored_quick(loc_x1, loc_y1, loc_x2, loc_y2);
 }
 // ------ End of function Place::is_stealth -------//
 
-
-FirmDieArray::FirmDieArray() : DynArrayB(sizeof(FirmDie),10, DEFAULT_REUSE_INTERVAL_DAYS)
-{
-	// nothing
+FirmDieArray::FirmDieArray()
+    : DynArrayB(sizeof(FirmDie), 10, DEFAULT_REUSE_INTERVAL_DAYS) {
+  // nothing
 }
 
-FirmDieArray::~FirmDieArray()
-{
-   deinit();
+FirmDieArray::~FirmDieArray() { deinit(); }
+
+void FirmDieArray::init() { zap(); }
+
+void FirmDieArray::deinit() {
+  // nothing
 }
 
-void FirmDieArray::init()
-{
-	zap();
+void FirmDieArray::process() {
+  int i, j;
+
+  for (i = 1, j = size(); j; --j, ++i) {
+    if (is_deleted(i))
+      continue;
+
+    FirmDie *firmDiePtr = this->operator[](i);
+
+    if (firmDiePtr->process()) {
+      del(i);
+      continue;
+    }
+  }
 }
 
-void FirmDieArray::deinit()
-{
-	// nothing
+int FirmDieArray::add(FirmDie *r) {
+  linkin(r);
+  return recno();
 }
 
-void FirmDieArray::process()
-{
-	int i, j;
+void FirmDieArray::del(int i) { linkout(i); }
 
-	for( i=1, j=size(); j; --j, ++i)
-	{
-		if( is_deleted(i) )
-			continue;
+FirmDie *FirmDieArray::operator[](int recNo) {
+  FirmDie *firmDiePtr = (FirmDie *)get(recNo);
 
-		FirmDie *firmDiePtr = this->operator[](i);
+  if (!firmDiePtr || is_deleted(recNo))
+    err.run("FirmDieArray[] is deleted");
 
-		if( firmDiePtr->process() )
-		{
-			del(i);
-			continue;
-		}
-	}
+  return firmDiePtr;
 }
 
-
-
-int FirmDieArray::add(FirmDie *r)
-{
-	linkin(r);
-	return recno();
+int FirmDieArray::is_deleted(int recNo) {
+  FirmDie *firmDiePtr = (FirmDie *)get(recNo);
+  if (!firmDiePtr || firmDiePtr->firm_id == 0)
+    return 1;
+  return 0;
 }
-
-void FirmDieArray::del(int i)
-{
-	linkout(i);
-}
-
-
-FirmDie *FirmDieArray::operator[](int recNo)
-{
-   FirmDie* firmDiePtr = (FirmDie*) get(recNo);
-
-   if( !firmDiePtr || is_deleted(recNo) )
-      err.run( "FirmDieArray[] is deleted" );
-
-   return firmDiePtr;
-}
-
-int FirmDieArray::is_deleted(int recNo)
-{
-	FirmDie* firmDiePtr = (FirmDie*) get(recNo);
-	if( !firmDiePtr || firmDiePtr->firm_id == 0)
-		return 1;
-	return 0;
-}
-

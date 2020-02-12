@@ -21,19 +21,17 @@
 // Filename    : OT_ITEM.H
 // Description : header file of Text Resource Item
 
-
 #ifndef __OT_ITEM_H
 #define __OT_ITEM_H
 
 #include <otxtres.h>
 
-class TextResItem : public TextResource
-{
+class TextResItem : public TextResource {
 public:
-	void	init();
+  void init();
 
-	const char*	str_item_name(int itemId);
-	const char*	str_item_desc(int itemId);
+  const char *str_item_name(int itemId);
+  const char *str_item_desc(int itemId);
 };
 
 extern TextResItem text_item;

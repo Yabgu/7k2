@@ -26,19 +26,18 @@
 
 #include <otxtres.h>
 
-class TextResBasic : public TextResource
-{
+class TextResBasic : public TextResource {
 public:
-	void	init();
+  void init();
 
-	// date class text
-	char*	str_long_date(int day, int month, int year );
-	char*	str_short_date(int day, int month, int year );
-	const char* str_month_string(int month);
+  // date class text
+  char *str_long_date(int day, int month, int year);
+  char *str_short_date(int day, int month, int year);
+  const char *str_month_string(int month);
 
-	// box class text
-	char* str_box_ok();
-	char* str_box_cancel();
+  // box class text
+  char *str_box_ok();
+  char *str_box_cancel();
 };
 
 extern TextResBasic text_basic;

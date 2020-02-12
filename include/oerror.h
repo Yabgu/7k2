@@ -18,8 +18,8 @@
  *
  */
 
-//Filename    : oerror.h
-//Description : Header file for the Error class
+// Filename    : oerror.h
+// Description : Header file for the Error class
 
 #ifndef __OERROR_H
 #define __OERROR_H
@@ -28,20 +28,21 @@
 
 typedef void (*ExtraHandler)();
 
-class Error
-{
+class Error {
 private:
-	ExtraHandler extra_handler;          // extra error handler
+  ExtraHandler extra_handler; // extra error handler
 
 public:
-	Error();
+  Error();
 
-	void		internal(char*,const char*,int);
-	void		mem();
-	void		msg(const char*,...);
-	void		run(const char*,...);
+  void internal(char *, const char *, int);
+  void mem();
+  void msg(const char *, ...);
+  void run(const char *, ...);
 
-	void		set_extra_handler(ExtraHandler extraHandler) { extra_handler = extraHandler; }
+  void set_extra_handler(ExtraHandler extraHandler) {
+    extra_handler = extraHandler;
+  }
 };
 
 extern Error err;
@@ -49,19 +50,22 @@ extern Error err;
 //-------- error handling functions ----------//
 
 #ifdef DEBUG
-	#define err_when(cond)   if(cond) err.internal(NULL,__FILE__, __LINE__)
-	#define err_here()       err.internal(NULL,__FILE__, __LINE__)
-	#define err_if(cond)     if(cond)
-	#define err_else         else
-	#define err_now(msg)     err.run(msg)        // internal error
+#define err_when(cond)                                                         \
+  if (cond)                                                                    \
+  err.internal(NULL, __FILE__, __LINE__)
+#define err_here() err.internal(NULL, __FILE__, __LINE__)
+#define err_if(cond) if (cond)
+#define err_else else
+#define err_now(msg) err.run(msg) // internal error
 
-   // always use err_if(cond) together with err_now(), so when debug is turn off, these two statement will turn off
+// always use err_if(cond) together with err_now(), so when debug is turn off,
+// these two statement will turn off
 #else
-	#define err_when(cond)
-	#define err_here()
-	#define err_if(cond)
-	#define err_else
-	#define err_now(msg)
+#define err_when(cond)
+#define err_here()
+#define err_if(cond)
+#define err_else
+#define err_now(msg)
 #endif
 
 #endif // __OERROR_H

@@ -18,62 +18,57 @@
  *
  */
 
-//Filename    : OFILE.CPP
-//Description : Object File
+// Filename    : OFILE.CPP
+// Description : Object File
 
 #include <all.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <ctype.h>
-#include <string.h>
-#include <dbglog.h>
-#include <ofile.h>
-#include <errno.h>
-#include <stdexcept>
-#include <regex>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <ctype.h>
+#include <dbglog.h>
+#include <errno.h>
+#include <ofile.h>
+#include <regex>
+#include <stdexcept>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 DBGLOG_DEFAULT_CHANNEL(File);
 
+static boost::filesystem::path
+findRelativeFileCaseInsensitive(const boost::filesystem::path &path) {
+  using namespace boost::filesystem;
+  auto pathString = path.string();
+  static const std::string base = "/home/abdurrahim/Seven Kingdoms 2 HD/";
 
-static boost::filesystem::path findRelativeFileCaseInsensitive(const boost::filesystem::path& path)
-{
-	using namespace boost::filesystem;
-	auto pathString = path.string();
-	static const std::string base = "/home/abdurrahim/Seven Kingdoms 2 HD/";
+  boost::replace_all(pathString, "*", ".*");
+  std::regex pattern(pathString, std::regex_constants::icase);
 
-	boost::replace_all(pathString, "*", ".*");
-	std::regex pattern(pathString, std::regex_constants::icase);
+  for (auto &entry :
+       boost::make_iterator_range(recursive_directory_iterator(base), {})) {
+    if (is_regular_file(entry)) {
+      auto fileName = entry.path().string().substr(base.length());
+      if (std::regex_match(fileName, pattern)) {
+        return entry;
+      }
+    }
+  }
 
-	for (auto& entry : boost::make_iterator_range(recursive_directory_iterator(base), {}))
-	{
-		if (is_regular_file(entry))
-		{
-			auto fileName = entry.path().string().substr(base.length());
-			if (std::regex_match(fileName, pattern))
-			{
-				return entry;
-			}
-		}
-	}
+  for (auto &entry : boost::make_iterator_range(
+           recursive_directory_iterator(path.parent_path()), {})) {
+    if (is_regular_file(entry)) {
+      if (std::regex_match(entry.path().string(), pattern)) {
+        return entry;
+      }
+    }
+  }
 
-	for (auto& entry : boost::make_iterator_range(recursive_directory_iterator(path.parent_path()), {}))
-	{
-		if (is_regular_file(entry))
-		{
-			if (std::regex_match(entry.path().string(), pattern))
-			{
-				return entry;
-			}
-		}
-	}
-
-	//throw std::runtime_error("cant find file");
-	return path;
+  // throw std::runtime_error("cant find file");
+  return path;
 }
 
 //-------- Begin of function File::file_open ----------//
@@ -86,56 +81,53 @@ static boost::filesystem::path findRelativeFileCaseInsensitive(const boost::file
 //                         quit immediately on fatal errors; now this only
 //                         affects error channel being used to output error
 //                         message (ERR or MSG)
-// [int]   fileType = FLAT (0, default) or STRUCTURED (1). Structured file stores
+// [int]   fileType = FLAT (0, default) or STRUCTURED (1). Structured file
+// stores
 //                    its data as a records, where every record has the
 //                    following format: [entry size: uint16; entry data: bytes]
-//                    However this behaviour is used with read/write methods only;
-//                    put/get methods (e.g. put_short) still write raw data.
+//                    However this behaviour is used with read/write methods
+//                    only; put/get methods (e.g. put_short) still write raw
+//                    data.
 //
 // return : 1-success, 0-fail
 //
-int File::file_open(const char* fileName, int handleError, int fileType)
-{
-	char name[MAX_PATH+1];
-	int size = strlen(fileName);
+int File::file_open(const char *fileName, int handleError, int fileType) {
+  char name[MAX_PATH + 1];
+  int size = strlen(fileName);
 
-	if(strlen(fileName) > MAX_PATH)
-		err.run("File : file name is too long.");
+  if (strlen(fileName) > MAX_PATH)
+    err.run("File : file name is too long.");
 
-	if (file_handle != NULL)
-		file_close();
+  if (file_handle != NULL)
+    file_close();
 
-	strcpy(name, fileName);
-	for (int i = 0; i < size; i++)
-	{
-		if (name[i] == '\\') name[i] = '/';
-	}
+  strcpy(name, fileName);
+  for (int i = 0; i < size; i++) {
+    if (name[i] == '\\')
+      name[i] = '/';
+  }
 
-	handle_error = handleError;
-	file_type = (FileType)fileType;
+  handle_error = handleError;
+  file_type = (FileType)fileType;
 
-	file_handle = fopen(name, "rb");
+  file_handle = fopen(name, "rb");
 
-	if (!file_handle)
-	{
-		auto found = findRelativeFileCaseInsensitive(name);
-		strcpy(name, found.c_str());
-		file_handle = fopen(name, "rb");
-	}
+  if (!file_handle) {
+    auto found = findRelativeFileCaseInsensitive(name);
+    strcpy(name, found.c_str());
+    file_handle = fopen(name, "rb");
+  }
 
+  if (!file_handle) {
+    return 0;
+  }
 
-	if (!file_handle)
-	{
-		return 0;
-	}
+  strcpy(file_name, name);
 
-	strcpy(file_name, name);
-
-	MSG("[File::file_open] opened %s\n", file_name);
-	return 1;
+  MSG("[File::file_open] opened %s\n", file_name);
+  return 1;
 }
 //---------- End of function File::file_open ----------//
-
 
 //-------- Begin of function File::file_create ----------//
 //
@@ -147,67 +139,60 @@ int File::file_open(const char* fileName, int handleError, int fileType)
 //                         quit immediately on fatal errors; now this only
 //                         affects error channel being used to output error
 //                         message (ERR or MSG)
-// [int]   fileType = FLAT (0, default) or STRUCTURED (1). Structured file stores
+// [int]   fileType = FLAT (0, default) or STRUCTURED (1). Structured file
+// stores
 //                    its data as a records, where every record has the
 //                    following format: [entry size: uint16; entry data: bytes]
-//                    However this behaviour is used with read/write methods only;
-//                    put/get methods (e.g. put_short) still write raw data.
+//                    However this behaviour is used with read/write methods
+//                    only; put/get methods (e.g. put_short) still write raw
+//                    data.
 //
 // return : 1-success, 0-fail
 //
-int File::file_create(const char* fileName, int handleError, int fileType)
-{
-	if(strlen(fileName) > MAX_PATH)
-		err.run("File : file name is too long.");
+int File::file_create(const char *fileName, int handleError, int fileType) {
+  if (strlen(fileName) > MAX_PATH)
+    err.run("File : file name is too long.");
 
-	strcpy(file_name, fileName);
-	// FIXME: this fileName handling is broken
-	for (int i = 0; i < strlen(fileName); i++)
-	{
-		file_name[i] = tolower(file_name[i]);
-		if (file_name[i] == '\\') file_name[i] = '/';
-	}
+  strcpy(file_name, fileName);
+  // FIXME: this fileName handling is broken
+  for (int i = 0; i < strlen(fileName); i++) {
+    file_name[i] = tolower(file_name[i]);
+    if (file_name[i] == '\\')
+      file_name[i] = '/';
+  }
 
-	handle_error = handleError;
-	file_type = (FileType)fileType;
+  handle_error = handleError;
+  file_type = (FileType)fileType;
 
-	file_handle = fopen(fileName, "wb+");
-	if (!file_handle)
-	{
-		err.run("[File::file_create] couldn't create %s: %s\n", fileName, strerror(errno));
-	}
+  file_handle = fopen(fileName, "wb+");
+  if (!file_handle) {
+    err.run("[File::file_create] couldn't create %s: %s\n", fileName,
+            strerror(errno));
+  }
 
-	MSG("[File::file_create] created %s\n", file_name);
-	return 1;
+  MSG("[File::file_create] created %s\n", file_name);
+  return 1;
 }
 //---------- End of function File::file_create ----------//
 
 //-------- Begin of function File::file_close ----------//
 //
-void File::file_close()
-{
-	if (file_handle != NULL)
-	{
-		MSG("[File::file_close] closing %s\n", file_name);
-		file_name[0] = '\0';
-		if (fclose(file_handle))
-		{
-			MSG("Error closing file descriptor: %s\n", strerror(errno));
-		}
-		file_handle = NULL;
-	}
+void File::file_close() {
+  if (file_handle != NULL) {
+    MSG("[File::file_close] closing %s\n", file_name);
+    file_name[0] = '\0';
+    if (fclose(file_handle)) {
+      MSG("Error closing file descriptor: %s\n", strerror(errno));
+    }
+    file_handle = NULL;
+  }
 }
 //---------- End of function File::file_close ----------//
 
-
 //-------- Begin of function File::~File ----------//
 //
-File::~File()
-{
-	file_close();
-}
+File::~File() { file_close(); }
 //---------- End of function File::~File ----------//
-
 
 //-------- Begin of function File::file_write ----------//
 //
@@ -218,43 +203,38 @@ File::~File()
 //
 // return : 1-success, 0-fail
 //
-int File::file_write(void* dataBuf, unsigned dataSize)
-{
-	err_when(!file_handle);
+int File::file_write(void *dataBuf, unsigned dataSize) {
+  err_when(!file_handle);
 
-	if (file_type == File::STRUCTURED)
-	{
-		// writing record size
-		if (dataSize > 0xFFFF)
-		{
-			// If 'dataSize' exceed the unsigned short limit, write 0
-			// instead of actual record size. Such a record may be
-			// correctly read though (if proper data size will be
-			// specified when calling successive file_read).
-			file_put_unsigned_short(0);
-			MSG("[File::file_write] warning: record size exceeds uint16 MAX value\n");
-		}
-		else
-		{
-			file_put_unsigned_short(dataSize);
-		}
-	}
+  if (file_type == File::STRUCTURED) {
+    // writing record size
+    if (dataSize > 0xFFFF) {
+      // If 'dataSize' exceed the unsigned short limit, write 0
+      // instead of actual record size. Such a record may be
+      // correctly read though (if proper data size will be
+      // specified when calling successive file_read).
+      file_put_unsigned_short(0);
+      MSG("[File::file_write] warning: record size exceeds uint16 MAX value\n");
+    } else {
+      file_put_unsigned_short(dataSize);
+    }
+  }
 
-	fwrite(dataBuf, 1, dataSize, file_handle);
+  fwrite(dataBuf, 1, dataSize, file_handle);
 
-	if (ferror(file_handle))
-	{
-		if (handle_error)
-			err.run("[File::file_write] error occured while writing file: %s\n", file_name);
-		else
-			ERR("[File::file_write] error occured while writing file: %s\n", file_name);
-		return 0;
-	}
+  if (ferror(file_handle)) {
+    if (handle_error)
+      err.run("[File::file_write] error occured while writing file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_write] error occured while writing file: %s\n",
+          file_name);
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 //---------- End of function File::file_write ----------//
-
 
 //-------- Begin of function File::file_read ----------//
 //
@@ -265,180 +245,179 @@ int File::file_write(void* dataBuf, unsigned dataSize)
 //
 // return : 1-success, 0-fail
 //
-int File::file_read(void* dataBuf, unsigned dataSize)
-{
-	err_when(!file_handle);
+int File::file_read(void *dataBuf, unsigned dataSize) {
+  err_when(!file_handle);
 
-	unsigned bytesToRead = dataSize, recordSize = dataSize;
+  unsigned bytesToRead = dataSize, recordSize = dataSize;
 
-	if (file_type == File::STRUCTURED)
-	{
-		recordSize = file_get_unsigned_short();
-		if (recordSize && recordSize < dataSize) // recordSize==0, if the size > 0xFFFF
-			bytesToRead = recordSize; // the read size is the minimum of the record size and the supposed read size
-	}
+  if (file_type == File::STRUCTURED) {
+    recordSize = file_get_unsigned_short();
+    if (recordSize &&
+        recordSize < dataSize)  // recordSize==0, if the size > 0xFFFF
+      bytesToRead = recordSize; // the read size is the minimum of the record
+                                // size and the supposed read size
+  }
 
-	fread(dataBuf, 1, bytesToRead, file_handle);
+  fread(dataBuf, 1, bytesToRead, file_handle);
 
-	// In the case of file_type == File::STRUCTURED
-	// if the record was read partially,
-	// skip remaining bytes in record and seek to next one
-	if (bytesToRead < recordSize)
-		file_seek(recordSize - bytesToRead, SEEK_CUR);
+  // In the case of file_type == File::STRUCTURED
+  // if the record was read partially,
+  // skip remaining bytes in record and seek to next one
+  if (bytesToRead < recordSize)
+    file_seek(recordSize - bytesToRead, SEEK_CUR);
 
-	// In the case of file_type == File::STRUCTURED
-	// if the actual record size was smaller than requested data size,
-	// fill the remaining bytes in buffer with 0
-	if (bytesToRead < dataSize)
-		memset((char*)dataBuf + bytesToRead, 0, dataSize - bytesToRead);
+  // In the case of file_type == File::STRUCTURED
+  // if the actual record size was smaller than requested data size,
+  // fill the remaining bytes in buffer with 0
+  if (bytesToRead < dataSize)
+    memset((char *)dataBuf + bytesToRead, 0, dataSize - bytesToRead);
 
-	if (ferror(file_handle))
-	{
-		// This used to prompt for a retry -- was this necessary?
-		if (handle_error)
-			err.run("[File::file_read] error occured while reading file: %s\n", file_name);
-		else
-			ERR("[File::file_read] error occured while reading file: %s\n", file_name);
-		return 0;
-	}
+  if (ferror(file_handle)) {
+    // This used to prompt for a retry -- was this necessary?
+    if (handle_error)
+      err.run("[File::file_read] error occured while reading file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_read] error occured while reading file: %s\n",
+          file_name);
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 //---------- End of function File::file_read ----------//
 
+int File::file_put_short(int16_t value) {
+  err_when(!file_handle);
 
-int File::file_put_short(int16_t value)
-{
-	err_when(!file_handle);
+  fwrite(&value, 1, sizeof(int16_t), file_handle);
 
-	fwrite(&value, 1, sizeof(int16_t), file_handle);
+  if (ferror(file_handle)) {
+    if (handle_error)
+      err.run("[File::file_put_short] error occured while writing file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_put_short] error occured while writing file: %s\n",
+          file_name);
+    return 0;
+  }
 
-	if (ferror(file_handle))
-	{
-		if (handle_error)
-			err.run("[File::file_put_short] error occured while writing file: %s\n", file_name);
-		else
-			ERR("[File::file_put_short] error occured while writing file: %s\n", file_name);
-		return 0;
-	}
-
-	return 1;
+  return 1;
 }
 
-int16_t File::file_get_short()
-{
-	err_when(!file_handle);
+int16_t File::file_get_short() {
+  err_when(!file_handle);
 
-    int16_t value;
-    fread(&value, 1, sizeof(int16_t), file_handle);
+  int16_t value;
+  fread(&value, 1, sizeof(int16_t), file_handle);
 
-	if (ferror(file_handle))
-	{
-		if (handle_error)
-			err.run("[File::file_get_short] error occured while reading file: %s\n", file_name);
-		else
-			ERR("[File::file_get_short] error occured while reading file: %s\n", file_name);
-		return 0;
-	}
+  if (ferror(file_handle)) {
+    if (handle_error)
+      err.run("[File::file_get_short] error occured while reading file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_get_short] error occured while reading file: %s\n",
+          file_name);
+    return 0;
+  }
 
-	return value;
+  return value;
 }
 
-int File::file_put_unsigned_short(uint16_t value)
-{
-	err_when(!file_handle);
+int File::file_put_unsigned_short(uint16_t value) {
+  err_when(!file_handle);
 
-    fwrite(&value, 1, sizeof(uint16_t), file_handle);
+  fwrite(&value, 1, sizeof(uint16_t), file_handle);
 
-	if (ferror(file_handle))
-	{
-		if (handle_error)
-			err.run("[File::file_put_unsigned_short] error occured while writing file: %s\n", file_name);
-		else
-			ERR("[File::file_put_unsigned_short] error occured while writing file: %s\n", file_name);
-		return 0;
-	}
+  if (ferror(file_handle)) {
+    if (handle_error)
+      err.run("[File::file_put_unsigned_short] error occured while writing "
+              "file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_put_unsigned_short] error occured while writing file: "
+          "%s\n",
+          file_name);
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
-uint16_t File::file_get_unsigned_short()
-{
-	err_when(!file_handle);
+uint16_t File::file_get_unsigned_short() {
+  err_when(!file_handle);
 
-    uint16_t value;
-    fread(&value, 1, sizeof(uint16_t), file_handle);
+  uint16_t value;
+  fread(&value, 1, sizeof(uint16_t), file_handle);
 
-	if (ferror(file_handle))
-	{
-		if (handle_error)
-			err.run("[File::file_get_unsigned_short] error occured while reading file: %s\n", file_name);
-		else
-			ERR("[File::file_get_unsigned_short] error occured while reading file: %s\n", file_name);
-		return 0;
-	}
+  if (ferror(file_handle)) {
+    if (handle_error)
+      err.run("[File::file_get_unsigned_short] error occured while reading "
+              "file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_get_unsigned_short] error occured while reading file: "
+          "%s\n",
+          file_name);
+    return 0;
+  }
 
-	return value;
+  return value;
 }
 
-int File::file_put_long(int32_t value)
-{
-	err_when(!file_handle);
+int File::file_put_long(int32_t value) {
+  err_when(!file_handle);
 
-    fwrite(&value, 1, sizeof(int32_t), file_handle);
+  fwrite(&value, 1, sizeof(int32_t), file_handle);
 
-	if (ferror(file_handle))
-	{
-		if (handle_error)
-			err.run("[File::file_put_long] error occured while writing file: %s\n", file_name);
-		else
-			ERR("[File::file_put_long] error occured while writing file: %s\n", file_name);
-		return 0;
-	}
+  if (ferror(file_handle)) {
+    if (handle_error)
+      err.run("[File::file_put_long] error occured while writing file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_put_long] error occured while writing file: %s\n",
+          file_name);
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
-int32_t File::file_get_long()
-{
-	err_when(!file_handle);
+int32_t File::file_get_long() {
+  err_when(!file_handle);
 
-    int32_t value;
-    fread(&value, 1, sizeof(int32_t), file_handle);
+  int32_t value;
+  fread(&value, 1, sizeof(int32_t), file_handle);
 
-	if (ferror(file_handle))
-	{
-		if (handle_error)
-			err.run("[File::file_get_long] error occured while reading file: %s\n", file_name);
-		else
-			ERR("[File::file_get_long] error occured while reading file: %s\n", file_name);
-		return 0;
-	}
+  if (ferror(file_handle)) {
+    if (handle_error)
+      err.run("[File::file_get_long] error occured while reading file: %s\n",
+              file_name);
+    else
+      ERR("[File::file_get_long] error occured while reading file: %s\n",
+          file_name);
+    return 0;
+  }
 
-	return value;
+  return value;
 }
 
 //---------- Start of function File::file_seek ---------//
 // whence = SEEK_SET, SEEK_CUR, SEEK_END (default: SEEK_SET)
 // return : new offset from the file beginning.
-long File::file_seek(long offset, int whence)
-{
-	fseek(file_handle, offset, whence);
-	return ftell(file_handle);
+long File::file_seek(long offset, int whence) {
+  fseek(file_handle, offset, whence);
+  return ftell(file_handle);
 }
 
-long File::file_pos()
-{
-	return ftell(file_handle);
-}
+long File::file_pos() { return ftell(file_handle); }
 
-long File::file_size()
-{
-	long actual = ftell(file_handle);
-	fseek(file_handle, 0, SEEK_END);
+long File::file_size() {
+  long actual = ftell(file_handle);
+  fseek(file_handle, 0, SEEK_END);
 
-	long size = ftell(file_handle);
+  long size = ftell(file_handle);
 
-	fseek(file_handle, actual, SEEK_SET);
-	return size;
+  fseek(file_handle, actual, SEEK_SET);
+  return size;
 }

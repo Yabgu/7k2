@@ -18,28 +18,26 @@
  *
  */
 
-//Filename   : OC_EAS26.CPP
-//Description: CampaignEastWest - STAGE_TRAIN_LEADERS
+// Filename   : OC_EAS26.CPP
+// Description: CampaignEastWest - STAGE_TRAIN_LEADERS
 
 #include <all.h>
-#include <osite.h>
-#include <otech.h>
-#include <ogame.h>
-#include <otechres.h>
-#include <ostate.h>
-#include <ogodres.h>
-#include <oraceres.h>
-#include <onews.h>
-#include <omonsres.h>
-#include <onation2.h>
 #include <oc_east.h>
 #include <of_inn.h>
-
+#include <ogame.h>
+#include <ogodres.h>
+#include <omonsres.h>
+#include <onation2.h>
+#include <onews.h>
+#include <oraceres.h>
+#include <osite.h>
+#include <ostate.h>
+#include <otech.h>
+#include <otechres.h>
 
 //---------- Define static vars ------------//
 
 static int goal_train_unit_leadership, goal_year_limit;
-
 
 //---- Begin of function CampaignEastWest::stage_26_create_game ----//
 //
@@ -47,296 +45,272 @@ static int goal_train_unit_leadership, goal_year_limit;
 //
 // None
 //
-int CampaignEastWest::stage_26_create_game()
-{
-	init_random_plot(0);		// no plot
+int CampaignEastWest::stage_26_create_game() {
+  init_random_plot(0); // no plot
 
-	//--- the player's military is relatively weak in this scenario ---//
+  //--- the player's military is relatively weak in this scenario ---//
 
-	set_std_situation();
+  set_std_situation();
 
-	cur_situation.military_level = 45 - campaign_difficulty * 5;
-	cur_situation.cash_level = 25;
+  cur_situation.military_level = 45 - campaign_difficulty * 5;
+  cur_situation.cash_level = 25;
 
-	//------- create objects and vars --------//
+  //------- create objects and vars --------//
 
-	if( !stage_26_create_nation() )
-		return 0;
+  if (!stage_26_create_nation())
+    return 0;
 
-	if( !stage_26_create_town() )
-		return 0;
+  if (!stage_26_create_town())
+    return 0;
 
-	if( !stage_26_create_firm() )
-		return 0;
+  if (!stage_26_create_firm())
+    return 0;
 
-	//------ init stage 1 vars -------//
+  //------ init stage 1 vars -------//
 
-	stage_26_init_vars();
+  stage_26_init_vars();
 
-	//---- generate plants and other objects on the map -----//
+  //---- generate plants and other objects on the map -----//
 
-	world.gen_rocks();		// generate mountains
+  world.gen_rocks(); // generate mountains
 
-	world.generate_map2();
+  world.generate_map2();
 
-	//------- create additional raw sites ----------//
+  //------- create additional raw sites ----------//
 
-	create_raw_site();
+  create_raw_site();
 
-	// ----- create royal units ------//
+  // ----- create royal units ------//
 
-	create_royal_units(CAMPAIGN_PLAYER_NATION_RECNO);
+  create_royal_units(CAMPAIGN_PLAYER_NATION_RECNO);
 
-	//------ plot create game --------//
+  //------ plot create game --------//
 
-	(this->*plot_create_game_FP)();
+  (this->*plot_create_game_FP)();
 
-	return 1;
+  return 1;
 }
 //---- End of function CampaignEastWest::stage_26_create_game -----//
 
-
 //---- Begin of function CampaignEastWest::stage_26_init_vars ----//
 
-void CampaignEastWest::stage_26_init_vars()
-{
-	//------ set game event vars -------//
+void CampaignEastWest::stage_26_init_vars() {
+  //------ set game event vars -------//
 
-	rebel_count = MAX(1, campaign_difficulty-1);
-	next_rebel_date = info.game_date + 30 + misc.random(30);
+  rebel_count = MAX(1, campaign_difficulty - 1);
+  next_rebel_date = info.game_date + 30 + misc.random(30);
 
-	general_defect_count = 5;
+  general_defect_count = 5;
 
-	//------- set player nation vars -------//
+  //------- set player nation vars -------//
 
-	init_player_resource(25);
+  init_player_resource(25);
 
-	//-------- add victory conditions -------//
+  //-------- add victory conditions -------//
 
-	game.reset_win_condition();
-	game.add_win_condition( E_TRAIN_10_GENERAL, 1, 0, goal_train_unit_leadership, goal_year_limit );
+  game.reset_win_condition();
+  game.add_win_condition(E_TRAIN_10_GENERAL, 1, 0, goal_train_unit_leadership,
+                         goal_year_limit);
 }
 //---- End of function CampaignEastWest::stage_26_init_vars -----//
-
 
 //---- Begin of function CampaignEastWest::stage_26_prelude ----//
 //
 // Pick a state to attack.
 //
-void CampaignEastWest::stage_26_prelude()
-{
-	//-------- randomize goal settings --------//
+void CampaignEastWest::stage_26_prelude() {
+  //-------- randomize goal settings --------//
 
-	goal_train_unit_leadership = 90;
+  goal_train_unit_leadership = 90;
 
-	goal_year_limit = 18 - campaign_difficulty * 2;
+  goal_year_limit = 18 - campaign_difficulty * 2;
 
-	//------------ display letter -------------//
-	
-	play_speech("PRE-26.WAV");
-	disp_narrative( res_stage.read("26PRELUD"), goal_train_unit_leadership, goal_year_limit );
-	stop_speech();
+  //------------ display letter -------------//
 
-	target_state_recno = random_pick_state(PLAYER_NATION_RECNO);
+  play_speech("PRE-26.WAV");
+  disp_narrative(res_stage.read("26PRELUD"), goal_train_unit_leadership,
+                 goal_year_limit);
+  stop_speech();
 
-	flash_state( target_state_recno );
+  target_state_recno = random_pick_state(PLAYER_NATION_RECNO);
 
-	//------- set config settings -------//
+  flash_state(target_state_recno);
 
-	config.explore_whole_map = 1;
+  //------- set config settings -------//
+
+  config.explore_whole_map = 1;
 }
 //---- End of function CampaignEastWest::stage_26_prelude -----//
 
-
 //---- Begin of function CampaignEastWest::stage_26_create_nation ----//
 
-int CampaignEastWest::stage_26_create_nation()
-{
-	//-------- create the player nation ------//
+int CampaignEastWest::stage_26_create_nation() {
+  //-------- create the player nation ------//
 
-	state_array[target_state_recno]->add_game_nation();
+  state_array[target_state_recno]->add_game_nation();
 
-	return 1;
+  return 1;
 }
 //---- End of function CampaignEastWest::stage_26_create_nation ----//
 
-
 //---- Begin of function CampaignEastWest::stage_26_create_town ----//
 
-int CampaignEastWest::stage_26_create_town()
-{
-	//----- create independent towns ------//
+int CampaignEastWest::stage_26_create_town() {
+  //----- create independent towns ------//
 
-	Battle::create_independent_town(3+misc.random(2));
+  Battle::create_independent_town(3 + misc.random(2));
 
-	//---------- create towns ---------//
+  //---------- create towns ---------//
 
-	int townAddCount   = 5 + misc.random(3);		// 5 to 7
-	int hasFortPercent = 50;
+  int townAddCount = 5 + misc.random(3); // 5 to 7
+  int hasFortPercent = 50;
 
-	return create_town(PLAYER_NATION_RECNO, townAddCount, hasFortPercent);
+  return create_town(PLAYER_NATION_RECNO, townAddCount, hasFortPercent);
 }
 //---- End of function CampaignEastWest::stage_26_create_town ----//
 
-
 //---- Begin of function CampaignEastWest::stage_26_create_firm ----//
 
-int CampaignEastWest::stage_26_create_firm()
-{
-	//----- create firms around established towns -----//
+int CampaignEastWest::stage_26_create_firm() {
+  //----- create firms around established towns -----//
 
-	Nation* nationPtr = nation_array[PLAYER_NATION_RECNO];
+  Nation *nationPtr = nation_array[PLAYER_NATION_RECNO];
 
-	int townRecno1 = king_oversee_town_recno(PLAYER_NATION_RECNO);
-	int townRecno2 = random_pick_town_with_camp(PLAYER_NATION_RECNO, 2);		// only pick towns with <= 2 links
+  int townRecno1 = king_oversee_town_recno(PLAYER_NATION_RECNO);
+  int townRecno2 = random_pick_town_with_camp(
+      PLAYER_NATION_RECNO, 2); // only pick towns with <= 2 links
 
-	if( townRecno2 && misc.random(2)==0 )		// swap the town in 50% chance
-	{
-		int t=townRecno1;
-		townRecno1 = townRecno2;
-		townRecno2 = t;
-	}
+  if (townRecno2 && misc.random(2) == 0) // swap the town in 50% chance
+  {
+    int t = townRecno1;
+    townRecno1 = townRecno2;
+    townRecno2 = t;
+  }
 
-	//--- while the races of towns are random, the two main towns' race has to be the king's race ---//
+  //--- while the races of towns are random, the two main towns' race has to be
+  //the king's race ---//
 
-	town_array[townRecno1]->set_race(nationPtr->race_id);
+  town_array[townRecno1]->set_race(nationPtr->race_id);
 
-	if( townRecno2 )
-		town_array[townRecno2]->set_race(nationPtr->race_id);
+  if (townRecno2)
+    town_array[townRecno2]->set_race(nationPtr->race_id);
 
-	if( !create_economic_firm(townRecno1) )
-		return 0;
+  if (!create_economic_firm(townRecno1))
+    return 0;
 
-	if( townRecno2 && !create_military_firm(townRecno2) )
-		return 0;
+  if (townRecno2 && !create_military_firm(townRecno2))
+    return 0;
 
-	return 1;
+  return 1;
 }
 //---- End of function CampaignEastWest::stage_26_create_firm ----//
 
-
 //---- Begin of function CampaignEastWest::stage_26_intro_text ----//
 
-char* CampaignEastWest::stage_26_intro_text()
-{
-	return substitute_text( res_stage.read("26INTRO"), goal_train_unit_leadership, goal_year_limit );
+char *CampaignEastWest::stage_26_intro_text() {
+  return substitute_text(res_stage.read("26INTRO"), goal_train_unit_leadership,
+                         goal_year_limit);
 }
 //---- End of function CampaignEastWest::stage_26_intro_text ----//
 
-
 //---- Begin of function CampaignEastWest::stage_26_goal_text ----//
 
-char* CampaignEastWest::stage_26_goal_text()
-{
-	return substitute_text( res_stage.read("26GOAL"), goal_train_unit_leadership, goal_year_limit );
+char *CampaignEastWest::stage_26_goal_text() {
+  return substitute_text(res_stage.read("26GOAL"), goal_train_unit_leadership,
+                         goal_year_limit);
 }
 //---- End of function CampaignEastWest::stage_26_goal_text ----//
 
-
-
 //=================================================================//
-
 
 //------- Begin of function CampaignEastWest::stage_26_next_day -------//
 //
-void CampaignEastWest::stage_26_next_day()
-{
-	(this->*plot_next_day_FP)();
+void CampaignEastWest::stage_26_next_day() {
+  (this->*plot_next_day_FP)();
 
-	if( should_rebel(30) )
-		town_defect(PLAYER_NATION_RECNO);
+  if (should_rebel(30))
+    town_defect(PLAYER_NATION_RECNO);
 
-	if( misc.random(60+nation_array.nation_count*100)==0 && nation_array.nation_count < campaign_difficulty+1 &&
-		 general_defect_count > 0 ) 		// stop forming new nations when a specific number of new nations have already been formed.
-	{
-		general_defect_count--;
-		rebel_form_nation();       // when this function is called, a new nation will formed if there is any independent towns.
-	}
+  if (misc.random(60 + nation_array.nation_count * 100) == 0 &&
+      nation_array.nation_count < campaign_difficulty + 1 &&
+      general_defect_count >
+          0) // stop forming new nations when a specific number of new nations
+             // have already been formed.
+  {
+    general_defect_count--;
+    rebel_form_nation(); // when this function is called, a new nation will
+                         // formed if there is any independent towns.
+  }
 
-	//------ remove units from inn -------//
+  //------ remove units from inn -------//
 
-	if( info.game_date % 15 == 0 )
-	{
-		for( int i=firm_array.size() ; i>0 ; i-- )
-		{
-			if( firm_array.is_deleted(i) )
-				continue;
+  if (info.game_date % 15 == 0) {
+    for (int i = firm_array.size(); i > 0; i--) {
+      if (firm_array.is_deleted(i))
+        continue;
 
-			FirmInn* firmPtr = firm_array[i]->cast_to_FirmInn();
+      FirmInn *firmPtr = firm_array[i]->cast_to_FirmInn();
 
-			if( firmPtr && firmPtr->inn_unit_count > 0 )
-			{
-				firmPtr->del_inn_unit( misc.random( firmPtr->inn_unit_count ) + 1 );
-				break;
-			}
-		}
-	}
+      if (firmPtr && firmPtr->inn_unit_count > 0) {
+        firmPtr->del_inn_unit(misc.random(firmPtr->inn_unit_count) + 1);
+        break;
+      }
+    }
+  }
 }
 //------- End of function CampaignEastWest::stage_26_next_day --------//
 
-
 //============================================================//
-
 
 //--- Begin of function CampaignEastWest::stage_26_process_game_result ---//
 //
-void CampaignEastWest::stage_26_process_game_result()
-{
-	//--- if the player won the game -----//
+void CampaignEastWest::stage_26_process_game_result() {
+  //--- if the player won the game -----//
 
-	if( game.result_win_condition_id >= 0 )
-	{
-		err_when( !return_event_id );
+  if (game.result_win_condition_id >= 0) {
+    err_when(!return_event_id);
 
-		set_event( return_event_id );
-	}
+    set_event(return_event_id);
+  }
 
-	//---- if the player lost the game ----//
+  //---- if the player lost the game ----//
 
-	else
-	{
-		// do nothing as the player must retry the game.
+  else {
+    // do nothing as the player must retry the game.
 
-		info.game_year = game_year;			// revert info.game_year back to campaign's game year so that the game's time will not advance
+    info.game_year = game_year; // revert info.game_year back to campaign's game
+                                // year so that the game's time will not advance
 
-		misc.set_random_seed( saved_random_seed );		// restore the random seed so that the game will replay in the same way
-	}
+    misc.set_random_seed(
+        saved_random_seed); // restore the random seed so that the game will
+                            // replay in the same way
+  }
 }
 //---- End of function CampaignEastWest::stage_26_process_game_result -----//
 
-
 //------ Begin of function CampaignEastWest::stage_26_disp_end_game_msg ------//
 //
-void CampaignEastWest::stage_26_disp_end_game_msg()
-{
-	if( game.result_win_condition_id >= 0 )
-	{
-		disp_in_game_msg( res_stage.read("26WIN") );
-	}
-	else
-	{
-		disp_in_game_msg( res_stage.read("26LOSE") );
-	}
+void CampaignEastWest::stage_26_disp_end_game_msg() {
+  if (game.result_win_condition_id >= 0) {
+    disp_in_game_msg(res_stage.read("26WIN"));
+  } else {
+    disp_in_game_msg(res_stage.read("26LOSE"));
+  }
 }
 //------- End of function CampaignEastWest::stage_26_disp_end_game_msg -------//
 
-
 //------ Begin of function CampaignEastWest::stage_26_write_file ------//
 //
-void CampaignEastWest::stage_26_write_file(File* filePtr)
-{
-	filePtr->file_put_long(goal_year_limit);
-	filePtr->file_put_long(goal_train_unit_leadership);
+void CampaignEastWest::stage_26_write_file(File *filePtr) {
+  filePtr->file_put_long(goal_year_limit);
+  filePtr->file_put_long(goal_train_unit_leadership);
 }
 //------- End of function CampaignEastWest::stage_26_write_file -------//
 
-
 //------ Begin of function CampaignEastWest::stage_26_read_file ------//
 //
-void CampaignEastWest::stage_26_read_file(File* filePtr)
-{
-	goal_year_limit = filePtr->file_get_long();
-	goal_train_unit_leadership = filePtr->file_get_long();
+void CampaignEastWest::stage_26_read_file(File *filePtr) {
+  goal_year_limit = filePtr->file_get_long();
+  goal_train_unit_leadership = filePtr->file_get_long();
 }
 //------- End of function CampaignEastWest::stage_26_read_file -------//
-

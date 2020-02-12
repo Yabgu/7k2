@@ -21,67 +21,63 @@
 // Filename    : OF_SPY.H
 // Description : Header file of FirmSpy
 
-
 #ifndef __OF_SPY_H
 #define __OF_SPY_H
 
 #include <of_train.h>
 
 #pragma pack(1)
-class FirmSpy : public FirmTrain
-{
+class FirmSpy : public FirmTrain {
 public:
-
 public:
-	FirmSpy();
+  FirmSpy();
 
-	void		process_ai();
+  void process_ai();
 
-	//------- type casting function --------//
+  //------- type casting function --------//
 
-	virtual FirmSpy*	cast_to_FirmSpy()	{ return this; }
+  virtual FirmSpy *cast_to_FirmSpy() { return this; }
 
-	//-------- interface functions ----------//
+  //-------- interface functions ----------//
 
-	void		put_info(int refreshFlag);
-	void		detect_info();
-	int		represent_attribute(int traineeId);
+  void put_info(int refreshFlag);
+  void detect_info();
+  int represent_attribute(int traineeId);
 
-	//------- functions on trainee ---------//
+  //------- functions on trainee ---------//
 
-	void		recruit_trainee( int townRecno, int trainType, char remoteAction );
-	virtual int can_recruit(int townRecno, int trainType);
+  void recruit_trainee(int townRecno, int trainType, char remoteAction);
+  virtual int can_recruit(int townRecno, int trainType);
 
-	// -------- rally point ----------//
+  // -------- rally point ----------//
 
-	int		can_set_rally_point(int destBaseObjRecno=0);
-	int		send_to_rally_point( int unitRecno );
+  int can_set_rally_point(int destBaseObjRecno = 0);
+  int send_to_rally_point(int unitRecno);
 
-	//------- multiplayer checking codes -------//
+  //------- multiplayer checking codes -------//
 
-	virtual	UCHAR crc8();
-	virtual	void	clear_ptr();
+  virtual UCHAR crc8();
+  virtual void clear_ptr();
 
 protected:
+  virtual void advanced_train();
 
-	virtual  void	advanced_train();
+  //------- protected interface function --------//
 
-	//------- protected interface function --------//
+  void disp_firm_info(int dispY1, int refreshFlag);
+  void detect_firm_info();
 
-	void		disp_firm_info(int dispY1, int refreshFlag );
-	void		detect_firm_info();
+  void disp_train_menu(int refreshFlag);
+  void detect_train_menu();
+  void disp_spy_menu(int refreshFlag);
+  void detect_spy_menu();
 
-	void		disp_train_menu(int refreshFlag);
-	void		detect_train_menu();
-	void		disp_spy_menu(int refreshFlag);
-	void		detect_spy_menu();
+  //-------- AI actions ---------//
 
-	//-------- AI actions ---------//
-
-	int		think_del();
-	void		think_train_new();
-	int 		has_spy(int raceId, int isCivilian);
-	void 		think_spy_action();
+  int think_del();
+  void think_train_new();
+  int has_spy(int raceId, int isCivilian);
+  void think_spy_action();
 };
 #pragma pack()
 

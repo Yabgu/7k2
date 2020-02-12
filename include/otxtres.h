@@ -21,10 +21,8 @@
 // Filename    : OTXTRES.H
 // Description : header file of text resource for translation
 
-
 #ifndef __OTXTRES_H
 #define __OTXTRES_H
-
 
 #include <ostr.h>
 #include <stdarg.h>
@@ -35,47 +33,45 @@
 #define TEXT_RES_SHORT_STRLEN 31
 #define FREE_SHORT_STR_COUNT 8
 
-class TextResource
-{
+class TextResource {
 public:
-	char	*main_text;
-	int	text_count;
-	int	*text_offset_array;
+  char *main_text;
+  int text_count;
+  int *text_offset_array;
 
-	char	res_name[128];
-	static char	str_buf[FREE_STR_COUNT][TEXT_RES_STRLEN+1];
-	static int free_str_buf;
-	static char	short_str_buf[FREE_SHORT_STR_COUNT][TEXT_RES_SHORT_STRLEN+1];
-	static int free_short_str_buf;
+  char res_name[128];
+  static char str_buf[FREE_STR_COUNT][TEXT_RES_STRLEN + 1];
+  static int free_str_buf;
+  static char short_str_buf[FREE_SHORT_STR_COUNT][TEXT_RES_SHORT_STRLEN + 1];
+  static int free_short_str_buf;
 
 public:
-	TextResource();
-	~TextResource();
+  TextResource();
+  ~TextResource();
 
-	void	init( const char *fileName);
-	void	deinit();
-	int	is_inited() { return res_name[0]; }
+  void init(const char *fileName);
+  void deinit();
+  int is_inited() { return res_name[0]; }
 
-	char	*get_format_str(int textId, const char *checkMark );
+  char *get_format_str(int textId, const char *checkMark);
 
-	// see OTXTRES.H for detail descriptions
-	static char	*process( char *formatStr, ... );
-	static char *vprocess( char *formatStr, va_list );
+  // see OTXTRES.H for detail descriptions
+  static char *process(char *formatStr, ...);
+  static char *vprocess(char *formatStr, va_list);
 
-	// --------- acquiring temp storage -----//
+  // --------- acquiring temp storage -----//
 
-	static char *get_free_str(char* =NULL);
-	static char *get_free_short_str(char* =NULL);
+  static char *get_free_str(char * = NULL);
+  static char *get_free_short_str(char * = NULL);
 
-	// --------- formatting function -------//
+  // --------- formatting function -------//
 
-   static char* format(double,int=1);
-   static char* format(int,int=1);
-	static char* roman_number(int);
+  static char *format(double, int = 1);
+  static char *format(int, int = 1);
+  static char *roman_number(int);
 
 private:
-	void	load_res(const char *fileName);
+  void load_res(const char *fileName);
 };
-
 
 #endif

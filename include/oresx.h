@@ -18,8 +18,8 @@
  *
  */
 
-//Filename    : ORESX.H
-//Description : Header file of Object ResourceIdx
+// Filename    : ORESX.H
+// Description : Header file of Object ResourceIdx
 
 #ifndef __ORESX_H
 #define __ORESX_H
@@ -29,68 +29,70 @@
 //--------- Define structure ResIndex ----------//
 
 #pragma pack(1)
-struct ResIndex
-{
-   char name[9];
-   uint32_t pointer;
+struct ResIndex {
+  char name[9];
+  uint32_t pointer;
 };
 #pragma pack()
 
 //--------- Define class ResourceIdx ----------//
 
-class ResourceIdx : public File
-{
+class ResourceIdx : public File {
 public:
-	enum     { DEF_BUF_SIZE = 5120 };   // default buffer size : 5K
+  enum { DEF_BUF_SIZE = 5120 }; // default buffer size : 5K
 
-	ResIndex *index_buf;         // index buffer pointer
-	char     *data_buf;          // data buffer pointer
-	unsigned data_buf_size;      // size of the data buffer
+  ResIndex *index_buf;    // index buffer pointer
+  char *data_buf;         // data buffer pointer
+  unsigned data_buf_size; // size of the data buffer
 
-	// ##### begin Gilbert 15/9 #######//
-	ResIndex *sorted_index_buf;
-	// ##### end Gilbert 15/9 #######//
+  // ##### begin Gilbert 15/9 #######//
+  ResIndex *sorted_index_buf;
+  // ##### end Gilbert 15/9 #######//
 
-	char	   init_flag;
-	char     read_all;           // read all data from resource file to memory
-	char     use_common_buf;     // use vga's buffer as data buffer or not
-	int      rec_count;          // total no. of records
-	int      cur_rec_no;         // current record no
+  char init_flag;
+  char read_all;       // read all data from resource file to memory
+  char use_common_buf; // use vga's buffer as data buffer or not
+  int rec_count;       // total no. of records
+  int cur_rec_no;      // current record no
 
-	char*		user_data_buf;
-	unsigned user_data_buf_size;
-	int		user_start_read_pos;	// the starting position of the data to be read into the buffer
+  char *user_data_buf;
+  unsigned user_data_buf_size;
+  int user_start_read_pos; // the starting position of the data to be read into
+                           // the buffer
 
 public:
-	ResourceIdx() 	{ init_flag=0; }
-	~ResourceIdx()	{ deinit(); }
+  ResourceIdx() { init_flag = 0; }
+  ~ResourceIdx() { deinit(); }
 
-   ResourceIdx(const char* resFile, int readAll, int useCommonBuf=0)
-       { init_flag=0; init(resFile, readAll, useCommonBuf); }
+  ResourceIdx(const char *resFile, int readAll, int useCommonBuf = 0) {
+    init_flag = 0;
+    init(resFile, readAll, useCommonBuf);
+  }
 
-   void  init(const char* resFile, int readAll, int useCommonBuf=0);
-	void  deinit();
+  void init(const char *resFile, int readAll, int useCommonBuf = 0);
+  void deinit();
 
-	int   is_inited() 	{ return init_flag; }
+  int is_inited() { return init_flag; }
 
-	void	set_user_buf(char* userDataBuf, int bufSize, int userStartReadPos=0);
-	void  reset_user_buf();
+  void set_user_buf(char *userDataBuf, int bufSize, int userStartReadPos = 0);
+  void reset_user_buf();
 
-   char* read(const char*);
-	int	read_into_user_buf(char* dataName, char* userDataBuf, int bufSize, int userStartReadPos=0);
-	int 	data_size(char* dataName);
+  char *read(const char *);
+  int read_into_user_buf(char *dataName, char *userDataBuf, int bufSize,
+                         int userStartReadPos = 0);
+  int data_size(char *dataName);
 
-   int   get_index(const char*);
-   char* get_data(int);
-	char	*data_name(int);
+  int get_index(const char *);
+  char *get_data(int);
+  char *data_name(int);
 
-   File* get_file(const char*, int&);
-   File* get_file(int, int&);
+  File *get_file(const char *, int &);
+  File *get_file(int, int &);
 
-	// ##### begin Gilbert 15/9 #######//
+  // ##### begin Gilbert 15/9 #######//
 protected:
-	void	build_sorted_index();
-	// ##### end Gilbert 15/9 #######//
+  void build_sorted_index();
+  // ##### end Gilbert 15/9 #######//
 };
 
 //--------------------------------------------//

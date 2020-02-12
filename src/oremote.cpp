@@ -18,27 +18,28 @@
  *
  */
 
-//Filename    : OREMOTE.CPP
-//Description : Object Remote
+// Filename    : OREMOTE.CPP
+// Description : Object Remote
 
 #include <all.h>
 
-#include <obox.h>
-#include <ovga.h>
-#include <ostr.h>
-#include <ofont.h>
-#include <osys.h>
-#include <oworld.h>
-#include <ogame.h>
-#include <opower.h>
-#include <onation.h>
-#include <oremote.h>
 #include <multiplayer.h>
+#include <obox.h>
 #include <oerrctrl.h>
+#include <ofont.h>
+#include <ogame.h>
+#include <onation.h>
+#include <opower.h>
+#include <oremote.h>
+#include <ostr.h>
+#include <osys.h>
+#include <ovga.h>
+#include <oworld.h>
 
 //---------- Define static variables ----------//
 
-static int	connection_failed = 0;		// connect_game_disconnect_handler() will set connection_failed to 0
+static int connection_failed =
+    0; // connect_game_disconnect_handler() will set connection_failed to 0
 
 //---------- Define static functions ----------//
 
@@ -46,113 +47,98 @@ static void connect_game_disconnect_handler(DWORD playerId);
 
 //--------- Begin of function Remote::Remote ----------//
 
-Remote::Remote()
-{
-	//--------------------------------------------//
+Remote::Remote() {
+  //--------------------------------------------//
 
-	packet_send_count    = 0;
-	packet_receive_count = 0;
+  packet_send_count = 0;
+  packet_receive_count = 0;
 
-	//--------------------------------------------//
+  //--------------------------------------------//
 
-	common_msg_buf    = mem_add( COMMON_MSG_BUF_SIZE );
+  common_msg_buf = mem_add(COMMON_MSG_BUF_SIZE);
 
-	mp_ptr				= NULL;
-	connectivity_mode = 0;
-	//	handle_vga_lock   = 1;
-	handle_vga_lock   = 0;			// lock vga front in MulitPlayerDP
-	process_queue_flag = 0;
-	nation_processing = 0;
-	// ###### patch begin Gilbert 22/1 #######//
-	sync_test_level = 0;			// 0=disable, bit0= random seed, bit1=crc, bit7=error encountered
-	// ###### patch end Gilbert 22/1 #######//
+  mp_ptr = NULL;
+  connectivity_mode = 0;
+  //	handle_vga_lock   = 1;
+  handle_vga_lock = 0; // lock vga front in MulitPlayerDP
+  process_queue_flag = 0;
+  nation_processing = 0;
+  // ###### patch begin Gilbert 22/1 #######//
+  sync_test_level =
+      0; // 0=disable, bit0= random seed, bit1=crc, bit7=error encountered
+         // ###### patch end Gilbert 22/1 #######//
 }
 //--------- End of function Remote::Remote ----------//
 
-
 //--------- Begin of function Remote::~Remote ----------//
 
-Remote::~Remote()
-{
-	deinit();
+Remote::~Remote() {
+  deinit();
 
-	mem_del( common_msg_buf  );
+  mem_del(common_msg_buf);
 }
 //--------- End of function Remote::~Remote ----------//
-
 
 //--------- Begin of function Remote::init ----------//
 //
 // <int> connectivityMode - connectivity mode can be:
-//									 REMOTE_WSOCK_TCPIP, REMOTE_WSOCK_IPX,
-//									 REMOTE_MODEM, REMOTE_NULL_MODEM
+//									 REMOTE_WSOCK_TCPIP,
+//REMOTE_WSOCK_IPX, 									 REMOTE_MODEM, REMOTE_NULL_MODEM
 //
-void Remote::init(MultiPlayer *mp)
-{
-	if( connectivity_mode )
-		deinit();
+void Remote::init(MultiPlayer *mp) {
+  if (connectivity_mode)
+    deinit();
 
-	connectivity_mode = 1;
-	poll_msg_flag = 0;
-	mp_ptr = mp;
+  connectivity_mode = 1;
+  poll_msg_flag = 0;
+  mp_ptr = mp;
 
-	// ###### patch begin Gilbert 22/1 #######//
-	sync_test_level = (misc.is_file_exist("SYNC1.SYS") ? 1 : 0)
-		| (misc.is_file_exist("SYNC2.SYS") ? 2 : 0);
-		// 0=disable, bit0= random seed, bit1=crc
-	// ###### patch end Gilbert 22/1 #######//
+  // ###### patch begin Gilbert 22/1 #######//
+  sync_test_level = (misc.is_file_exist("SYNC1.SYS") ? 1 : 0) |
+                    (misc.is_file_exist("SYNC2.SYS") ? 2 : 0);
+  // 0=disable, bit0= random seed, bit1=crc
+  // ###### patch end Gilbert 22/1 #######//
 
-	reset_process_frame_delay();
+  reset_process_frame_delay();
 
-	set_alternating_send(1);		// send every frame
+  set_alternating_send(1); // send every frame
 }
 //--------- End of function Remote::init ----------//
 
-
 //--------- Begin of function Remote::deinit ----------//
 
-void Remote::deinit()
-{
-	if( connectivity_mode )
-	{
-		connectivity_mode = 0;
-	}
-	// ###### patch begin Gilbert 22/1 #######//
-	sync_test_level = 0;			// 0=disable, bit0= random seed, bit1=crc
-	// ###### patch end Gilbert 22/1 #######//
+void Remote::deinit() {
+  if (connectivity_mode) {
+    connectivity_mode = 0;
+  }
+  // ###### patch begin Gilbert 22/1 #######//
+  sync_test_level = 0; // 0=disable, bit0= random seed, bit1=crc
+                       // ###### patch end Gilbert 22/1 #######//
 }
 //--------- End of function Remote::deinit ----------//
 
-
 //--------- Begin of function Remote::create_game ---------//
 //
-int Remote::create_game()
-{
-	//--------- initialize session parameters ---------//
+int Remote::create_game() {
+  //--------- initialize session parameters ---------//
 
-	is_host = TRUE;
+  is_host = TRUE;
 
-	return 1;
+  return 1;
 }
 //--------- End of function Remote::create_game ---------//
 
-
 //--------- Begin of function Remote::connect_game ---------//
 //
-int Remote::connect_game()
-{
-	is_host = FALSE;
-	return 1;
+int Remote::connect_game() {
+  is_host = FALSE;
+  return 1;
 }
 //--------- End of function Remote::connect_game ---------//
 
-
 //-------- Begin of function Remote::is_enable ---------//
 //
-int Remote::is_enable()
-{
-	return connectivity_mode;
-}
+int Remote::is_enable() { return connectivity_mode; }
 //--------- End of function Remote::is_enable ----------//
 
 /*
@@ -160,33 +146,30 @@ int Remote::is_enable()
 //
 int Remote::can_start_game()
 {
-	err_when(!connectivity_mode);
+        err_when(!connectivity_mode);
 
-	return wsock_ptr->can_start_game();
+        return wsock_ptr->can_start_game();
 }
 //--------- End of function Remote::can_start_game ----------//
 */
 
 //-------- Begin of function Remote::number_of_opponent ---------//
 //
-int Remote::number_of_opponent()
-{
-	err_when(!connectivity_mode);
+int Remote::number_of_opponent() {
+  err_when(!connectivity_mode);
 
-	//return wsock_ptr->number_of_player;
-	return mp_ptr->get_player_count()-1;
+  // return wsock_ptr->number_of_player;
+  return mp_ptr->get_player_count() - 1;
 }
 //--------- End of function Remote::number_of_opponent ----------//
 
-
 //-------- Begin of function Remote::self_player_id ---------//
 //
-DWORD Remote::self_player_id()
-{
-	err_when(!connectivity_mode);
+DWORD Remote::self_player_id() {
+  err_when(!connectivity_mode);
 
-	// return wsock_ptr->self_player_id;
-	return mp_ptr->get_my_player_id();
+  // return wsock_ptr->self_player_id;
+  return mp_ptr->get_my_player_id();
 }
 //--------- End of function Remote::self_player_id ----------//
 
@@ -195,133 +178,104 @@ DWORD Remote::self_player_id()
 //
 void Remote::set_disconnect_handler(DisconnectFP disconnectFP)
 {
-	err_when(!connectivity_mode);
+        err_when(!connectivity_mode);
 
-	wsock_ptr->set_disconnect_handler(disconnectFP);
+        wsock_ptr->set_disconnect_handler(disconnectFP);
 }
 //--------- End of function Remote::set_disconnect_handler ----------//
 */
 
-
 //-------- Begin of function Remote::start_game ---------//
 //
-void Remote::start_game()
-{
-	err_when(!connectivity_mode);
+void Remote::start_game() {
+  err_when(!connectivity_mode);
 
-	// wsock_ptr->start_game();
+  // wsock_ptr->start_game();
 }
 //--------- End of function Remote::start_game ----------//
-
 
 //----- Begin of function connect_game_disconnect_handler -----//
 //
 // Disconnection handler for Remote::connect_game()
 //
-static void connect_game_disconnect_handler(DWORD playerId)
-{
-	connection_failed = 1;
+static void connect_game_disconnect_handler(DWORD playerId) {
+  connection_failed = 1;
 }
 //------ End of function connect_game_disconnect_handler ------//
 
-
-
 //-------- Begin of function Remote::reset_process_frame_delay ---------//
-void Remote::reset_process_frame_delay()
-{
-	process_frame_delay = 1;
-	err_when( process_frame_delay > MAX_PROCESS_FRAME_DELAY );
+void Remote::reset_process_frame_delay() {
+  process_frame_delay = 1;
+  err_when(process_frame_delay > MAX_PROCESS_FRAME_DELAY);
 }
 //-------- End of function Remote::reset_process_frame_delay ---------//
 
-
 //-------- Begin of function Remote::get_process_frame_delay ---------//
-int Remote::get_process_frame_delay()
-{
-	return process_frame_delay;
-}
+int Remote::get_process_frame_delay() { return process_frame_delay; }
 //-------- End of function Remote::get_process_frame_delay ---------//
 
-
 //-------- Begin of function Remote::set_process_frame_delay ---------//
-void Remote::set_process_frame_delay(int f)
-{
-	// must not be called after init_receive_queue()
+void Remote::set_process_frame_delay(int f) {
+  // must not be called after init_receive_queue()
 
-	if( f < 1 )
-		f = 1;
-	if( f > MAX_PROCESS_FRAME_DELAY )
-		f = MAX_PROCESS_FRAME_DELAY;
-	process_frame_delay = f;
+  if (f < 1)
+    f = 1;
+  if (f > MAX_PROCESS_FRAME_DELAY)
+    f = MAX_PROCESS_FRAME_DELAY;
+  process_frame_delay = f;
 }
 //-------- End of function Remote::set_process_frame_delay ---------//
 
-
 //-------- Begin of function Remote::calc_process_frame_delay ---------//
-int Remote::calc_process_frame_delay(int milliSecond)
-{
-	int f = 1 + (milliSecond+20)/100;
-	if( f < 1 )
-		f = 1;
-	if( f > MAX_PROCESS_FRAME_DELAY )
-		f = MAX_PROCESS_FRAME_DELAY;
-	return f;
+int Remote::calc_process_frame_delay(int milliSecond) {
+  int f = 1 + (milliSecond + 20) / 100;
+  if (f < 1)
+    f = 1;
+  if (f > MAX_PROCESS_FRAME_DELAY)
+    f = MAX_PROCESS_FRAME_DELAY;
+  return f;
 }
 //-------- End of function Remote::calc_process_frame_delay ---------//
 
-
 //-------- Begin of function Remote::set_alternating_send ---------//
-void Remote::set_alternating_send(int rate)
-{
-	if( rate <= 0 || rate > 100 || (sync_test_level != 0 && rate != 1) )
-	{
-		err_here();
-		// must not have any sync testing to enable alternating send
-		// tell_random_seed and crc checking must send data every frame
-	}
-	else
-		alternating_send_rate = rate;
+void Remote::set_alternating_send(int rate) {
+  if (rate <= 0 || rate > 100 || (sync_test_level != 0 && rate != 1)) {
+    err_here();
+    // must not have any sync testing to enable alternating send
+    // tell_random_seed and crc checking must send data every frame
+  } else
+    alternating_send_rate = rate;
 }
 //-------- End of function Remote::set_alternating_send ---------//
 
-
 //-------- Begin of function Remote::set_alternating_send ---------//
-int Remote::get_alternating_send()
-{
-	return alternating_send_rate;
-}
+int Remote::get_alternating_send() { return alternating_send_rate; }
 //-------- End of function Remote::set_alternating_send ---------//
-
 
 //-------- Begin of function Remote::has_send_frame ---------//
-int Remote::has_send_frame(int nationRecno, DWORD frameCount)
-{
-	return ((frameCount + nationRecno) % alternating_send_rate) == 0;
+int Remote::has_send_frame(int nationRecno, DWORD frameCount) {
+  return ((frameCount + nationRecno) % alternating_send_rate) == 0;
 }
 //-------- End of function Remote::has_send_frame ---------//
-
 
 //-------- Begin of function Remote::next_send_frame ---------//
 // if has_send_frame is true, return frameCount
 // otherwise return the next frame which has_send_frame return true
-DWORD Remote::next_send_frame(int nationRecno, DWORD frameCount)
-{
-	DWORD remainder = ((frameCount + nationRecno) % alternating_send_rate);
-	if(remainder == 0)
-		return frameCount;
-	else
-		return frameCount + alternating_send_rate - remainder;
+DWORD Remote::next_send_frame(int nationRecno, DWORD frameCount) {
+  DWORD remainder = ((frameCount + nationRecno) % alternating_send_rate);
+  if (remainder == 0)
+    return frameCount;
+  else
+    return frameCount + alternating_send_rate - remainder;
 }
 //-------- End of function Remote::next_send_frame ---------//
 
-
 // --------- begin of function Remote::is_lobbied -------//
 // 0 - not lobbied, 1 - create game, 2 - join game
-int Remote::is_lobbied()
-{
-	if( mp_obj.is_initialized() )
-		return mp_obj.is_lobbied();
-	else
-		return 0;
+int Remote::is_lobbied() {
+  if (mp_obj.is_initialized())
+    return mp_obj.is_lobbied();
+  else
+    return 0;
 }
 // --------- end of function Remote::is_lobbied -------//

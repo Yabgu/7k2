@@ -18,51 +18,36 @@
  *
  */
 
-//Filename    : ODATE.CPP
-//Description : Date Information Object
+// Filename    : ODATE.CPP
+// Description : Date Information Object
 
 #include <stdlib.h>
 #include <string.h>
 
-#include <ostr.h>
-#include <omisc.h>
-#include <otransl.h>
 #include <odate.h>
+#include <omisc.h>
+#include <ostr.h>
+#include <otransl.h>
 
 #define USE_TEXT_RES
 
-#if(defined(USE_TEXT_RES))
+#if (defined(USE_TEXT_RES))
 #include <ot_basic.h>
 #endif
 
-
 //--------- Define static member variables -----------//
 
+#define JULIAN_ADJUSTMENT 1721425L
 
-#define  JULIAN_ADJUSTMENT    1721425L
+static char month_str_array[][10] = {
+    "January", "February", "March",     "April",   "May",      "June",
+    "July",    "August",   "September", "October", "November", "December"};
 
-static char month_str_array[][10] =
-{
-   "January",
-   "February",
-   "March",
-   "April",
-   "May",
-   "June",
-   "July",
-   "August",
-   "September",
-   "October",
-   "November",
-   "December"
-} ;
-
-static int month_tot[]=
-    { 0, 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } ;
+static int month_tot[] = {0,   0,   31,  59,  90,  120, 151,
+                          181, 212, 243, 273, 304, 334, 365};
 
 // Jan Feb Mar  Apr  May  Jun   Jul  Aug  Sep  Oct  Nov  Dec
 // 31  28  31   30   31   30     31   31   30   31   30   31
-
 
 //------------ Begin of function DateInfo::julain ----------//
 //
@@ -76,23 +61,21 @@ static int month_tot[]=
 // Return : <long> the julian date
 //          -1     illegal given date
 //
-long DateInfo::julian( int year, int month, int day )
-{
-	long  total, dayYear ;
+long DateInfo::julian(int year, int month, int day) {
+  long total, dayYear;
 
-	dayYear    =  day_year( year, month, day) ;
+  dayYear = day_year(year, month, day);
 
-	if (dayYear < 1)
-		return( -1) ;  /* Illegal Date */
+  if (dayYear < 1)
+    return (-1); /* Illegal Date */
 
-	total =  ytoj(year) ;
-	total+=  dayYear ;
-	total+=  JULIAN_ADJUSTMENT ;
+  total = ytoj(year);
+  total += dayYear;
+  total += JULIAN_ADJUSTMENT;
 
-	return total;
+  return total;
 }
 //-------------- End of function DateInfo::julian ------------//
-
 
 //--------- Begin of function DateInfo::julian ---------//
 //
@@ -105,13 +88,11 @@ long DateInfo::julian( int year, int month, int day )
 //        0  -  NULL Date (dbf_date is all blank)
 //       -1  -  Illegal Date
 //
-long DateInfo::julian( char *dateStr )
-{
-   return julian( misc.atoi( dateStr,4 ), misc.atoi( dateStr+4,2 ),
-                  misc.atoi( dateStr+6,2 ) );
+long DateInfo::julian(char *dateStr) {
+  return julian(misc.atoi(dateStr, 4), misc.atoi(dateStr + 4, 2),
+                misc.atoi(dateStr + 6, 2));
 }
 //---------- End of function DateInfo::julian ----------//
-
 
 //------------ Begin of function DateInfo::get_date ---------//
 //
@@ -123,57 +104,51 @@ long DateInfo::julian( char *dateStr )
 // Return : the year, month or day of the julian date
 //          -1 if the julian date passed is invalid
 //
-int DateInfo::get_date( long julianDate, char returnType )
-{
-   int   year, month, day, nDays, maxDays ;
-   long   totalDays ;
+int DateInfo::get_date(long julianDate, char returnType) {
+  int year, month, day, nDays, maxDays;
+  long totalDays;
 
-   if ( julianDate > 5373484 || julianDate < JULIAN_ADJUSTMENT )
-      return -1;
+  if (julianDate > 5373484 || julianDate < JULIAN_ADJUSTMENT)
+    return -1;
 
-   totalDays  =  (long) (julianDate) - JULIAN_ADJUSTMENT ;
-   year       =  (int) ((double)totalDays/365.2425) + 1 ;
-   nDays      =  (int) (totalDays -  ytoj(year)) ;
+  totalDays = (long)(julianDate)-JULIAN_ADJUSTMENT;
+  year = (int)((double)totalDays / 365.2425) + 1;
+  nDays = (int)(totalDays - ytoj(year));
 
-   if ( nDays <= 0 )
-   {
-      year-- ;
-      nDays   =  (int) (totalDays - ytoj(year)) ;
-   }
+  if (nDays <= 0) {
+    year--;
+    nDays = (int)(totalDays - ytoj(year));
+  }
 
-   if (year%4 == 0 && year%100 != 0 || year%400 == 0)
-      maxDays =  366 ;
-   else
-      maxDays =  365 ;
+  if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0)
+    maxDays = 366;
+  else
+    maxDays = 365;
 
-   if ( nDays > maxDays )
-   {
-      year++ ;
-      nDays -= maxDays ;
-   }
+  if (nDays > maxDays) {
+    year++;
+    nDays -= maxDays;
+  }
 
-   if ( month_day( year, nDays, month, day ) < 0 )
-      return -1;
+  if (month_day(year, nDays, month, day) < 0)
+    return -1;
 
-   //............................................//
+  //............................................//
 
-   switch( returnType )
-   {
-      case 'Y':
-         return year;
+  switch (returnType) {
+  case 'Y':
+    return year;
 
-      case 'M':   // return the month
-         return month;
+  case 'M': // return the month
+    return month;
 
-      case 'D':
-         return day;
-   }
+  case 'D':
+    return day;
+  }
 
-   return 0;
+  return 0;
 }
 //------------- End of function DateInfo::get_date --------//
-
-
 
 //------------ Begin of function DateInfo::date_str ---------//
 //
@@ -184,114 +159,103 @@ int DateInfo::get_date( long julianDate, char returnType )
 // Ex.  Jan 1, 1981 is  2444606
 //
 // <long> julianDate    = the julian date to be converted
-// [int]  shortMonthStr = short month string or not (e.g. Jan instead of January)
+// [int]  shortMonthStr = short month string or not (e.g. Jan instead of
+// January)
 //                        (default : 0)
 //
 // Return : <char*> the formated date string
 //
-char* DateInfo::date_str( long julianDate, int shortMonthStr)
-{
-   int    year, month, day, nDays, maxDays ;
-   long   totalDays ;
-   static char strBuf[16];
+char *DateInfo::date_str(long julianDate, int shortMonthStr) {
+  int year, month, day, nDays, maxDays;
+  long totalDays;
+  static char strBuf[16];
 
-   if ( julianDate > 5373484 || julianDate < JULIAN_ADJUSTMENT )
-   {
-      strBuf[0]='\0';
-      return strBuf;
-   }
+  if (julianDate > 5373484 || julianDate < JULIAN_ADJUSTMENT) {
+    strBuf[0] = '\0';
+    return strBuf;
+  }
 
-   totalDays  =  (long) (julianDate) - JULIAN_ADJUSTMENT ;
-   year       =  (int) ((double)totalDays/365.2425) + 1 ;
-   nDays      =  (int) (totalDays -  ytoj(year)) ;
+  totalDays = (long)(julianDate)-JULIAN_ADJUSTMENT;
+  year = (int)((double)totalDays / 365.2425) + 1;
+  nDays = (int)(totalDays - ytoj(year));
 
-   if ( nDays <= 0 )
-   {
-      year-- ;
-      nDays   =  (int) (totalDays - ytoj(year)) ;
-   }
+  if (nDays <= 0) {
+    year--;
+    nDays = (int)(totalDays - ytoj(year));
+  }
 
-   if (year%4 == 0 && year%100 != 0 || year%400 == 0)
-      maxDays =  366 ;
-   else
-      maxDays =  365 ;
+  if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0)
+    maxDays = 366;
+  else
+    maxDays = 365;
 
-   if ( nDays > maxDays )
-   {
-      year++ ;
-      nDays -= maxDays ;
-   }
+  if (nDays > maxDays) {
+    year++;
+    nDays -= maxDays;
+  }
 
-   if ( month_day( year, nDays, month, day ) < 0 )
-   {
-      strBuf[0]='\0';
-      return strBuf;
-   }
+  if (month_day(year, nDays, month, day) < 0) {
+    strBuf[0] = '\0';
+    return strBuf;
+  }
 
-   //--------------------------------------------//
+  //--------------------------------------------//
 
-   static String str;
+  static String str;
 
-#if(defined(USE_TEXT_RES))
+#if (defined(USE_TEXT_RES))
 
-	if( shortMonthStr )
-		str = text_basic.str_short_date( day, month, year );
-	else
-		str = text_basic.str_long_date( day, month, year );
+  if (shortMonthStr)
+    str = text_basic.str_short_date(day, month, year);
+  else
+    str = text_basic.str_long_date(day, month, year);
 
-#elif(defined(SPANISH))
-	if( shortMonthStr )
-	{
-		str  = itoa(day,strBuf,10);		// day
-		str += "-";
-		strcpy(strBuf, translate.process(month_str_array[month-1]));
-		if(strlen(strBuf) > 3)
-			strBuf[3] = '\0';		// limit month to 3 chars
-		str += strBuf;							// month
-		str += "-";
-	   str += itoa(year,strBuf,10);		// year
-	}
-	else
-	{
-		str  = itoa(day,strBuf,10);		// day
-		str += " de ";
-		str += translate.process(month_str_array[month-1]);
-		str += " de ";
-	   str += itoa(year,strBuf,10);		// year
-	}
-#elif(defined(FRENCH))
-	str  = itoa(day,strBuf,10);		// day
-	str += " ";
-	if( shortMonthStr )
-	{
-		strcpy(strBuf, translate.process(month_str_array[month-1]));
-		if(strlen(strBuf) > 3)
-			strBuf[3] = '\0';		// limit month to 4 chars
-		if(month == 7)				// Juillet(July) abbreviated to Jul.
-			strBuf[2] = 'l';
-		str += strBuf;							// month
-	}
-	else
-	{
-		str += translate.process(month_str_array[month-1]);
-	}
-	str += " ";
-	str += itoa(year,strBuf,10);		// year
+#elif (defined(SPANISH))
+  if (shortMonthStr) {
+    str = itoa(day, strBuf, 10); // day
+    str += "-";
+    strcpy(strBuf, translate.process(month_str_array[month - 1]));
+    if (strlen(strBuf) > 3)
+      strBuf[3] = '\0'; // limit month to 3 chars
+    str += strBuf;      // month
+    str += "-";
+    str += itoa(year, strBuf, 10); // year
+  } else {
+    str = itoa(day, strBuf, 10); // day
+    str += " de ";
+    str += translate.process(month_str_array[month - 1]);
+    str += " de ";
+    str += itoa(year, strBuf, 10); // year
+  }
+#elif (defined(FRENCH))
+  str = itoa(day, strBuf, 10); // day
+  str += " ";
+  if (shortMonthStr) {
+    strcpy(strBuf, translate.process(month_str_array[month - 1]));
+    if (strlen(strBuf) > 3)
+      strBuf[3] = '\0'; // limit month to 4 chars
+    if (month == 7)     // Juillet(July) abbreviated to Jul.
+      strBuf[2] = 'l';
+    str += strBuf; // month
+  } else {
+    str += translate.process(month_str_array[month - 1]);
+  }
+  str += " ";
+  str += itoa(year, strBuf, 10); // year
 #else
-	// GERMAN and US
-	str = translate.process(month_str_array[month-1]);
-   if( shortMonthStr )
-      str = str.left(3);
-   str += " ";
-   str += itoa(day,strBuf,10);
-   str += ", ";
-   str += itoa(year,strBuf,10);
+  // GERMAN and US
+  str = translate.process(month_str_array[month - 1]);
+  if (shortMonthStr)
+    str = str.left(3);
+  str += " ";
+  str += itoa(day, strBuf, 10);
+  str += ", ";
+  str += itoa(year, strBuf, 10);
 #endif
 
-   return str;
+  return str;
 }
 //------------- End of function DateInfo::date_str --------//
-
 
 //------------ Begin of function DateInfo::month_str ---------//
 //
@@ -299,16 +263,14 @@ char* DateInfo::date_str( long julianDate, int shortMonthStr)
 //
 // Return : <char*> the month string
 //
-const char* DateInfo::month_str(int monthNo)
-{
-#if(defined(USE_TEXT_RES))
-	return text_basic.str_month_string( monthNo );
+const char *DateInfo::month_str(int monthNo) {
+#if (defined(USE_TEXT_RES))
+  return text_basic.str_month_string(monthNo);
 #else
-	return translate.process(month_str_array[monthNo-1]);
+  return translate.process(month_str_array[monthNo - 1]);
 #endif
 }
 //------------- End of function DateInfo::month_str --------//
-
 
 //---------- Begin of function DateInfo::day_year ----------//
 //
@@ -318,27 +280,25 @@ const char* DateInfo::month_str(int monthNo)
 // Returns      -1  if it is an illegal date.
 //
 
-int DateInfo::day_year( int year, int month, int day )
-{
-   int  isLeap, monthDays ;
+int DateInfo::day_year(int year, int month, int day) {
+  int isLeap, monthDays;
 
-   isLeap =   ( year%4 == 0 && year%100 != 0 || year%400 == 0 ) ?  1 : 0 ;
+  isLeap = (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) ? 1 : 0;
 
-   monthDays =  month_tot[ month+1 ] -  month_tot[ month] ;
-   if ( month == 2 )  monthDays += isLeap ;
+  monthDays = month_tot[month + 1] - month_tot[month];
+  if (month == 2)
+    monthDays += isLeap;
 
-   if ( year  < 0  ||
-        month < 1  ||  month > 12  ||
-        day   < 1  ||  day   > monthDays )
-        return( -1 ) ;  /* Illegal Date */
+  if (year < 0 || month < 1 || month > 12 || day < 1 || day > monthDays)
+    return (-1); /* Illegal Date */
 
-   if ( month <= 2 )  isLeap = 0 ;
+  if (month <= 2)
+    isLeap = 0;
 
-   return(  month_tot[month] + day + isLeap ) ;
+  return (month_tot[month] + day + isLeap);
 }
 
 //------------- End of function DateInfo::day_year -----------//
-
 
 //----------- Begin of function DateInfo::ytoj ----------//
 //
@@ -352,47 +312,42 @@ int DateInfo::day_year( int year, int month, int day )
 //     Since we do not want to consider the current year, we will
 //     subtract the year by 1 before doing the calculation.
 
-long DateInfo::ytoj( int yr )
-{
-   yr-- ;
-   return( yr*365L +  yr/4L - yr/100L + yr/400L ) ;
+long DateInfo::ytoj(int yr) {
+  yr--;
+  return (yr * 365L + yr / 4L - yr / 100L + yr / 400L);
 }
 
 //--------------- End of function DateInfo::ytoj -----------//
-
 
 //--------- Begin of function DateInfo::month_day ---------//
 //
 //  Given the year and the day of the year, returns the
 //  month and day of month.
 //
-int DateInfo::month_day( int year, int days,  int &monthRef,  int &dayRef )
-{
-   int isLeap, i ;
+int DateInfo::month_day(int year, int days, int &monthRef, int &dayRef) {
+  int isLeap, i;
 
-   isLeap =  ( year%4 == 0 && year%100 != 0 || year%400 == 0 ) ?  1 : 0 ;
-   if ( days <= 59 )  isLeap = 0 ;
+  isLeap = (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) ? 1 : 0;
+  if (days <= 59)
+    isLeap = 0;
 
-   for( i = 2; i <= 13; i++)
-   {
-      if ( days <=  month_tot[i] + isLeap )
-      {
-         monthRef =  --i ;
-         if ( i <= 2) isLeap = 0 ;
+  for (i = 2; i <= 13; i++) {
+    if (days <= month_tot[i] + isLeap) {
+      monthRef = --i;
+      if (i <= 2)
+        isLeap = 0;
 
-         dayRef   =  days - month_tot[ i] - isLeap ;
-         return( 0) ;
-      }
-   }
-   dayRef   =  0 ;
-   monthRef =  0 ;
+      dayRef = days - month_tot[i] - isLeap;
+      return (0);
+    }
+  }
+  dayRef = 0;
+  monthRef = 0;
 
-   return( -1 ) ;
+  return (-1);
 }
 
 //----------- End of function DateInfo::month_day -----------//
-
-
 
 //--------- Begin of function DateInfo::time_str ---------//
 //
@@ -400,22 +355,20 @@ int DateInfo::month_day( int year, int days,  int &monthRef,  int &dayRef )
 //
 // <int> inTime = the time in integer format (e.g. 1600 --> "16:00" )
 //
-char* DateInfo::time_str(int inTime)
-{
-	// #### begin Gilbert 18/8 ####//
-	static char strBuf[6] = "00:00";
-	//itoa( inTime/100, strBuf, 10 );
-	//itoa( inTime%100, strBuf+3, 10 );
-	strBuf[4] = '0' + inTime % 10;
-	strBuf[3] = '0' + (inTime/10) % 10;
-	strBuf[1] = '0' + (inTime/100) % 10;
-	strBuf[0] = '0' + (inTime/1000) % 10;
-	// #### end Gilbert 18/8 ####//
+char *DateInfo::time_str(int inTime) {
+  // #### begin Gilbert 18/8 ####//
+  static char strBuf[6] = "00:00";
+  // itoa( inTime/100, strBuf, 10 );
+  // itoa( inTime%100, strBuf+3, 10 );
+  strBuf[4] = '0' + inTime % 10;
+  strBuf[3] = '0' + (inTime / 10) % 10;
+  strBuf[1] = '0' + (inTime / 100) % 10;
+  strBuf[0] = '0' + (inTime / 1000) % 10;
+  // #### end Gilbert 18/8 ####//
 
-   return strBuf;
+  return strBuf;
 }
 //---------- End of function DateInfo::time_str ----------//
-
 
 //-------- Begin of function DateInfo::days_in_month ------//
 //
@@ -425,12 +378,10 @@ char* DateInfo::time_str(int inTime)
 //
 // return : <int> = the no. of days in a given monthh
 //
-int DateInfo::days_in_month(int inMonth)
-{
-   return month_tot[inMonth+1] - month_tot[inMonth];
+int DateInfo::days_in_month(int inMonth) {
+  return month_tot[inMonth + 1] - month_tot[inMonth];
 }
 //---------- End of function DateInfo::days_in_month ------//
-
 
 //-------- Begin of function DateInfo::add_months ------//
 //
@@ -441,55 +392,50 @@ int DateInfo::days_in_month(int inMonth)
 //
 // return : <int> - the result julian date
 //
-int DateInfo::add_months(int inDate, int addMonth)
-{
-	int inYear  = year(inDate);
-	int inMonth = month(inDate);
-	int inDay   = day(inDate);
+int DateInfo::add_months(int inDate, int addMonth) {
+  int inYear = year(inDate);
+  int inMonth = month(inDate);
+  int inDay = day(inDate);
 
-	inMonth += addMonth;
+  inMonth += addMonth;
 
-	// if( inMonth > 12 )
-	while( inMonth > 12 )
-	{
-		inMonth -= 12;
-		inYear++;
-	}
-	// ####### begin Gilbert 30/6 ########//
-	while( inMonth <= 0 )
-	{
-		inMonth += 12;
-		inYear--;
-	}
-	// ####### end Gilbert 30/6 ########//
+  // if( inMonth > 12 )
+  while (inMonth > 12) {
+    inMonth -= 12;
+    inYear++;
+  }
+  // ####### begin Gilbert 30/6 ########//
+  while (inMonth <= 0) {
+    inMonth += 12;
+    inYear--;
+  }
+  // ####### end Gilbert 30/6 ########//
 
-	if( inDay > days_in_month(inMonth) )
-		inDay = days_in_month(inMonth);
+  if (inDay > days_in_month(inMonth))
+    inDay = days_in_month(inMonth);
 
-	return julian( inYear, inMonth, inDay );
+  return julian(inYear, inMonth, inDay);
 }
 //---------- End of function DateInfo::add_months ------//
 
-
 //-------- Begin of function DateInfo::file_time_to_julian ------//
 //
-int DateInfo::file_time_to_julian(FILETIME& fileTime)
-{
-/*
-	WORD dosTime, dosDate;
+int DateInfo::file_time_to_julian(FILETIME &fileTime) {
+  /*
+          WORD dosTime, dosDate;
 
-	CoFileTimeToDosDateTime( &fileTime, &dosDate, &dosTime );
+          CoFileTimeToDosDateTime( &fileTime, &dosDate, &dosTime );
 
-	//--------------------------------------------//
-	// Bits	Contents
-	// 0-4	Days of the month (1-31).
-	// 5-8	Months (1 = January, 2 = February, and so forth).
-	// 9-15	Year offset from 1980 (add 1980 to get actual year).
-	//--------------------------------------------//
+          //--------------------------------------------//
+          // Bits	Contents
+          // 0-4	Days of the month (1-31).
+          // 5-8	Months (1 = January, 2 = February, and so forth).
+          // 9-15	Year offset from 1980 (add 1980 to get actual year).
+          //--------------------------------------------//
 
-	return julian( 1980 + (dosDate>>9), (dosDate>>5) & 0x0F, dosDate & 0x0F );
-*/
-	return 0;
+          return julian( 1980 + (dosDate>>9), (dosDate>>5) & 0x0F, dosDate &
+     0x0F );
+  */
+  return 0;
 }
 //---------- End of function DateInfo::file_time_to_julian ------//
-

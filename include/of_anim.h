@@ -21,7 +21,6 @@
 // Filename    : OF_ANIM.H
 // Description : header file of Animal Habitat
 
-
 #ifndef __OF_ANIM_H
 #define __OF_ANIM_H
 
@@ -29,109 +28,106 @@
 
 // ------- define constant -------//
 
-#define MAX_ANIMAL_UNIT   5
+#define MAX_ANIMAL_UNIT 5
 #define ANIMAL_TYPE_COUNT 3
 
 // ------- define struct AnimalUnit --------/
 
 #pragma pack(1)
-struct AnimalUnit
-{
-	short unit_id;
+struct AnimalUnit {
+  short unit_id;
 
-	short hire_cost;
-	short live_point_cost;
-	short stay_count;		// how long this unit is going to stay until it leaves the animal habitat if you do not hire him.
+  short hire_cost;
+  short live_point_cost;
+  short stay_count; // how long this unit is going to stay until it leaves the
+                    // animal habitat if you do not hire him.
 
-	Skill skill;
-	int  	combat_level() 	{ return skill.actual_combat_level(&item); }
-	int  	skill_level()		{ return skill.actual_skill_level(&item); }
-	int  	max_hit_points()	{ return skill.actual_max_hit_points(&item); }
+  Skill skill;
+  int combat_level() { return skill.actual_combat_level(&item); }
+  int skill_level() { return skill.actual_skill_level(&item); }
+  int max_hit_points() { return skill.actual_max_hit_points(&item); }
 
-	Item  item;
+  Item item;
 
-	short	display_slot_id;
+  short display_slot_id;
 
 public:
-	void	set_hire_cost();
+  void set_hire_cost();
 };
 #pragma pack()
-
 
 // ------- define class FirmAnimal --------/
 
 #pragma pack(1)
-class FirmAnimal : public Firm
-{
+class FirmAnimal : public Firm {
 public:
+  enum { MAX_DISPLAY_SLOT = 5 };
 
-	enum { MAX_DISPLAY_SLOT = 5 };
+  AnimalUnit animal_unit_array[MAX_ANIMAL_UNIT];
+  short animal_unit_count;
 
-	AnimalUnit		animal_unit_array[MAX_ANIMAL_UNIT];
-	short				animal_unit_count;
-
-	static short	selected_unit_id;
-	static short	animal_unit_id[ANIMAL_TYPE_COUNT];
+  static short selected_unit_id;
+  static short animal_unit_id[ANIMAL_TYPE_COUNT];
 
 public:
-	FirmAnimal();
-	~FirmAnimal();
+  FirmAnimal();
+  ~FirmAnimal();
 
-	void 		init_derived();
-	void		deinit_derived();
-	void		free_all_people();
+  void init_derived();
+  void deinit_derived();
+  void free_all_people();
 
-	// ------- interface functions -------//
+  // ------- interface functions -------//
 
-	void 		put_info(int);
-	void 		detect_info();
+  void put_info(int);
+  void detect_info();
 
-	// ------ process function -------//
+  // ------ process function -------//
 
-	void		next_day();
-	int		kill_unit(int recNo);
+  void next_day();
+  int kill_unit(int recNo);
 
-	int		can_hire(int recNo);
-	int		hire(short recNo);
+  int can_hire(int recNo);
+  int hire(short recNo);
 
-	//------- AI functions -------//
+  //------- AI functions -------//
 
-	void		process_ai();
+  void process_ai();
 
-	//--------- firm drawing functions ----------//
+  //--------- firm drawing functions ----------//
 
-	void		draw(int displayLayer=1);
+  void draw(int displayLayer = 1);
 
-	//------- multiplayer checking codes -------//
+  //------- multiplayer checking codes -------//
 
-	virtual	UCHAR crc8();
-	virtual	void	clear_ptr();
+  virtual UCHAR crc8();
+  virtual void clear_ptr();
 
-	// --------- type casting function --------//
+  // --------- type casting function --------//
 
-	virtual FirmAnimal*  cast_to_FirmAnimal() { return this; }
+  virtual FirmAnimal *cast_to_FirmAnimal() { return this; }
 
-	//---------- save game function ---------//
+  //---------- save game function ---------//
 
-	int  read_derived_file(File*);
+  int read_derived_file(File *);
 
 private:
-	int		transfer_animal_unit(int recNo);
-	void 		add_animal_unit(int unitId, int animalLevel);
-	void 		del_animal_unit(int recNo);
-	void 		update_add_hire_list();
-	void 		update_del_hire_list();
+  int transfer_animal_unit(int recNo);
+  void add_animal_unit(int unitId, int animalLevel);
+  void del_animal_unit(int recNo);
+  void update_add_hire_list();
+  void update_del_hire_list();
 
-	// ------ protected interface function -------//
+  // ------ protected interface function -------//
 
-	void 		disp_unit_list(int dispY1, int refreshFlag);
-	void 		detect_unit_list();
-	void		disp_unit_info(int dispY1, int refreshFlag);
+  void disp_unit_list(int dispY1, int refreshFlag);
+  void detect_unit_list();
+  void disp_unit_info(int dispY1, int refreshFlag);
 
-	//-------- AI actions ---------//
+  //-------- AI actions ---------//
 
-	void		think_hire_new();
-	int		think_del();
+  void think_hire_new();
+  int think_del();
 };
 #pragma pack()
 

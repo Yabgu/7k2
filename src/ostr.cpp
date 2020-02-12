@@ -18,38 +18,29 @@
  *
  */
 
-//Filename    : OSTR.CPP
-//Description : Object String
+// Filename    : OSTR.CPP
+// Description : Object String
 
 #include <omisc.h>
 #include <ostr.h>
 #include <win32_compat.h>
 
-
 //------- Define static variable --------//
 
-static char work_buf[MAX_STR_LEN+1];
+static char work_buf[MAX_STR_LEN + 1];
 
 //-------- Begin of constructor/destructor functions --------//
 
-String::String()
-{
-   str_buf[0] = '\0';
+String::String() { str_buf[0] = '\0'; }
+
+String::String(const char *s) {
+  strncpy(str_buf, s, MAX_STR_LEN);
+  str_buf[MAX_STR_LEN] = '\0';
 }
 
-String::String( const char *s )
-{
-   strncpy(str_buf, s, MAX_STR_LEN );
-   str_buf[MAX_STR_LEN] = '\0';
-}
-
-String::String( String& s )
-{
-   memcpy(str_buf, s.str_buf, MAX_STR_LEN+1 );
-}
+String::String(String &s) { memcpy(str_buf, s.str_buf, MAX_STR_LEN + 1); }
 
 //---------- End of constructor/destructor functions --------//
-
 
 //------- Begin of function String::substr --------//
 //
@@ -58,27 +49,25 @@ String::String( String& s )
 // [int] len = the length of the sub string
 //             (default : till the end of the string
 //
-char* String::substr(int pos, int len)
-{
+char *String::substr(int pos, int len) {
   work_buf[0] = '\0';
 
   int strLen = strlen(str_buf);
 
-  if(pos >= strLen)                     // check for boundary errors
-     return work_buf;
+  if (pos >= strLen) // check for boundary errors
+    return work_buf;
 
-  if( len <= 0 )
-     len = strLen - pos;
-  else
-  {
-     if(len > strLen - pos)
-		  // ##### begin Gilbert 22/7 ########//
-        // return work_buf;
-		  return str_buf + pos;
-		  // ##### end Gilbert 22/7 ########//
+  if (len <= 0)
+    len = strLen - pos;
+  else {
+    if (len > strLen - pos)
+      // ##### begin Gilbert 22/7 ########//
+      // return work_buf;
+      return str_buf + pos;
+    // ##### end Gilbert 22/7 ########//
   }
 
-  strncpy( work_buf, str_buf+pos, len );
+  strncpy(work_buf, str_buf + pos, len);
   work_buf[len] = '\0';
 
   return work_buf;
@@ -86,27 +75,23 @@ char* String::substr(int pos, int len)
 
 //------- End of function String::substr ------------//
 
-
 //------- Begin of function String::upper/lower -------//
 
-char* String::upper()
-{
-   memcpy( work_buf, str_buf, len()+1 );
-   strupr( work_buf );
+char *String::upper() {
+  memcpy(work_buf, str_buf, len() + 1);
+  strupr(work_buf);
 
-   return work_buf;
+  return work_buf;
 }
 
-char* String::lower(void)
-{
-   memcpy( work_buf, str_buf, len()+1 );
-   strlwr( work_buf );
+char *String::lower(void) {
+  memcpy(work_buf, str_buf, len() + 1);
+  strlwr(work_buf);
 
-   return work_buf;
+  return work_buf;
 }
 
 //--------- End of function String::upper/lower --------//
-
 
 //-------- Begin of function String::at ---------------//
 //
@@ -115,13 +100,12 @@ char* String::lower(void)
 // return : >= 0 the position of the search str in the string
 //          = -1 if not found
 //
-int String::at(char* searchStr)
-{
+int String::at(char *searchStr) {
   int pos;
   char *tmp;
 
-  if( (tmp = strstr(str_buf, searchStr)) != NULL)
-    pos = (int)(tmp-str_buf);
+  if ((tmp = strstr(str_buf, searchStr)) != NULL)
+    pos = (int)(tmp - str_buf);
   else
     pos = -1;
 
@@ -129,68 +113,58 @@ int String::at(char* searchStr)
 }
 //---------- End of function String::at ---------------//
 
-
 //-------- Begin of operator= functions -----------//
 
-String& String::operator=(String& s)
-{
-   memcpy(str_buf, s.str_buf, MAX_STR_LEN+1 );
+String &String::operator=(String &s) {
+  memcpy(str_buf, s.str_buf, MAX_STR_LEN + 1);
 
-   return *this;
+  return *this;
 }
 
-String& String::operator=(const char *s)
-{
-   strncpy(str_buf, s, MAX_STR_LEN );
-   str_buf[MAX_STR_LEN] = '\0';
+String &String::operator=(const char *s) {
+  strncpy(str_buf, s, MAX_STR_LEN);
+  str_buf[MAX_STR_LEN] = '\0';
 
-   return *this;
+  return *this;
 }
 
-String& String::operator=(long value)
-{
-   strncpy(str_buf, misc.format(value), MAX_STR_LEN );
-   str_buf[MAX_STR_LEN] = '\0';
+String &String::operator=(long value) {
+  strncpy(str_buf, misc.format(value), MAX_STR_LEN);
+  str_buf[MAX_STR_LEN] = '\0';
 
-   return *this;
+  return *this;
 }
 //---------- End of operator= functions -----------//
 
-
 //-------- Begin of operator+= functions -----------//
 
-String& String::operator+=(String& s)
-{
-	strncat( str_buf, s.str_buf, MAX_STR_LEN );
-	str_buf[MAX_STR_LEN] = '\0';
-	return *this;
+String &String::operator+=(String &s) {
+  strncat(str_buf, s.str_buf, MAX_STR_LEN);
+  str_buf[MAX_STR_LEN] = '\0';
+  return *this;
 }
 
-String& String::operator+=(const char *s)
-{
-	strncat( str_buf, s, MAX_STR_LEN );
-	str_buf[MAX_STR_LEN] = '\0';
-   return *this;
+String &String::operator+=(const char *s) {
+  strncat(str_buf, s, MAX_STR_LEN);
+  str_buf[MAX_STR_LEN] = '\0';
+  return *this;
 }
 
-String& String::operator+=(long value)
-{
-   strncat( str_buf, misc.format(value), MAX_STR_LEN );
-   str_buf[MAX_STR_LEN] = '\0';
-   return *this;
+String &String::operator+=(long value) {
+  strncat(str_buf, misc.format(value), MAX_STR_LEN);
+  str_buf[MAX_STR_LEN] = '\0';
+  return *this;
 }
 
 //---------- End of operator+= functions -----------//
 
-
 //-------- Begin of operator*= functions -----------//
 
-String& String::operator*=(int n)
-{
-  memcpy( work_buf, str_buf, len()+1 );
+String &String::operator*=(int n) {
+  memcpy(work_buf, str_buf, len() + 1);
 
-  for(int i=1; i<n; i++)
-     strncat(str_buf, work_buf, MAX_STR_LEN);
+  for (int i = 1; i < n; i++)
+    strncat(str_buf, work_buf, MAX_STR_LEN);
 
   str_buf[MAX_STR_LEN] = '\0';
 
@@ -199,19 +173,15 @@ String& String::operator*=(int n)
 
 //---------- End of operator*= functions -----------//
 
-
 //-------- Begin of function String::add_char --------//
 
-String& String::add_char(char inChar)
-{
-	char charBuf[2] = "A";
+String &String::add_char(char inChar) {
+  char charBuf[2] = "A";
 
-	charBuf[0] = inChar;
+  charBuf[0] = inChar;
 
-	strncat( str_buf, charBuf, MAX_STR_LEN );
-	str_buf[MAX_STR_LEN] = '\0';
-	return *this;
+  strncat(str_buf, charBuf, MAX_STR_LEN);
+  str_buf[MAX_STR_LEN] = '\0';
+  return *this;
 }
 //---------- End of function String::add_char -------//
-
-

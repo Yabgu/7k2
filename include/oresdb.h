@@ -18,8 +18,8 @@
  *
  */
 
-//Filename    : ORESDB.H
-//Description : Header file of Object Resource Database
+// Filename    : ORESDB.H
+// Description : Header file of Object Resource Database
 
 #ifndef __ORESDB_H
 #define __ORESDB_H
@@ -30,35 +30,37 @@
 
 class Database;
 
-class ResourceDb : public File
-{
+class ResourceDb : public File {
 public:
-   char			init_flag;
+  char init_flag;
 
 protected:
-   Database		*db_obj;
-   int			index_field_offset;
-   int			use_common_buf;
-	char			*data_buf;
-	int			data_buf_size;
+  Database *db_obj;
+  int index_field_offset;
+  int use_common_buf;
+  char *data_buf;
+  int data_buf_size;
 
-   char			read_all;
+  char read_all;
 
 public:
-   ResourceDb()   { init_flag=0; }
-   ~ResourceDb()  { deinit(); }
+  ResourceDb() { init_flag = 0; }
+  ~ResourceDb() { deinit(); }
 
-   ResourceDb(char* resName,Database* dbObj,int indexOffset,int useCommonBuf=0)
-	{ init_flag=0; init(resName,dbObj,indexOffset,useCommonBuf); }
+  ResourceDb(char *resName, Database *dbObj, int indexOffset,
+             int useCommonBuf = 0) {
+    init_flag = 0;
+    init(resName, dbObj, indexOffset, useCommonBuf);
+  }
 
-   void init(char*,Database*,int,int=0);
-   void deinit();
+  void init(char *, Database *, int, int = 0);
+  void deinit();
 
-   char* read(int= -1);
-   File* get_file();
+  char *read(int = -1);
+  File *get_file();
 
-   void  init_imported(const char*,int,int=0);
-   char* read_imported(long);
+  void init_imported(const char *, int, int = 0);
+  char *read_imported(long);
 };
 
 #endif

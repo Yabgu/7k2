@@ -18,19 +18,19 @@
  *
  */
 
-//Filename    : OERR.CPP
-//Description : Object Error Handling
+// Filename    : OERR.CPP
+// Description : Object Error Handling
 
 #include <new>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include <osys.h>
+#include <all.h>
 #include <obox.h>
+#include <osys.h>
 #include <ovga.h>
 #include <ovgalock.h>
-#include <all.h>
 
 #include <dbglog.h>
 
@@ -50,30 +50,24 @@ static void new_func_handler();
 
 //---------- define static variable ----------//
 
-static char error_flag=0;		// prevent error message dead loop
+static char error_flag = 0; // prevent error message dead loop
 
 //------- Begin of function Error::Error ------------//
 //
 // Set new() operator error handler, new_handler() is called when
 // new cannot allocate sufficient memory required.
 //
-Error::Error()
-{
-        std::set_new_handler(new_func_handler);        // set_new_handler() is a C++ function
+Error::Error() {
+  std::set_new_handler(new_func_handler); // set_new_handler() is a C++ function
 
-	extra_handler = NULL;
+  extra_handler = NULL;
 }
 //-------- End of function Error::Error --------------//
 
-
 //------- Begin of function new_func_handler ------------//
 //
-static void new_func_handler()
-{
-	err.mem();
-}
+static void new_func_handler() { err.mem(); }
 //-------- End of function new_func_handler --------------//
-
 
 //------- BEGIN OF FUNCTION Error::internal -----------//
 //
@@ -91,34 +85,34 @@ static void new_func_handler()
 // <int>   lineNum  - the line number of program cause error
 //                    usually is __LINE__
 //
-void Error::internal(char* errMsg,const char* fileName,int lineNum)
-{
- 	if( error_flag )	// prevent error message dead loop
-		return;
+void Error::internal(char *errMsg, const char *fileName, int lineNum) {
+  if (error_flag) // prevent error message dead loop
+    return;
 
-	error_flag=1;
+  error_flag = 1;
 
-	//-------------------------------------------------//
+  //-------------------------------------------------//
 
-	char strBuf[100];
+  char strBuf[100];
 
-	if( extra_handler )		// all the extra error handler first
-		(*extra_handler)();
+  if (extra_handler) // all the extra error handler first
+    (*extra_handler)();
 
-	if( errMsg )
-		sprintf(strBuf, "Error : %s\nFile : %s\nLine : %d\n", errMsg,fileName,lineNum );
-	else
-		sprintf(strBuf, "Error on File : %s\nLine : %d\n",fileName,lineNum );
+  if (errMsg)
+    sprintf(strBuf, "Error : %s\nFile : %s\nLine : %d\n", errMsg, fileName,
+            lineNum);
+  else
+    sprintf(strBuf, "Error on File : %s\nLine : %d\n", fileName, lineNum);
 
-	//-------- display error message -------//
+  //-------- display error message -------//
 
-	ERR("%s\n", strBuf);
+  ERR("%s\n", strBuf);
 #ifdef __WIN32_
-	OutputDebugString( strBuf );
+  OutputDebugString(strBuf);
 #endif
 
-	//if( vga.is_inited() )
-	//	box.msg( strBuf, 0 );
+  // if( vga.is_inited() )
+  //	box.msg( strBuf, 0 );
 #if 0
 	if( vga.is_inited() && vga_front.is_inited() )
 	{
@@ -136,41 +130,39 @@ void Error::internal(char* errMsg,const char* fileName,int lineNum)
 	}
 #endif
 
-//	sys.deinit_directx();
+  //	sys.deinit_directx();
 
-	exit( -2 );
+  exit(-2);
 }
 //--------- END OF FUNCTION Error::internal ----------//
-
 
 //------- BEGIN OF FUNCTION Error::mem -----------//
 //
 // There is no memory left to save the screen, so don't use v_pop.ask(),
 // direct output to screen.
 //
-void Error::mem()
-{
-	if( error_flag )	// prevent error message dead loop
-		return;
+void Error::mem() {
+  if (error_flag) // prevent error message dead loop
+    return;
 
-	error_flag=1;
+  error_flag = 1;
 
-	//-------------------------------------------------//
+  //-------------------------------------------------//
 
-	if( extra_handler )
-		(*extra_handler)();
+  if (extra_handler)
+    (*extra_handler)();
 
-	const char* strBuf = "Insufficient Memory, execution interrupt.";
+  const char *strBuf = "Insufficient Memory, execution interrupt.";
 
-	//-------- display error message -------//
+  //-------- display error message -------//
 
-	ERR("%s\n", strBuf);
+  ERR("%s\n", strBuf);
 #ifdef __WIN32_
-	OutputDebugString( strBuf );
+  OutputDebugString(strBuf);
 #endif
 
-	//if( vga.is_inited() )
-	//	box.msg( strBuf, 0 );
+  // if( vga.is_inited() )
+  //	box.msg( strBuf, 0 );
 #if 0
 	if( vga.is_inited() && vga_front.is_inited() )
 	{
@@ -188,47 +180,45 @@ void Error::mem()
 	}
 #endif
 
-	// sys.deinit_directx();
+  // sys.deinit_directx();
 
-	exit( -2 );
+  exit(-2);
 }
 //--------- END OF FUNCTION Error::mem ----------//
-
 
 //------- BEGIN OF FUNCTION Error::msg -----------//
 //
 // <char*> formated erorr message with % argument
 // <....>  the argument list
 //
-void Error::msg( const char *format, ... )
-{
-	if( error_flag )	// prevent error message dead loop
-		return;
+void Error::msg(const char *format, ...) {
+  if (error_flag) // prevent error message dead loop
+    return;
 
-	error_flag=1;
+  error_flag = 1;
 
-	//-------------------------------------------------//
+  //-------------------------------------------------//
 
-	//---- translate the message and the arguments into one message ----//
+  //---- translate the message and the arguments into one message ----//
 
-	char strBuf[100];
+  char strBuf[100];
 
-	va_list argPtr;        // the argument list structure
+  va_list argPtr; // the argument list structure
 
-	va_start( argPtr, format );
-	vsprintf( strBuf, format, argPtr );
+  va_start(argPtr, format);
+  vsprintf(strBuf, format, argPtr);
 
-	va_end( argPtr );
+  va_end(argPtr);
 
-	//-------- display error message -------//
+  //-------- display error message -------//
 
-	ERR("%s\n", strBuf);
+  ERR("%s\n", strBuf);
 #ifdef __WIN32_
-	OutputDebugString( strBuf );
+  OutputDebugString(strBuf);
 #endif
 
-	//if( vga.is_inited() )
-	//	box.msg( strBuf, 0 );
+  // if( vga.is_inited() )
+  //	box.msg( strBuf, 0 );
 #if 0
 	if( vga.is_inited() && vga_front.is_inited() )
 	{
@@ -246,52 +236,50 @@ void Error::msg( const char *format, ... )
 	}
 #endif
 
-//	sys.deinit_directx();
-	error_flag = 0;		// this error does not exit program
+  //	sys.deinit_directx();
+  error_flag = 0; // this error does not exit program
 }
 //--------- END OF FUNCTION Error::msg ----------//
-
 
 //------- BEGIN OF FUNCTION Error::run --------//
 //
 // <char*> formated erorr message with % argument
 // <....>  the argument list
 //
-void Error::run( const char *format, ... )
-{
-	// TODO !!!! Clean this mess up 
-	return;
+void Error::run(const char *format, ...) {
+  // TODO !!!! Clean this mess up
+  return;
 
-	if( error_flag )	// prevent error message dead loop
-		return;
+  if (error_flag) // prevent error message dead loop
+    return;
 
-	error_flag=1;
+  error_flag = 1;
 
-	//-------------------------------------------------//
+  //-------------------------------------------------//
 
-	if( extra_handler )
-		(*extra_handler)();
+  if (extra_handler)
+    (*extra_handler)();
 
-	//---- translate the message and the arguments into one message ----//
+  //---- translate the message and the arguments into one message ----//
 
-	char strBuf[100];
+  char strBuf[100];
 
-	va_list argPtr;        // the argument list structure
+  va_list argPtr; // the argument list structure
 
-	va_start( argPtr, format );
-	vsprintf( strBuf, format, argPtr );
+  va_start(argPtr, format);
+  vsprintf(strBuf, format, argPtr);
 
-	va_end( argPtr );
+  va_end(argPtr);
 
-	//-------- display error message -------//
+  //-------- display error message -------//
 
-	ERR("%s\n", strBuf);
+  ERR("%s\n", strBuf);
 #ifdef __WIN32_
-	OutputDebugString( strBuf );
+  OutputDebugString(strBuf);
 #endif
 
-	// if( vga.is_inited() )
-	//	box.msg( strBuf, 0 );
+  // if( vga.is_inited() )
+  //	box.msg( strBuf, 0 );
 #if 0
 	if( vga.is_inited() && vga_front.is_inited() )
 	{
@@ -309,9 +297,8 @@ void Error::run( const char *format, ... )
 	}
 #endif
 
-//	sys.deinit_directx();
+  //	sys.deinit_directx();
 
-	exit( -2 );
+  exit(-2);
 }
 //---------- END OF FUNCTION Error::run -----------//
-

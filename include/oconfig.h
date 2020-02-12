@@ -18,8 +18,8 @@
  *
  */
 
-//Filename	  : OCONFIG.H
-//Description : Header file for Game Config class
+// Filename	  : OCONFIG.H
+// Description : Header file for Game Config class
 
 #ifndef __OCONFIG_H
 #define __OCONFIG_H
@@ -30,223 +30,236 @@
 
 //------------- Define constant -------------//
 
-enum { OPTION_NONE, OPTION_LOW, OPTION_MODERATE, OPTION_HIGH, OPTION_VERY_HIGH };
+enum {
+  OPTION_NONE,
+  OPTION_LOW,
+  OPTION_MODERATE,
+  OPTION_HIGH,
+  OPTION_VERY_HIGH
+};
 
 enum { OPTION_MONSTER_NONE, OPTION_MONSTER_SAVAGE, OPTION_MONSTER_INTELLIGENT };
 
-enum { OPTION_EASIEST=0, OPTION_HARDEST=7, OPTION_CUSTOM };
+enum { OPTION_EASIEST = 0, OPTION_HARDEST = 7, OPTION_CUSTOM };
 
 enum { OPTION_DISPLAY_MAJOR_NEWS, OPTION_DISPLAY_ALL_NEWS };
 
 //------------- Define constant -------------//
 
-enum { SMALL_STARTUP_RESOURCE  = 4000,
-		 MEDIUM_STARTUP_RESOURCE = 7000,
-		 LARGE_STARTUP_RESOURCE  = 12000,
-		 VERY_LARGE_STARTUP_RESOURCE = 20000 };
+enum {
+  SMALL_STARTUP_RESOURCE = 4000,
+  MEDIUM_STARTUP_RESOURCE = 7000,
+  LARGE_STARTUP_RESOURCE = 12000,
+  VERY_LARGE_STARTUP_RESOURCE = 20000
+};
 
 //---------- Define class Config -----------//
 
 #pragma pack(1)
-class Config
-{
+class Config {
 public:
-	void			init();
-	void			deinit();
+  void init();
+  void deinit();
 
-	void			default_game_setting();
-	void			clear_goals();	// but not reset some number to default
-	void			default_cheat_setting();
-	void			default_campaign_setting();
-	void			default_local_game_setting();
-	void			default_preference();
+  void default_game_setting();
+  void clear_goals(); // but not reset some number to default
+  void default_cheat_setting();
+  void default_campaign_setting();
+  void default_local_game_setting();
+  void default_preference();
 
-	void			change_game_setting( Config & );
-	void			change_preference( Config & );
-	void			change_difficulty(int);
-	
-	int			single_player_difficulty(int raceId);
-	int			multi_player_difficulty(int remotePlayers, int raceId);
+  void change_game_setting(Config &);
+  void change_preference(Config &);
+  void change_difficulty(int);
 
-	int 			write_file(File* filePtr);
-	int			read_file(File* filePtr, int keepSysSettings=0);
-	int			save(const char *);		// save to file
-	int			load(const char *);		// load from file
-	int			validate();
+  int single_player_difficulty(int raceId);
+  int multi_player_difficulty(int remotePlayers, int raceId);
 
-	void			reset_cheat_setting();
-	void			enable_weather_visual();
-	void			disable_weather_visual();
-	void			enable_weather_audio();
-	void			disable_weather_audio();
+  int write_file(File *filePtr);
+  int read_file(File *filePtr, int keepSysSettings = 0);
+  int save(const char *); // save to file
+  int load(const char *); // load from file
+  int validate();
+
+  void reset_cheat_setting();
+  void enable_weather_visual();
+  void disable_weather_visual();
+  void enable_weather_audio();
+  void disable_weather_audio();
 
 public:
-	enum { PLAYER_NAME_LEN=20 };		// should be te same as NationBase::KING_NAME_LEN
+  enum {
+    PLAYER_NAME_LEN = 20
+  }; // should be te same as NationBase::KING_NAME_LEN
 
-	//--------- GLOBAL GAME SETTING --------//
-	//
-	// parameters under GLOBAL GAME SETTING should remain unchange
-	// after the game starts, and are the same across other players
-	// in a multiplayer game
-	// (i.e. change_game_setting() should updates all these setting )
-	//
-	//--------------------------------------//
+  //--------- GLOBAL GAME SETTING --------//
+  //
+  // parameters under GLOBAL GAME SETTING should remain unchange
+  // after the game starts, and are the same across other players
+  // in a multiplayer game
+  // (i.e. change_game_setting() should updates all these setting )
+  //
+  //--------------------------------------//
 
-	//------- parameter settings --------//
+  //------- parameter settings --------//
 
-	short			human_difficulty_rating;
-	short			monster_difficulty_rating;
+  short human_difficulty_rating;
+  short monster_difficulty_rating;
 
-	char			ai_human_nation_count;			// no. of AI nations in the game
-	char			ai_monster_nation_count;
-	int			ai_nation_count()		{ return ai_human_nation_count + ai_monster_nation_count; }
-	short			start_up_cash;
-	short			ai_start_up_cash;
-	char			ai_aggressiveness;
-	short			start_up_independent_town;
-	short			start_up_raw_site;
-	char			difficulty_level;
+  char ai_human_nation_count; // no. of AI nations in the game
+  char ai_monster_nation_count;
+  int ai_nation_count() {
+    return ai_human_nation_count + ai_monster_nation_count;
+  }
+  short start_up_cash;
+  short ai_start_up_cash;
+  char ai_aggressiveness;
+  short start_up_independent_town;
+  short start_up_raw_site;
+  char difficulty_level;
 
-	//-------- option settings ----------//
+  //-------- option settings ----------//
 
-	char			explore_whole_map;			// whether the map is explored at first place
-	char			fog_of_war;						// fog of war option
-	short			terrain_set;
-	char			building_size;
-	short			latitude;
-	char			weather_effect;
-	char			land_mass;
+  char explore_whole_map; // whether the map is explored at first place
+  char fog_of_war;        // fog of war option
+  short terrain_set;
+  char building_size;
+  short latitude;
+  char weather_effect;
+  char land_mass;
 
-	char			new_independent_town_emerge;
-	char		 	independent_town_resistance; 	// whether independent towns' defenders have higher combat levels
-	char			random_event_frequency;
-	char			new_nation_emerge;
-	char			monster_type;
-	char			start_up_has_mine_nearby;
-	char			random_start_up;
-	char			spy_methodology;
+  char new_independent_town_emerge;
+  char independent_town_resistance; // whether independent towns' defenders have
+                                    // higher combat levels
+  char random_event_frequency;
+  char new_nation_emerge;
+  char monster_type;
+  char start_up_has_mine_nearby;
+  char random_start_up;
+  char spy_methodology;
 
-	//--------- goal ----------//
+  //--------- goal ----------//
 
-	char			goal_destroy_monster;
-	char			goal_population_flag;
-	char			goal_economic_score_flag;
-	char			goal_total_score_flag;
-	char			goal_year_limit_flag;
-	char			goal_alliance_win_flag;
+  char goal_destroy_monster;
+  char goal_population_flag;
+  char goal_economic_score_flag;
+  char goal_total_score_flag;
+  char goal_year_limit_flag;
+  char goal_alliance_win_flag;
 
-	int			goal_population;
-	int  			goal_economic_score;
-	int			goal_total_score;
-	int			goal_year_limit;
+  int goal_population;
+  int goal_economic_score;
+  int goal_total_score;
+  int goal_year_limit;
 
-	//------- game setting on fire ---------//
+  //------- game setting on fire ---------//
 
-	char			fire_spread_rate;          // 0 to disable, 10 for normal
-	char			wind_spread_fire_rate;     // 0 to disable, 5 for normal
-	char			fire_fade_rate;            // 1 for slow, 2 for fast
-	char			fire_restore_prob;         // 0 to 100, 5 for normal
-	char			rain_reduce_fire_rate;     // 0 to 20, 5 for normal
-	char			fire_damage;               // 0 to disable 2 for normal
+  char fire_spread_rate;      // 0 to disable, 10 for normal
+  char wind_spread_fire_rate; // 0 to disable, 5 for normal
+  char fire_fade_rate;        // 1 for slow, 2 for fast
+  char fire_restore_prob;     // 0 to 100, 5 for normal
+  char rain_reduce_fire_rate; // 0 to 20, 5 for normal
+  char fire_damage;           // 0 to disable 2 for normal
 
-	// ------ campaign game setting ------//
+  // ------ campaign game setting ------//
 
-	char			campaign_difficulty;
+  char campaign_difficulty;
 
-	//--------- CHEAT GAME SETTING --------//
-	//
-	// parameters under CHEAT GAME SETTING can be changed
-	// after the game starts, and must be reset in in a multiplayer game
-	// (i.e. reset_cheat_setting() can reset all these setting )
-	//
-	//--------------------------------------//
-	char			show_ai_info;
-	char			show_debug_info;
-	char			fast_build;							// fast building everything
-	char			disable_ai_flag;
-	char			king_undie_flag;					// for testing game only
-	
-	//--------- LOCAL GAME SETTING --------//
-	//
-	// parameters under LOCAL GAME SETTING should remain unchange
-	// after the game starts, may not be the same across other players
-	//
-	//-------------------------------------//
+  //--------- CHEAT GAME SETTING --------//
+  //
+  // parameters under CHEAT GAME SETTING can be changed
+  // after the game starts, and must be reset in in a multiplayer game
+  // (i.e. reset_cheat_setting() can reset all these setting )
+  //
+  //--------------------------------------//
+  char show_ai_info;
+  char show_debug_info;
+  char fast_build; // fast building everything
+  char disable_ai_flag;
+  char king_undie_flag; // for testing game only
 
-	char			race_id;
-	char			player_name[PLAYER_NAME_LEN+1];
-	char			player_nation_color;
+  //--------- LOCAL GAME SETTING --------//
+  //
+  // parameters under LOCAL GAME SETTING should remain unchange
+  // after the game starts, may not be the same across other players
+  //
+  //-------------------------------------//
 
-	char			expired_flag;
+  char race_id;
+  char player_name[PLAYER_NAME_LEN + 1];
+  char player_nation_color;
 
-	//--------- PREFERENCE --------//
-	//
-	// parameters under PREFERENCE are changeable during the game
-	// the game will not be affect at any setting
-	//
-	//-------------------------------------//
+  char expired_flag;
 
-	char			opaque_report;
-	char			disp_news_flag;
+  //--------- PREFERENCE --------//
+  //
+  // parameters under PREFERENCE are changeable during the game
+  // the game will not be affect at any setting
+  //
+  //-------------------------------------//
 
-	short			scroll_speed;					// map scrolling speed. 1-slowest, 10-fastest
-	short			frame_speed;					// game speed, the desired frames per second
-	char			scroll_method;
+  char opaque_report;
+  char disp_news_flag;
 
-	char			help_mode;
-	char			disp_extend_info;
-	char			show_all_unit_icon;			// 0:show icon when pointed, 1:always
-	char			show_unit_path;				// bit 0 show unit path on ZoomMatrix, bit 1 for MapMatrix
+  short scroll_speed; // map scrolling speed. 1-slowest, 10-fastest
+  short frame_speed;  // game speed, the desired frames per second
+  char scroll_method;
 
-	//------- sound effect --------//
+  char help_mode;
+  char disp_extend_info;
+  char show_all_unit_icon; // 0:show icon when pointed, 1:always
+  char
+      show_unit_path; // bit 0 show unit path on ZoomMatrix, bit 1 for MapMatrix
 
-	char			music_flag;
-	short			cd_music_volume;    	// a value from 0 to 100
-	short			wav_music_volume;		// a value from 0 to 100
+  //------- sound effect --------//
 
-	char			sound_effect_flag;
-	short			sound_effect_volume; 	// a value from 0 to 100
+  char music_flag;
+  short cd_music_volume;  // a value from 0 to 100
+  short wav_music_volume; // a value from 0 to 100
 
-	char			pan_control;                            // mono speaker should disable pan_control
+  char sound_effect_flag;
+  short sound_effect_volume; // a value from 0 to 100
 
-	//------- weather visual effect flags -------//
+  char pan_control; // mono speaker should disable pan_control
 
-	char			lightning_visual;
-	char			earthquake_visual;
-	char			rain_visual;
-	char			snow_visual;
-	char			snow_ground;			// 0=disable, 1=i_snow, 2=snow_res
+  //------- weather visual effect flags -------//
 
-	//-------- weather audio effect flags -------//
+  char lightning_visual;
+  char earthquake_visual;
+  char rain_visual;
+  char snow_visual;
+  char snow_ground; // 0=disable, 1=i_snow, 2=snow_res
 
-	char			lightning_audio;
-	char			earthquake_audio;
-	char			rain_audio;
-	char			snow_audio;				// not used
-	char			wind_audio;
+  //-------- weather audio effect flags -------//
 
-	//--------- weather visual effect parameters --------//
+  char lightning_audio;
+  char earthquake_audio;
+  char rain_audio;
+  char snow_audio; // not used
+  char wind_audio;
 
-	int			lightning_brightness;	// 0, 20, 40 or 60
-	int			cloud_darkness;		// 0 to 5, 0 to disable cloud darkness
+  //--------- weather visual effect parameters --------//
 
-	//-------- weather audio effect parameters ----------//
+  int lightning_brightness; // 0, 20, 40 or 60
+  int cloud_darkness;       // 0 to 5, 0 to disable cloud darkness
 
-	int			lightning_volume;		// default 100
-	int			earthquake_volume;	// default 100
-	int			rain_volume;			// default 90
-	int			snow_volume;			// default 100
-	int			wind_volume;			// default 70
+  //-------- weather audio effect parameters ----------//
 
-	//------------ map prefernce -------------//
+  int lightning_volume;  // default 100
+  int earthquake_volume; // default 100
+  int rain_volume;       // default 90
+  int snow_volume;       // default 100
+  int wind_volume;       // default 70
 
-	char			blacken_map;				// whether the map is blackened at the first place
-	char			explore_mask_method;		// 0 for none, 1 for masking, 2 for remapping
-	char			fog_mask_method;			// 1 for fast masking, 2 for slow remapping
+  //------------ map prefernce -------------//
 
-	// ----------- display mode -----------//
+  char blacken_map;         // whether the map is blackened at the first place
+  char explore_mask_method; // 0 for none, 1 for masking, 2 for remapping
+  char fog_mask_method;     // 1 for fast masking, 2 for slow remapping
 
-	int			display_mode_id;			// see OMODEID.H
+  // ----------- display mode -----------//
+
+  int display_mode_id; // see OMODEID.H
 };
 #pragma pack()
 

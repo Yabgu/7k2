@@ -18,8 +18,8 @@
  *
  */
 
-//Filename    : ODB.H
-//Description : Header file of ODB.CPP object Database
+// Filename    : ODB.H
+// Description : Header file of ODB.CPP object Database
 
 #ifndef __ODB_H
 #define __ODB_H
@@ -28,74 +28,66 @@
 #include <ofile.h>
 #endif
 
-
 //-------- Define class Database ------------//
 
-class Database : public File
-{
+class Database : public File {
 private:
+  struct DbfHeader {
+    char dbf_id;
+    char last_update[3];
+    uint32_t last_rec;
+    unsigned short data_offset;
+    unsigned short rec_size;
+    char dummy[20];
+  };
 
-	struct DbfHeader
-	{
-		char     dbf_id;
-		char     last_update[3];
-		uint32_t last_rec;
-		unsigned short data_offset;
-		unsigned short rec_size;
-		char		dummy[20];
-	};
+  struct DbfRec {
+    char field_name[11];
+    char field_type;
+    uint32_t field_offset;
+    union {
+      unsigned short char_len;
+      struct {
+        unsigned char len;
+        unsigned char dec;
+      } num_size;
+    } len_info;
 
-	struct DbfRec
-	{
-		char     field_name[11];
-		char     field_type;
-		uint32_t field_offset;
-		union
-		{
-			unsigned short char_len;
-			struct
-			{
-				unsigned char len;
-				unsigned char dec;
-			} num_size;
-		} len_info;
-
-		char filler[14];
-	};
+    char filler[14];
+  };
 
 private:
+  DbfHeader dbf_header;
+  char *rec_buf;
+  long cur_recno;
+  long last_read_recno;
 
-   DbfHeader dbf_header;
-   char*     rec_buf;
-   long      cur_recno;
-   long      last_read_recno;
+  char *dbf_buf;          // buffer for reading in the whole dbf
+  char dbf_buf_allocated; // whether we allocated the buffer or only take from
+                          // extern pointer
 
-   char*     dbf_buf;     	// buffer for reading in the whole dbf
-   char      dbf_buf_allocated; // whether we allocated the buffer or only take from extern pointer
-
-	DbfRec*	 dbf_record_spec;
-	int		 dbf_field_count;
+  DbfRec *dbf_record_spec;
+  int dbf_field_count;
 
 public:
+  Database(const char * = 0, int bufferAll = 0, int importRecSpec = 0);
+  ~Database();
 
-   Database(const char* =0, int bufferAll=0, int importRecSpec=0);
-   ~Database();
+  void open(const char *, int bufferAll = 0, int importRecSpec = 0);
+  void open_from_buf(char *, int importRecSpec = 0);
 
-   void  open(const char*, int bufferAll=0, int importRecSpec=0);
-   void  open_from_buf(char*, int importRecSpec=0);
+  char *read(long = 0);
+  void go(long recNo) { cur_recno = recNo; }
+  void close();
 
-	char* read(long=0);
-	void  go(long recNo)    { cur_recno=recNo; }
-	void  close();
+  long rec_count() { return dbf_header.last_rec; }
+  long recno() { return cur_recno; }
 
-	long  rec_count()       { return dbf_header.last_rec; }
-   long  recno()           { return cur_recno; }
-
-	// if imported record spec
-	int	get_field_offset(char *);
-	int	get_field_width(char *);
-	int	get_field_dec_width(char *);
-	int	write_file(char *srcFile, char *destFile);
+  // if imported record spec
+  int get_field_offset(char *);
+  int get_field_width(char *);
+  int get_field_dec_width(char *);
+  int write_file(char *srcFile, char *destFile);
 };
 
 //----------------------------------------------//

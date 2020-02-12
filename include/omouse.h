@@ -19,8 +19,8 @@
  *
  */
 
-//Filename    : OMOUSE.H
-//Description : Header file for Mouse Handling Object (OMOUSE.CPP)
+// Filename    : OMOUSE.H
+// Description : Header file for Mouse Handling Object (OMOUSE.CPP)
 
 #ifndef __OMOUSE_H
 #define __OMOUSE_H

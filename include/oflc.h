@@ -21,37 +21,35 @@
 // Filename    : OFLC.H
 // Description : Header file of class FLC (animation format)
 
-
 #ifndef __OFLC_H
 #define __OFLC_H
 
-class Flc
-{
+class Flc {
 public:
-	//TFAnimation*		flc_handle;
-	unsigned char*		frame_buffer;
-	unsigned char*		palette_buffer;
-	int					init_flag;
+  // TFAnimation*		flc_handle;
+  unsigned char *frame_buffer;
+  unsigned char *palette_buffer;
+  int init_flag;
 
 public:
-	Flc();
-	~Flc();
+  Flc();
+  ~Flc();
 
-	int	open_file(char *filename);
-	int	open_mem(void *flcBuffer);
-	void	deinit();
+  int open_file(char *filename);
+  int open_mem(void *flcBuffer);
+  void deinit();
 
-	static void set_error_handler( void (*handler)(char *msg) );
+  static void set_error_handler(void (*handler)(char *msg));
 
-	// -------- get info function -------//
-	short	width()   { return 0; }
-	short	height()  { return 0; }
-	short max_frame() { return 0; }
-	short cur_frame() { return 0; }
-	unsigned char *get_palette() { return 0; }
+  // -------- get info function -------//
+  short width() { return 0; }
+  short height() { return 0; }
+  short max_frame() { return 0; }
+  short cur_frame() { return 0; }
+  unsigned char *get_palette() { return 0; }
 
-	int	advance();		// advance to next frame
-	int	rewind();		// rewind to the beginning
-	void	get_area(void *, short x1, short y1, short x2, short y2);
+  int advance(); // advance to next frame
+  int rewind();  // rewind to the beginning
+  void get_area(void *, short x1, short y1, short x2, short y2);
 };
 #endif

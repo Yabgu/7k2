@@ -21,17 +21,11 @@
 // Filename    : OT_TALK.CPP
 // Description : Text Resource Talk
 
-
-#include <ot_talk.h>
 #include <all.h>
 #include <onationb.h>
+#include <ot_talk.h>
 
-
-void TextResTalk::init()
-{
-	TextResource::init( DIR_RES"T_TALK.RES" );
-}
-
+void TextResTalk::init() { TextResource::init(DIR_RES "T_TALK.RES"); }
 
 // text id 1 - 5
 // [REL0]War
@@ -39,35 +33,28 @@ void TextResTalk::init()
 // [REL2]Neutral
 // [REL3]Friendly
 // [REL4]Alliance
-const char* TextResTalk::str_relation_status(char status)
-{
-	switch( status )
-	{
-	case RELATION_HOSTILE:
-		return get_format_str( 1, "REL0" );
-	case RELATION_TENSE:
-		return get_format_str( 2, "REL1" );
-	case RELATION_NEUTRAL:
-		return get_format_str( 3, "REL2" );
-	case RELATION_FRIENDLY:
-		return get_format_str( 4, "REL3" );
-	case RELATION_ALLIANCE:
-		return get_format_str( 5, "REL4" );
-	default:
-		return "";
-	};
+const char *TextResTalk::str_relation_status(char status) {
+  switch (status) {
+  case RELATION_HOSTILE:
+    return get_format_str(1, "REL0");
+  case RELATION_TENSE:
+    return get_format_str(2, "REL1");
+  case RELATION_NEUTRAL:
+    return get_format_str(3, "REL2");
+  case RELATION_FRIENDLY:
+    return get_format_str(4, "REL3");
+  case RELATION_ALLIANCE:
+    return get_format_str(5, "REL4");
+  default:
+    return "";
+  };
 }
 
 // text id 6
 // [TRAD]Trade Treaty
-char* TextResTalk::str_trade_treaty()
-{
-	return get_format_str( 6, "TRAD" );
-}
-
+char *TextResTalk::str_trade_treaty() { return get_format_str(6, "TRAD"); }
 
 // text id 7 - 10 reserved
-
 
 // text id 11 - 16 trade treaty
 // [YPTT]You propose a trade treaty to %1s.
@@ -152,7 +139,6 @@ char* TextResTalk::str_trade_treaty()
 // [YWAR]You declare war on %1s.
 // [NWAR]%1s declares war on you.
 
-
 // text id 69 - 74 offer tribute
 // [YPOT]You offer %1s %2,2d in tribute.
 // [NPOT]%1s offers you %2,2d in tribute.
@@ -195,11 +181,12 @@ char* TextResTalk::str_trade_treaty()
 
 // text id 99 - 104 request surrender
 // [YPRS]You offer %2,2d for the throne of %1s.
-// [NPRS]To unite our two Kingdoms under his rule, %1s offers %2,2d for your throne.
-// [NARS]%1s agrees to take your money in exchange for his throne.
+// [NPRS]To unite our two Kingdoms under his rule, %1s offers %2,2d for your
+// throne. [NARS]%1s agrees to take your money in exchange for his throne.
 // [NRRS]%1s refuses to dishonor himself by selling his throne!
-// [(never appears)YARS]You agree to take the money from %1s in exchange for your throne to.
-// [YRRS]You refuse to dishonor yourself by selling your throne to %1s.
+// [(never appears)YARS]You agree to take the money from %1s in exchange for
+// your throne to. [YRRS]You refuse to dishonor yourself by selling your throne
+// to %1s.
 
 // text id 105 - 106 surrender
 // [YSUR]You have surrendered to %1s.
@@ -208,136 +195,90 @@ char* TextResTalk::str_trade_treaty()
 // text id 107 - 120 reserved
 
 // text id 121
-// [MANY]You've sent too many messages to this kingdom. You cannot send any new messages until the existing ones are processed.
-char* TextResTalk::str_too_many_msg()
-{
-	return get_format_str( 121, "MANY" );
-}
+// [MANY]You've sent too many messages to this kingdom. You cannot send any new
+// messages until the existing ones are processed.
+char *TextResTalk::str_too_many_msg() { return get_format_str(121, "MANY"); }
 
 // text id 122
 // [SENT]The message has been sent.
-char* TextResTalk::str_msg_sent()
-{
-	return get_format_str( 122, "SENT" );
-}
+char *TextResTalk::str_msg_sent() { return get_format_str(122, "SENT"); }
 
 // text id 123
 // [CNCL]Cancel.
-char* TextResTalk::str_cancel_()
-{
-	return get_format_str( 123, "CNCL" );
-}
+char *TextResTalk::str_cancel_() { return get_format_str(123, "CNCL"); }
 
 // text id 124
 // [CONT]Continue
-char* TextResTalk::str_continue()
-{
-	return get_format_str( 124, "CONT" );
-}
+char *TextResTalk::str_continue() { return get_format_str(124, "CONT"); }
 
 // text id 125
 // [ASKT]How much tribute?
-char* TextResTalk::str_ask_tribute()
-{
-	return get_format_str( 125, "ASKT" );
-}
+char *TextResTalk::str_ask_tribute() { return get_format_str(125, "ASKT"); }
 
 // text id 126
 // [ASKA]How much aid?
-char* TextResTalk::str_ask_aid()
-{
-	return get_format_str( 126, "ASKA" );
-}
+char *TextResTalk::str_ask_aid() { return get_format_str(126, "ASKA"); }
 
 // text id 127
 // [ASKE]Request an embargo on trade with which kingdom?
-char* TextResTalk::str_ask_embargo()
-{
-	return get_format_str( 127, "ASKE" );
-}
+char *TextResTalk::str_ask_embargo() { return get_format_str(127, "ASKE"); }
 
 // text id 128
 // [ASKW]Declare war on which kingdom?
-char* TextResTalk::str_ask_declare_war()
-{
-	return get_format_str( 128, "ASKW" );
-}
+char *TextResTalk::str_ask_declare_war() { return get_format_str(128, "ASKW"); }
 
 // text id 129
 // [ASKF]How much food do you want to purchase?
-char* TextResTalk::str_ask_buy_food()
-{
-	return get_format_str( 129, "ASKF" );
-}
+char *TextResTalk::str_ask_buy_food() { return get_format_str(129, "ASKF"); }
 
 // text id 130
 // [ASKP]How much do you offer for 10 units of food?
-char* TextResTalk::str_ask_food_price()
-{
-	return get_format_str( 130, "ASKP" );
-}
+char *TextResTalk::str_ask_food_price() { return get_format_str(130, "ASKP"); }
 
 // text id 131
 // [OFFT]Technology you offer?
-char* TextResTalk::str_ask_offer_tech()
-{
-	return get_format_str( 131, "OFFT" );
-}
+char *TextResTalk::str_ask_offer_tech() { return get_format_str(131, "OFFT"); }
 
 // text id 132
 // [REQT]Technology you request?
-char* TextResTalk::str_ask_request_tech()
-{
-	return get_format_str( 132, "REQT" );
+char *TextResTalk::str_ask_request_tech() {
+  return get_format_str(132, "REQT");
 }
 
 // text id 133
 // [SURP]How much do you offer?
-char* TextResTalk::str_ask_surrender_price()
-{
-	return get_format_str( 133, "SURP" );
+char *TextResTalk::str_ask_surrender_price() {
+  return get_format_str(133, "SURP");
 }
 
 // text id 134
 // [CSUR]Do you really want to Surrender to %1s?
-char* TextResTalk::str_ask_confirm_surrender( char* nationName )
-{
-	return process( get_format_str( 134, "CSUR" ), 
-		nationName );
+char *TextResTalk::str_ask_confirm_surrender(char *nationName) {
+  return process(get_format_str(134, "CSUR"), nationName);
 }
 
 // text id 135
 // [CFRM]Confirm.
-char* TextResTalk::str_confirm_()
-{
-	return get_format_str( 135, "CFRM" );
-}
+char *TextResTalk::str_confirm_() { return get_format_str(135, "CFRM"); }
 
 // text id 136
 // [ACCP]Accept.
-char* TextResTalk::str_accept_()
-{
-	return get_format_str( 136, "ACCP" );
-}
+char *TextResTalk::str_accept_() { return get_format_str(136, "ACCP"); }
 
 // text id 137
 // [REJT]Reject.
-char* TextResTalk::str_reject_()
-{
-	return get_format_str( 137, "REJT" );
-}
+char *TextResTalk::str_reject_() { return get_format_str(137, "REJT"); }
 
 // text id 138 - 160 reserved
 
 // text id 161 - 179 (180 - 188 reserved)
 // [TKM1] - [TKMJ]
-char* TextResTalk::str_msg_name(int talkMsgId)
-{
-	err_when( talkMsgId <= 0 );
+char *TextResTalk::str_msg_name(int talkMsgId) {
+  err_when(talkMsgId <= 0);
 
-	if( talkMsgId == 1 )	// check only the first
-	{
-		return get_format_str( 160+talkMsgId, "TKM1" );
-	}
-	return get_format_str( 160+talkMsgId, NULL );
+  if (talkMsgId == 1) // check only the first
+  {
+    return get_format_str(160 + talkMsgId, "TKM1");
+  }
+  return get_format_str(160 + talkMsgId, NULL);
 }

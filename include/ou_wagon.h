@@ -33,46 +33,45 @@
 //-------- Define class UnitWagon --------//
 
 #pragma pack(1)
-class UnitWagon : public Unit
-{
+class UnitWagon : public Unit {
 public:
-	int	population;
-	short	spy_count;
-	short	spy_recno[MAX_WAGON_POPULATION];
+  int population;
+  short spy_count;
+  short spy_recno[MAX_WAGON_POPULATION];
 
 public:
-	UnitWagon();
-	~UnitWagon();
+  UnitWagon();
+  ~UnitWagon();
 
-	void	init_derived();
-	void	deinit();
+  void init_derived();
+  void deinit();
 
-	// --------- overloaded function ----------//
+  // --------- overloaded function ----------//
 
-	void	change_nation(int newNationRecno );
+  void change_nation(int newNationRecno);
 
-	// --------- population functions ---------//
+  // --------- population functions ---------//
 
-	void	set_race(int raceId)		{ race_id = raceId; }
-	void	set_pop(int);		// also change hit point
-	short mobilize_civilian( short spyRecno );
+  void set_race(int raceId) { race_id = raceId; }
+  void set_pop(int); // also change hit point
+  short mobilize_civilian(short spyRecno);
 
-	// -------- spy function ---------//
+  // -------- spy function ---------//
 
-	void	add_spy(short spyRecno);
-	short	del_spy(short spyRecno=-1);			// return the first spy, and remove it from spy_array
-	int	explore_for_player();
+  void add_spy(short spyRecno);
+  short del_spy(short spyRecno =
+                    -1); // return the first spy, and remove it from spy_array
+  int explore_for_player();
 
-	//-------------- multiplayer checking codes ---------------//
+  //-------------- multiplayer checking codes ---------------//
 
-	virtual	UCHAR crc8();
-	virtual	void	clear_ptr();
+  virtual UCHAR crc8();
+  virtual void clear_ptr();
 
-	//--------- casting function ----------//
+  //--------- casting function ----------//
 
-	UnitWagon*	cast_to_UnitWagon()	{ return this; }
+  UnitWagon *cast_to_UnitWagon() { return this; }
 };
 #pragma pack()
-
 
 #endif

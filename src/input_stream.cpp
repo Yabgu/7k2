@@ -24,25 +24,23 @@
  * type AliasT.
  */
 template <typename T, typename AliasT>
-bool read_le_alias(InputStream *is, T *valp)
-{
-   union { T val; AliasT al; } u;
+bool read_le_alias(InputStream *is, T *valp) {
+  union {
+    T val;
+    AliasT al;
+  } u;
 
-   if (!read_le_integer<AliasT>(is, &u.al))
-      return false;
+  if (!read_le_integer<AliasT>(is, &u.al))
+    return false;
 
-   *valp = u.val;
-   return true;
+  *valp = u.val;
+  return true;
 }
 
-template <>
-bool read_le<float>(InputStream *is, float *valp)
-{
-   return read_le_alias<float, uint32_t>(is, valp);
+template <> bool read_le<float>(InputStream *is, float *valp) {
+  return read_le_alias<float, uint32_t>(is, valp);
 }
 
-template <>
-bool read_le<double>(InputStream *is, double *valp)
-{
-   return read_le_alias<double, uint64_t>(is, valp);
+template <> bool read_le<double>(InputStream *is, double *valp) {
+  return read_le_alias<double, uint64_t>(is, valp);
 }

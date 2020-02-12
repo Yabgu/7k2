@@ -21,28 +21,27 @@
 // Filename    : OB_FLAME.H
 // Description : non-moving bullet attack (flamethrower)
 
-
 #ifndef __OB_FLAME_H
 #define __OB_FLAME_H
 
-#include	<obullet.h>
+#include <obullet.h>
 
 // cur_action of BulletFlame is SPRITE_STOP before die
 
 #pragma pack(1)
-class BulletFlame : public Bullet
-{
+class BulletFlame : public Bullet {
 public:
-	BulletFlame();
+  BulletFlame();
 
-	void 	init(char parentType, short parentRecno, short targetXLoc, short targetYLoc, char targetMobileType);
-	void	process_idle();
-	char	display_layer();
-	int	reflect( int baseObjRecno ) { return 0;}
+  void init(char parentType, short parentRecno, short targetXLoc,
+            short targetYLoc, char targetMobileType);
+  void process_idle();
+  char display_layer();
+  int reflect(int baseObjRecno) { return 0; }
 
-	//-------------- multiplayer checking codes ---------------//
-	virtual	UCHAR crc8();
-	virtual	void	clear_ptr();
+  //-------------- multiplayer checking codes ---------------//
+  virtual UCHAR crc8();
+  virtual void clear_ptr();
 };
 #pragma pack()
 
