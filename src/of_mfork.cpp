@@ -27,251 +27,254 @@
 #include <ounit.h>
 #include <oworld.h>
 
-int FirmMonsterFortress::return_fire(BaseObj *attackerObj) {
-  // remember the target
+int FirmMonsterFortress::return_fire(BaseObj *attackerObj)
+{
+    // remember the target
 
-  if (attackerObj) {
-    if (target_count < MAX_FORTRESS_TARGET) {
-      target_base_obj_recno[target_count] = attackerObj->base_obj_recno;
-      target_count++;
-      return 1;
-    } else if (misc.random(100) < 20) // 20% to preempt
+    if (attackerObj)
     {
-      target_base_obj_recno[misc.random(MAX_FORTRESS_TARGET)] =
-          attackerObj->base_obj_recno;
-      return 1;
-    }
-  }
-
-  return 0;
-}
-
-void FirmMonsterFortress::process_monster_firm() {
-  // fire at target
-
-  int fireCount = misc.random(3) - 1; // may be negative, also mean zero
-
-  // archer's remain_attack_delay decreases in sprite_array.process
-  // so not need to decrease here
-
-  if (target_count <= 0)
-    return;
-
-  int i = misc.random(target_count);
-  for (int a = 0; a < archer_count && fireCount > 0; ++a) {
-    Unit *archerPtr = unit_array[archer_unit_recno[a]];
-    if (archerPtr->remain_attack_delay > 0)
-      continue;
-
-    int j;
-    for (j = 0; j < target_count; ++j, ++i) {
-      if (i >= target_count)
-        i = 0;
-
-      short targetObjRecno = target_base_obj_recno[i];
-
-      if (base_obj_array.is_deleted(targetObjRecno))
-        continue;
-
-      BaseObj *targetObj = base_obj_array[targetObjRecno];
-
-      if (!targetObj->obj_is_visible() ||
-          !archerPtr->can_attack_target(targetObjRecno))
-        continue;
-      break;
-    }
-
-    if (j < target_count) {
-      BaseObj *targetObj = base_obj_array[target_base_obj_recno[i]];
-
-      // find the maximum damage range attack
-
-      int curAttack;
-      int maxDamageAttack;
-      int maxDamage = 0;
-
-      for (curAttack = 0; curAttack < archerPtr->attack_count; ++curAttack) {
-        AttackInfo *attackInfo = &archerPtr->attack_info_array[curAttack];
-
-        if (attackInfo->attack_range > 2 &&
-            archerPtr->can_attack_with(
-                curAttack)) // don't allow spitfire to attack
+        if (target_count < MAX_FORTRESS_TARGET)
         {
-          AttackInfo *attackInfo = &archerPtr->attack_info_array[curAttack];
-          if (attackInfo->attack_damage > maxDamage) {
-            maxDamage = attackInfo->attack_damage;
-            maxDamageAttack = curAttack;
-          }
+            target_base_obj_recno[target_count] = attackerObj->base_obj_recno;
+            target_count++;
+            return 1;
         }
-      }
-
-      if (maxDamage) {
-        fire_archer_id = a + 1; // for get_attacker_unit to get attacking unit
-
-        AttackInfo *attackInfo = &archerPtr->attack_info_array[maxDamageAttack];
-        archerPtr->cur_attack = maxDamageAttack;
-        err_when(!archerPtr->cur_attack_info()->bullet_sprite_id);
-
-        // ------ add bullet --------//
-
-        int bulletRecno = 0;
-        if (targetObj->cast_to_Unit())
-          bulletRecno =
-              bullet_array.add_bullet(this, targetObj->cast_to_Unit());
-        else if (targetObj->cast_to_Place())
-          bulletRecno =
-              bullet_array.add_bullet(this, targetObj->cast_to_Place());
-
-        if (bulletRecno) {
-          // ----- change attribute of archer  --------//
-
-          archerPtr->remain_attack_delay =
-              attackInfo->attack_delay + attackInfo->bullet_out_frame;
-          archerPtr->cur_power -= attackInfo->min_power;
-
-          // ----- change attribute of bullet ------//
-
-          Bullet *bulletPtr = bullet_array[bulletRecno];
-          bulletPtr->parent_recno = archerPtr->sprite_recno;
-          bulletPtr->parent_base_obj_recno = archerPtr->base_obj_recno;
-          bulletPtr->attack_attribute = attackInfo->attack_attribute;
-
-          fireCount--;
+        else if (misc.random(100) < 20) // 20% to preempt
+        {
+            target_base_obj_recno[misc.random(MAX_FORTRESS_TARGET)] = attackerObj->base_obj_recno;
+            return 1;
         }
-
-        fire_archer_id = 0; // clear it as soon as bullet fired
-      }
-    } // if( j < target_count )
-  }   // for(a)
-}
-
-void FirmMonsterFortress::process_scan_target() {
-  // removed deleted or out of range target
-
-  short srcCount = target_count;
-  short srcTarget[MAX_FORTRESS_TARGET];
-  err_when(sizeof(target_base_obj_recno) != sizeof(srcTarget));
-  memcpy(srcTarget, target_base_obj_recno, sizeof(srcTarget));
-
-  target_count = 0;
-  for (int i = 0; i < srcCount; ++i) {
-    if (base_obj_array.is_deleted(srcTarget[i]))
-      continue;
-
-    BaseObj *targetObj = base_obj_array[srcTarget[i]];
-
-    if (!targetObj->obj_is_visible())
-      continue;
-
-    // --- if no archer can attack also remove -----//
-
-    int a;
-    for (a = 0; a < archer_count &&
-                !unit_array[archer_unit_recno[a]]->can_attack_target(
-                    targetObj->base_obj_recno);
-         ++a)
-      ;
-    if (a >= archer_count)
-      continue; // no archer can attack
-
-    //------------------------------------------------//
-
-    if (area_distance(targetObj) > FORTRESS_SCAN_RANGE)
-      continue;
-
-    // ##### begin Gilbert 4/2 ######//
-    // ----- skip camouflaged unit ------//
-
-    Unit *unitPtr = targetObj->cast_to_Unit();
-    if (unitPtr && unitPtr->is_camouflage(nation_recno))
-      continue;
-    // ##### end Gilbert 4/2 ######//
-
-    target_base_obj_recno[target_count] = srcTarget[i];
-    target_count++;
-  }
-
-  if (target_count < MAX_FORTRESS_TARGET &&
-      archer_count > 0) // don't find new target
-  {
-    int xLoc1 = loc_x1 - FORTRESS_SCAN_RANGE;
-    int yLoc1 = loc_y1 - FORTRESS_SCAN_RANGE;
-    int xLoc2 = loc_x2 + FORTRESS_SCAN_RANGE;
-    int yLoc2 = loc_y2 + FORTRESS_SCAN_RANGE;
-
-    // reduce scanning range
-
-    switch (info.game_date % 4) {
-    case 0:
-      xLoc2 = center_x;
-      break; // left half
-    case 1:
-      xLoc1 = center_x + 1;
-      break; // right half
-    case 2:
-      yLoc2 = center_y;
-      break; // top half
-    case 3:
-      yLoc1 = center_y + 1;
-      break; // bottom half
     }
 
-    xLoc1 = MAX(xLoc1, 0);
-    yLoc1 = MAX(yLoc1, 0);
-    xLoc2 = MIN(xLoc2, MAX_WORLD_X_LOC - 1);
-    yLoc2 = MIN(yLoc2, MAX_WORLD_Y_LOC - 1);
+    return 0;
+}
 
-    //------------------------------------------//
+void FirmMonsterFortress::process_monster_firm()
+{
+    // fire at target
 
-    int xLoc, yLoc;
-    Unit *unitPtr;
-    Location *locPtr;
+    int fireCount = misc.random(3) - 1; // may be negative, also mean zero
 
-    for (yLoc = yLoc1; yLoc <= yLoc2 && target_count < MAX_FORTRESS_TARGET;
-         yLoc++) {
-      locPtr = world.get_loc(xLoc1, yLoc);
+    // archer's remain_attack_delay decreases in sprite_array.process
+    // so not need to decrease here
 
-      for (xLoc = xLoc1; xLoc <= xLoc2 && target_count < MAX_FORTRESS_TARGET;
-           xLoc++, locPtr++) {
-        //--- if there is an enemy unit here ---//
+    if (target_count <= 0)
+        return;
 
-        int scannedUnitRecno;
-        if ((scannedUnitRecno = locPtr->unit_recno(UNIT_LAND)) &&
-            !unit_array.is_deleted(scannedUnitRecno)) {
-          unitPtr = unit_array[scannedUnitRecno];
-
-          if (unitPtr->hit_points <= 0.0f)
+    int i = misc.random(target_count);
+    for (int a = 0; a < archer_count && fireCount > 0; ++a)
+    {
+        Unit *archerPtr = unit_array[archer_unit_recno[a]];
+        if (archerPtr->remain_attack_delay > 0)
             continue;
 
-          // ----- skip camouflaged unit ------//
+        int j;
+        for (j = 0; j < target_count; ++j, ++i)
+        {
+            if (i >= target_count)
+                i = 0;
 
-          if (unitPtr->is_camouflage(nation_recno))
+            short targetObjRecno = target_base_obj_recno[i];
+
+            if (base_obj_array.is_deleted(targetObjRecno))
+                continue;
+
+            BaseObj *targetObj = base_obj_array[targetObjRecno];
+
+            if (!targetObj->obj_is_visible() || !archerPtr->can_attack_target(targetObjRecno))
+                continue;
+            break;
+        }
+
+        if (j < target_count)
+        {
+            BaseObj *targetObj = base_obj_array[target_base_obj_recno[i]];
+
+            // find the maximum damage range attack
+
+            int curAttack;
+            int maxDamageAttack;
+            int maxDamage = 0;
+
+            for (curAttack = 0; curAttack < archerPtr->attack_count; ++curAttack)
+            {
+                AttackInfo *attackInfo = &archerPtr->attack_info_array[curAttack];
+
+                if (attackInfo->attack_range > 2 &&
+                    archerPtr->can_attack_with(curAttack)) // don't allow spitfire to attack
+                {
+                    AttackInfo *attackInfo = &archerPtr->attack_info_array[curAttack];
+                    if (attackInfo->attack_damage > maxDamage)
+                    {
+                        maxDamage = attackInfo->attack_damage;
+                        maxDamageAttack = curAttack;
+                    }
+                }
+            }
+
+            if (maxDamage)
+            {
+                fire_archer_id = a + 1; // for get_attacker_unit to get attacking unit
+
+                AttackInfo *attackInfo = &archerPtr->attack_info_array[maxDamageAttack];
+                archerPtr->cur_attack = maxDamageAttack;
+                err_when(!archerPtr->cur_attack_info()->bullet_sprite_id);
+
+                // ------ add bullet --------//
+
+                int bulletRecno = 0;
+                if (targetObj->cast_to_Unit())
+                    bulletRecno = bullet_array.add_bullet(this, targetObj->cast_to_Unit());
+                else if (targetObj->cast_to_Place())
+                    bulletRecno = bullet_array.add_bullet(this, targetObj->cast_to_Place());
+
+                if (bulletRecno)
+                {
+                    // ----- change attribute of archer  --------//
+
+                    archerPtr->remain_attack_delay = attackInfo->attack_delay + attackInfo->bullet_out_frame;
+                    archerPtr->cur_power -= attackInfo->min_power;
+
+                    // ----- change attribute of bullet ------//
+
+                    Bullet *bulletPtr = bullet_array[bulletRecno];
+                    bulletPtr->parent_recno = archerPtr->sprite_recno;
+                    bulletPtr->parent_base_obj_recno = archerPtr->base_obj_recno;
+                    bulletPtr->attack_attribute = attackInfo->attack_attribute;
+
+                    fireCount--;
+                }
+
+                fire_archer_id = 0; // clear it as soon as bullet fired
+            }
+        } // if( j < target_count )
+    }     // for(a)
+}
+
+void FirmMonsterFortress::process_scan_target()
+{
+    // removed deleted or out of range target
+
+    short srcCount = target_count;
+    short srcTarget[MAX_FORTRESS_TARGET];
+    err_when(sizeof(target_base_obj_recno) != sizeof(srcTarget));
+    memcpy(srcTarget, target_base_obj_recno, sizeof(srcTarget));
+
+    target_count = 0;
+    for (int i = 0; i < srcCount; ++i)
+    {
+        if (base_obj_array.is_deleted(srcTarget[i]))
             continue;
 
-          // if in target list , skip
+        BaseObj *targetObj = base_obj_array[srcTarget[i]];
 
-          int i;
-          for (i = 0; i < target_count &&
-                      target_base_obj_recno[i] != unitPtr->base_obj_recno;
-               ++i)
-            ;
-          if (i < target_count)
-            continue; // inside the list
+        if (!targetObj->obj_is_visible())
+            continue;
 
-          int a;
-          for (a = 0; a < archer_count &&
-                      !unit_array[archer_unit_recno[a]]->can_attack_target(
-                          unitPtr->base_obj_recno);
-               ++a)
+        // --- if no archer can attack also remove -----//
+
+        int a;
+        for (a = 0; a < archer_count && !unit_array[archer_unit_recno[a]]->can_attack_target(targetObj->base_obj_recno);
+             ++a)
             ;
-          if (a >= archer_count)
+        if (a >= archer_count)
             continue; // no archer can attack
 
-          return_fire(unitPtr); // add unit in the list
-        }
-      }
+        //------------------------------------------------//
+
+        if (area_distance(targetObj) > FORTRESS_SCAN_RANGE)
+            continue;
+
+        // ##### begin Gilbert 4/2 ######//
+        // ----- skip camouflaged unit ------//
+
+        Unit *unitPtr = targetObj->cast_to_Unit();
+        if (unitPtr && unitPtr->is_camouflage(nation_recno))
+            continue;
+        // ##### end Gilbert 4/2 ######//
+
+        target_base_obj_recno[target_count] = srcTarget[i];
+        target_count++;
     }
-  }
+
+    if (target_count < MAX_FORTRESS_TARGET && archer_count > 0) // don't find new target
+    {
+        int xLoc1 = loc_x1 - FORTRESS_SCAN_RANGE;
+        int yLoc1 = loc_y1 - FORTRESS_SCAN_RANGE;
+        int xLoc2 = loc_x2 + FORTRESS_SCAN_RANGE;
+        int yLoc2 = loc_y2 + FORTRESS_SCAN_RANGE;
+
+        // reduce scanning range
+
+        switch (info.game_date % 4)
+        {
+        case 0:
+            xLoc2 = center_x;
+            break; // left half
+        case 1:
+            xLoc1 = center_x + 1;
+            break; // right half
+        case 2:
+            yLoc2 = center_y;
+            break; // top half
+        case 3:
+            yLoc1 = center_y + 1;
+            break; // bottom half
+        }
+
+        xLoc1 = MAX(xLoc1, 0);
+        yLoc1 = MAX(yLoc1, 0);
+        xLoc2 = MIN(xLoc2, MAX_WORLD_X_LOC - 1);
+        yLoc2 = MIN(yLoc2, MAX_WORLD_Y_LOC - 1);
+
+        //------------------------------------------//
+
+        int xLoc, yLoc;
+        Unit *unitPtr;
+        Location *locPtr;
+
+        for (yLoc = yLoc1; yLoc <= yLoc2 && target_count < MAX_FORTRESS_TARGET; yLoc++)
+        {
+            locPtr = world.get_loc(xLoc1, yLoc);
+
+            for (xLoc = xLoc1; xLoc <= xLoc2 && target_count < MAX_FORTRESS_TARGET; xLoc++, locPtr++)
+            {
+                //--- if there is an enemy unit here ---//
+
+                int scannedUnitRecno;
+                if ((scannedUnitRecno = locPtr->unit_recno(UNIT_LAND)) && !unit_array.is_deleted(scannedUnitRecno))
+                {
+                    unitPtr = unit_array[scannedUnitRecno];
+
+                    if (unitPtr->hit_points <= 0.0f)
+                        continue;
+
+                    // ----- skip camouflaged unit ------//
+
+                    if (unitPtr->is_camouflage(nation_recno))
+                        continue;
+
+                    // if in target list , skip
+
+                    int i;
+                    for (i = 0; i < target_count && target_base_obj_recno[i] != unitPtr->base_obj_recno; ++i)
+                        ;
+                    if (i < target_count)
+                        continue; // inside the list
+
+                    int a;
+                    for (a = 0; a < archer_count &&
+                                !unit_array[archer_unit_recno[a]]->can_attack_target(unitPtr->base_obj_recno);
+                         ++a)
+                        ;
+                    if (a >= archer_count)
+                        continue; // no archer can attack
+
+                    return_fire(unitPtr); // add unit in the list
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -481,52 +484,64 @@ it as soon as bullet fired return bulletRecno;
 
 // ----- begin of function FirmMonsterFortress::get_attacker_unit -----//
 
-Unit *FirmMonsterFortress::get_attacker_unit() {
-  if (fire_archer_id > 0 && fire_archer_id <= archer_count) {
-    return unit_array[archer_unit_recno[fire_archer_id - 1]];
-  } else {
-    err_here();
-    return NULL;
-  }
+Unit *FirmMonsterFortress::get_attacker_unit()
+{
+    if (fire_archer_id > 0 && fire_archer_id <= archer_count)
+    {
+        return unit_array[archer_unit_recno[fire_archer_id - 1]];
+    }
+    else
+    {
+        err_here();
+        return NULL;
+    }
 }
 // ----- end of function FirmMonsterFortress::get_attacker_unit -----//
 
 // ----- begin of function FirmMonsterFortress::bullet_damage -----//
 //
-float FirmMonsterFortress::bullet_damage() {
-  return get_attacker_unit()->actual_damage();
+float FirmMonsterFortress::bullet_damage()
+{
+    return get_attacker_unit()->actual_damage();
 }
 // ----- end of function FirmMonsterFortress::bullet_damage -----//
 
 // ----- begin of function FirmMonsterFortress::bullet_radius -----//
 //
-short FirmMonsterFortress::bullet_radius() {
-  return get_attacker_unit()->cur_attack_info()->bullet_radius;
+short FirmMonsterFortress::bullet_radius()
+{
+    return get_attacker_unit()->cur_attack_info()->bullet_radius;
 }
 // ----- end of function FirmMonsterFortress::bullet_radius -----//
 
 // ----- begin of function FirmMonsterFortress::bullet_fire -----//
 //
-char FirmMonsterFortress::bullet_fire() {
-  return get_attacker_unit()->cur_attack_info()->fire_radius;
+char FirmMonsterFortress::bullet_fire()
+{
+    return get_attacker_unit()->cur_attack_info()->fire_radius;
 }
 // ----- end of function FirmMonsterFortress::bullet_fire -----//
 
 // ----- begin of function FirmMonsterFortress::bullet_id -----//
 //
-short FirmMonsterFortress::bullet_id() {
-  return get_attacker_unit()->cur_attack_info()->bullet_sprite_id;
+short FirmMonsterFortress::bullet_id()
+{
+    return get_attacker_unit()->cur_attack_info()->bullet_sprite_id;
 }
 // ----- end of function FirmMonsterFortress::bullet_id -----//
 
 // ----- begin of function FirmMonsterFortress::bullet_speed -----//
 //
-short FirmMonsterFortress::bullet_speed() {
-  return get_attacker_unit()->cur_attack_info()->bullet_speed;
+short FirmMonsterFortress::bullet_speed()
+{
+    return get_attacker_unit()->cur_attack_info()->bullet_speed;
 }
 // ----- end of function FirmMonsterFortress::bullet_speed -----//
 
 // ----- begin of function FirmMonsterFortress::bullet_init_z -----//
 //
-short FirmMonsterFortress::bullet_init_z() { return altitude + 32; }
+short FirmMonsterFortress::bullet_init_z()
+{
+    return altitude + 32;
+}
 // ----- end of function FirmMonsterFortress::bullet_init_z -----//

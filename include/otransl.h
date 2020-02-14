@@ -26,35 +26,39 @@
 
 //--------- Define struct TranslateRec -------//
 
-struct TranslateRec {
-  char *from_text_ptr;
-  char *to_text_ptr;
+struct TranslateRec
+{
+    char *from_text_ptr;
+    char *to_text_ptr;
 };
 
 //---------- Define class Translate -----------//
 
-class Translate {
-private:
-  char init_flag;
-  int rec_count; // no. of translation records.
+class Translate
+{
+  private:
+    char init_flag;
+    int rec_count; // no. of translation records.
 
-  char *translate_text_buf;
-  TranslateRec *translate_table;
+    char *translate_text_buf;
+    TranslateRec *translate_table;
 
-  short
-      quick_seek_table[256]; // ascii from 0 to 255, total 256 records, storing
-                             // record numbers pointing to translate_table
+    short quick_seek_table[256]; // ascii from 0 to 255, total 256 records, storing
+                                 // record numbers pointing to translate_table
 
-public:
-  Translate();
-  ~Translate() { deinit(); }
+  public:
+    Translate();
+    ~Translate()
+    {
+        deinit();
+    }
 
-  void init();
-  void deinit();
+    void init();
+    void deinit();
 
-  const char *process(const char *);
+    const char *process(const char *);
 
-  static void multi_to_win(char *c, int len);
+    static void multi_to_win(char *c, int len);
 };
 
 extern Translate translate;

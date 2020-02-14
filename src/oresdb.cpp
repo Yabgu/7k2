@@ -43,48 +43,51 @@
 //
 // <char*>     resName			= name of the resource file (e.g.
 // "GIF.RES")
-// <Database*> dbObj				= name of the database      (e.g.
+// <Database*> dbObj				= name of the database (e.g.
 // Database db("PFILE.DBF"))
 // <int>       indexOffset		= offset of the index field
 // [int]       useCommonBuf   = whether use the vga common buffer to store the
 // data or not
 //										  (default:0)
 //
-void ResourceDb::init(char *resName, Database *dbObj, int indexOffset,
-                      int useCommonBuf) {
-  deinit();
+void ResourceDb::init(char *resName, Database *dbObj, int indexOffset, int useCommonBuf)
+{
+    deinit();
 
-  file_open(resName);
+    file_open(resName);
 
-  db_obj = dbObj;
-  index_field_offset = indexOffset;
-  use_common_buf = useCommonBuf;
+    db_obj = dbObj;
+    index_field_offset = indexOffset;
+    use_common_buf = useCommonBuf;
 
-  if (use_common_buf)
-    data_buf = sys.common_data_buf;
-  else
-    data_buf = NULL;
+    if (use_common_buf)
+        data_buf = sys.common_data_buf;
+    else
+        data_buf = NULL;
 
-  err_if(db_obj == NULL) err_now("db_obj is NULL");
+    err_if(db_obj == NULL) err_now("db_obj is NULL");
 
-  init_flag = 1;
+    init_flag = 1;
 }
 //----------- End of function ResourceDb::init ------------//
 
 //---------- Begin of function ResourceDb::deinit ---------//
 //
-void ResourceDb::deinit() {
-  if (init_flag) {
-    if (!use_common_buf && data_buf) {
-      mem_del(data_buf);
-      data_buf = NULL;
+void ResourceDb::deinit()
+{
+    if (init_flag)
+    {
+        if (!use_common_buf && data_buf)
+        {
+            mem_del(data_buf);
+            data_buf = NULL;
+        }
+
+        if (!read_all)
+            file_close();
+
+        init_flag = 0;
     }
-
-    if (!read_all)
-      file_close();
-
-    init_flag = 0;
-  }
 }
 //----------- End of function ResourceDb::deinit ----------//
 
@@ -103,31 +106,32 @@ void ResourceDb::deinit() {
 // Return : <char*> data pointer
 //          NULL    if the record has not index to data
 //
-char *ResourceDb::read(int recNo) {
-  err_when(!init_flag || !db_obj);
+char *ResourceDb::read(int recNo)
+{
+    err_when(!init_flag || !db_obj);
 
-  long *indexFieldPtr;
-  char *recPtr;
+    long *indexFieldPtr;
+    char *recPtr;
 
-  if ((recPtr = db_obj->read(recNo)) == NULL)
-    return NULL;
+    if ((recPtr = db_obj->read(recNo)) == NULL)
+        return NULL;
 
-  indexFieldPtr = (long *)(recPtr + index_field_offset);
+    indexFieldPtr = (long *)(recPtr + index_field_offset);
 
-  if (memcmp(indexFieldPtr, "    ", 4) == 0)
-    return NULL; // no sample screen for this file
+    if (memcmp(indexFieldPtr, "    ", 4) == 0)
+        return NULL; // no sample screen for this file
 
-  file_seek(*indexFieldPtr);
-  data_buf_size = file_get_long();
+    file_seek(*indexFieldPtr);
+    data_buf_size = file_get_long();
 
-  err_when(use_common_buf && data_buf_size > COMMON_DATA_BUF_SIZE);
+    err_when(use_common_buf && data_buf_size > COMMON_DATA_BUF_SIZE);
 
-  if (!use_common_buf)
-    data_buf = mem_resize(data_buf, data_buf_size);
+    if (!use_common_buf)
+        data_buf = mem_resize(data_buf, data_buf_size);
 
-  file_read(data_buf, data_buf_size);
+    file_read(data_buf, data_buf_size);
 
-  return data_buf;
+    return data_buf;
 }
 //----------- End of function ResourceDb::read -------------//
 
@@ -141,24 +145,25 @@ char *ResourceDb::read(int recNo) {
 // Return : <FILE*> the file stream
 //          NULL    if the record has not index to data
 //
-File *ResourceDb::get_file() {
-  err_when(!init_flag || !db_obj);
+File *ResourceDb::get_file()
+{
+    err_when(!init_flag || !db_obj);
 
-  long *indexFieldPtr;
-  char emptyField[] = "        ";
-  char *recPtr;
+    long *indexFieldPtr;
+    char emptyField[] = "        ";
+    char *recPtr;
 
-  if ((recPtr = db_obj->read()) == NULL)
-    return NULL;
+    if ((recPtr = db_obj->read()) == NULL)
+        return NULL;
 
-  indexFieldPtr = (long *)(recPtr + index_field_offset);
+    indexFieldPtr = (long *)(recPtr + index_field_offset);
 
-  if (memcmp(indexFieldPtr, emptyField, 8) == 0)
-    return NULL; // no sample screen for this file
+    if (memcmp(indexFieldPtr, emptyField, 8) == 0)
+        return NULL; // no sample screen for this file
 
-  file_seek(*indexFieldPtr + sizeof(int32_t));
+    file_seek(*indexFieldPtr + sizeof(int32_t));
 
-  return this;
+    return this;
 }
 //----------- End of function ResourceDb::get_file -------------//
 
@@ -173,35 +178,38 @@ File *ResourceDb::get_file() {
 // data or not
 //                     (default:0)
 //
-void ResourceDb::init_imported(const char *resName, int readAll,
-                               int useCommonBuf) {
-  deinit();
+void ResourceDb::init_imported(const char *resName, int readAll, int useCommonBuf)
+{
+    deinit();
 
-  db_obj = NULL;
-  index_field_offset = 0;
+    db_obj = NULL;
+    index_field_offset = 0;
 
-  read_all = readAll;
+    read_all = readAll;
 
-  file_open(resName);
+    file_open(resName);
 
-  if (read_all) {
-    data_buf_size = file_size();
+    if (read_all)
+    {
+        data_buf_size = file_size();
 
-    data_buf = mem_add(data_buf_size);
-    file_read(data_buf, data_buf_size);
-    file_close();
+        data_buf = mem_add(data_buf_size);
+        file_read(data_buf, data_buf_size);
+        file_close();
 
-    use_common_buf = 0; // don't use vga buffer if read all
-  } else {
-    use_common_buf = useCommonBuf;
-
-    if (use_common_buf)
-      data_buf = sys.common_data_buf;
+        use_common_buf = 0; // don't use vga buffer if read all
+    }
     else
-      data_buf = NULL;
-  }
+    {
+        use_common_buf = useCommonBuf;
 
-  init_flag = 1;
+        if (use_common_buf)
+            data_buf = sys.common_data_buf;
+        else
+            data_buf = NULL;
+    }
+
+    init_flag = 1;
 }
 //----------- End of function ResourceDb::init_imported -------------//
 
@@ -215,41 +223,43 @@ void ResourceDb::init_imported(const char *resName, int readAll,
 // Return : <char*> data pointer
 //          NULL    if the record has not index to data
 //
-char *ResourceDb::read_imported(long offset) {
-  err_when(!init_flag);
+char *ResourceDb::read_imported(long offset)
+{
+    err_when(!init_flag);
 
-  // #### begin Gilbert 4/10 ######//
-  //	err_if( offset<0 || offset>=data_buf_size )
-  //		err_here();
-  // #### end Gilbert 4/10 ######//
+    // #### begin Gilbert 4/10 ######//
+    //	err_if( offset<0 || offset>=data_buf_size )
+    //		err_here();
+    // #### end Gilbert 4/10 ######//
 
-  //-------- read from buffer ---------//
+    //-------- read from buffer ---------//
 
-  // ##### begin Gilbert 4/10 #######//
-  if (read_all) {
-    // SXM: Remove the following line for Chinese Version, but it's a risk.
-    err_when(offset < 0 || offset >= data_buf_size);
-    return data_buf + offset + sizeof(int32_t); // by pass the long parameters
-                                                // which is the size of the data
-  }
-  // ##### end Gilbert 4/10 #######//
+    // ##### begin Gilbert 4/10 #######//
+    if (read_all)
+    {
+        // SXM: Remove the following line for Chinese Version, but it's a risk.
+        err_when(offset < 0 || offset >= data_buf_size);
+        return data_buf + offset + sizeof(int32_t); // by pass the long parameters
+                                                    // which is the size of the data
+    }
+    // ##### end Gilbert 4/10 #######//
 
-  //---------- read from file ---------//
+    //---------- read from file ---------//
 
-  // ##### begin Gilbert 2/10 ######//
-  err_when(offset >= file_size());
-  // ##### end Gilbert 2/10 ######//
-  file_seek(offset);
+    // ##### begin Gilbert 2/10 ######//
+    err_when(offset >= file_size());
+    // ##### end Gilbert 2/10 ######//
+    file_seek(offset);
 
-  data_buf_size = file_get_long();
+    data_buf_size = file_get_long();
 
-  err_when(use_common_buf && data_buf_size > COMMON_DATA_BUF_SIZE);
+    err_when(use_common_buf && data_buf_size > COMMON_DATA_BUF_SIZE);
 
-  if (!use_common_buf)
-    data_buf = mem_resize(data_buf, data_buf_size);
+    if (!use_common_buf)
+        data_buf = mem_resize(data_buf, data_buf_size);
 
-  file_read(data_buf, data_buf_size);
+    file_read(data_buf, data_buf_size);
 
-  return data_buf;
+    return data_buf;
 }
 //----------- End of function ResourceDb::read_imported -------------//

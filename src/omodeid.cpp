@@ -91,49 +91,72 @@ static DisplayModeInfo display_info_array[MAX_DISPLAY_MODE_ID] = {
     // 1024x768x16
     {
         MODE_ID_1024x768x16, // mode id
-        1024, 768, 16,       // screen_width, height, bbp
+        1024, 768,
+        16, // screen_width, height, bbp
         32, 2, 799, 762, 768,
         761, // zoom_matrix_x1,y1,x2,y2,width,height  {y1 must never 0, 64 must
-             // be a factor of y1 - y2}
-        816, 193, 1015, 392, 200, 200, // map_matrix_x1,y1,x2,y2,width,height
-                                       //	810, 120, 1018, 167,
-                                       //// top_menu_x1,y1,x2,y2
-        804 - 5, 2, 1023, 74,          // top_menu_x1,y1,x2,y2
-        800, 426, 1023, 751,           // info_x1,y1,x2,y2
-        810, 589 - 29, 1014, 589,      // msg_info_x1,y1,x2,y2
-        937, 171, 24, 24,              // map_mode_button_x1, y1, width, height
-        901, 20 + 60,                  // menu_button_x1, y1
-        814 + 155, 165 - 165,          // repu_button_x1, y1
-        875, 150 - 90, 150,            // date_x1, y1, length
-        947 - 120, 122 - 95, 72,       // food_x1, y1, length
-        848 + 50, 122 - 95, 56,        // cash_x1, y1, length
-        801 - 2, 80 - 5, 1018, 168,    // scroll_menu_x1, y1, x2, y2
-        801, 752, 1023, 767,           // help_short_x1, y1, x2, y2
+        // be a factor of y1 - y2}
+        816, 193, 1015, 392, 200,
+        200, // map_matrix_x1,y1,x2,y2,width,height
+        //	810, 120, 1018, 167,
+        //// top_menu_x1,y1,x2,y2
+        804 - 5, 2, 1023,
+        74, // top_menu_x1,y1,x2,y2
+        800, 426, 1023,
+        751, // info_x1,y1,x2,y2
+        810, 589 - 29, 1014,
+        589, // msg_info_x1,y1,x2,y2
+        937, 171, 24,
+        24, // map_mode_button_x1, y1, width, height
+        901,
+        20 + 60, // menu_button_x1, y1
+        814 + 155,
+        165 - 165, // repu_button_x1, y1
+        875, 150 - 90,
+        150, // date_x1, y1, length
+        947 - 120, 122 - 95,
+        72, // food_x1, y1, length
+        848 + 50, 122 - 95,
+        56, // cash_x1, y1, length
+        801 - 2, 80 - 5, 1018,
+        168, // scroll_menu_x1, y1, x2, y2
+        801, 752, 1023,
+        767, // help_short_x1, y1, x2, y2
 
-        32, 2, 1018, 762 // mouse_x1,y1,x2,y2
+        32, 2, 1018,
+        762 // mouse_x1,y1,x2,y2
     },
 };
 
-void DisplayModeInfo::init(int modeId) {
-  if (modeId >= 0 && modeId < MAX_DISPLAY_MODE_ID) {
-    *this = display_info_array[modeId];
-  } else {
-    err_here();
-  }
+void DisplayModeInfo::init(int modeId)
+{
+    if (modeId >= 0 && modeId < MAX_DISPLAY_MODE_ID)
+    {
+        *this = display_info_array[modeId];
+    }
+    else
+    {
+        err_here();
+    }
 }
 
 // return NULL for non-existing display mode
-DisplayModeInfo *DisplayModeInfo::get_display_info(int modeId) {
-  if (modeId >= 0 && modeId < MAX_DISPLAY_MODE_ID)
-    return display_info_array + modeId;
-  else
-    return NULL;
+DisplayModeInfo *DisplayModeInfo::get_display_info(int modeId)
+{
+    if (modeId >= 0 && modeId < MAX_DISPLAY_MODE_ID)
+        return display_info_array + modeId;
+    else
+        return NULL;
 }
 
-void DisplayModeInfo::set_current_display_mode(int modeId) {
-  if (modeId >= 0 && modeId < MAX_DISPLAY_MODE_ID) {
-    current_display_mode = display_info_array[modeId];
-  } else {
-    err_here();
-  }
+void DisplayModeInfo::set_current_display_mode(int modeId)
+{
+    if (modeId >= 0 && modeId < MAX_DISPLAY_MODE_ID)
+    {
+        current_display_mode = display_info_array[modeId];
+    }
+    else
+    {
+        err_here();
+    }
 }

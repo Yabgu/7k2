@@ -43,66 +43,67 @@
 
 #define MAX_SE_STORE 4
 
-struct SERequest {
-  char *wave_ptr;
-  short resx_id;
+struct SERequest
+{
+    char *wave_ptr;
+    short resx_id;
 
-  short req_used;
-  RelVolume play_vol[MAX_SE_STORE];
+    short req_used;
+    RelVolume play_vol[MAX_SE_STORE];
 
-  void add_request(RelVolume);
-  int max_entry();
-  void remove_request(int slot);
-  void clear_request();
+    void add_request(RelVolume);
+    int max_entry();
+    void remove_request(int slot);
+    void clear_request();
 };
 
 // ------ Define Class SECtrl -------//
 
-class SECtrl {
-private:
-  int biased_se;
-  SERequest *req_pool;
-  char *last_cycle;
+class SECtrl
+{
+  private:
+    int biased_se;
+    SERequest *req_pool;
+    char *last_cycle;
 
-  int cached_size;
-  short cached_index[MAX_SE_CACHED];
+    int cached_size;
+    short cached_index[MAX_SE_CACHED];
 
-public:
-  int init_flag;
-  int audio_flag; // set if audio.wav_init_flag is set during init
-  int max_sound_effect;
-  int max_supp_effect;
-  int total_effect;
-  Audio *audio_ptr;
-  ResourceIdx res_wave;
-  ResourceIdx &res_supp;
+  public:
+    int init_flag;
+    int audio_flag; // set if audio.wav_init_flag is set during init
+    int max_sound_effect;
+    int max_supp_effect;
+    int total_effect;
+    Audio *audio_ptr;
+    ResourceIdx res_wave;
+    ResourceIdx &res_supp;
 
-public:
-  SECtrl(Audio *);
-  ~SECtrl();
-  void init();
-  void deinit();
+  public:
+    SECtrl(Audio *);
+    ~SECtrl();
+    void init();
+    void deinit();
 
-  void request(int soundEffect, RelVolume);
-  void request(const char *soundName, RelVolume);
-  // volume between 0 to 100; pan between -10,000=left, 10,000=right
-  void flush(); // output sound effect to volume
-  void clear();
-  char *get_effect_name(int);
-  int search_effect_id(const char *);
-  int search_effect_id(const char *, int len);
+    void request(int soundEffect, RelVolume);
+    void request(const char *soundName, RelVolume);
+    // volume between 0 to 100; pan between -10,000=left, 10,000=right
+    void flush(); // output sound effect to volume
+    void clear();
+    char *get_effect_name(int);
+    int search_effect_id(const char *);
+    int search_effect_id(const char *, int len);
 
-  int immediate_sound(
-      const char *soundName,
-      RelVolume = DEF_REL_VOLUME); // mainly for button sound, interface
+    int immediate_sound(const char *soundName,
+                        RelVolume = DEF_REL_VOLUME); // mainly for button sound, interface
 
-  //	static long sound_volume(short locX, short locY);
-  //	static long sound_volume(short locX, short locY, short limit, short
-  //drop); 	static long sound_pan(short locX, short locY); 	static long
-  //sound_pan(short locX, short locY, short drop);
+    //	static long sound_volume(short locX, short locY);
+    //	static long sound_volume(short locX, short locY, short limit, short
+    // drop); 	static long sound_pan(short locX, short locY); 	static long
+    // sound_pan(short locX, short locY, short drop);
 
-private:
-  void load_info();
+  private:
+    void load_info();
 };
 
 extern SECtrl se_ctrl;

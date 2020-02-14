@@ -67,71 +67,74 @@ DBGLOG_DEFAULT_CHANNEL(Sys);
 
 //----------- Begin of function Sys::Sys -----------//
 
-Sys::Sys() {
-  memset(this, 0, sizeof(Sys));
+Sys::Sys()
+{
+    memset(this, 0, sizeof(Sys));
 
-  common_data_buf = mem_add(COMMON_DATA_BUF_SIZE);
+    common_data_buf = mem_add(COMMON_DATA_BUF_SIZE);
 
-  view_mode = MODE_NORMAL; // the animation mode
+    view_mode = MODE_NORMAL; // the animation mode
 
-  toggle_full_screen_flag = 0;
+    toggle_full_screen_flag = 0;
 }
 //----------- End of function Sys::Sys -----------//
 
 //----------- Begin of function Sys::~Sys -----------//
 
-Sys::~Sys() {
-  deinit();
-  mem_del(common_data_buf);
+Sys::~Sys()
+{
+    deinit();
+    mem_del(common_data_buf);
 }
 //----------- End of function Sys::~Sys -----------//
 
 //------------ Begin of function Sys::init ----------//
 //
-int Sys::init() {
-  err_when(init_flag);
+int Sys::init()
+{
+    err_when(init_flag);
 
-  //------- initialize basic vars --------//
+    //------- initialize basic vars --------//
 
 #ifdef BETA
-  debug_session = misc.is_file_exist("DEBUG.SYS");
-  testing_session = misc.is_file_exist("TESTING.SYS");
-  scenario_cheat_flag = misc.is_file_exist("EDITOR.SYS");
+    debug_session = misc.is_file_exist("DEBUG.SYS");
+    testing_session = misc.is_file_exist("TESTING.SYS");
+    scenario_cheat_flag = misc.is_file_exist("EDITOR.SYS");
 #endif
 
 #ifdef DEBUG
-  debug_session = misc.is_file_exist("DEBUG.SYS");
-  testing_session = misc.is_file_exist("TESTING.SYS");
-  scenario_cheat_flag = misc.is_file_exist("EDITOR.SYS");
+    debug_session = misc.is_file_exist("DEBUG.SYS");
+    testing_session = misc.is_file_exist("TESTING.SYS");
+    scenario_cheat_flag = misc.is_file_exist("EDITOR.SYS");
 #endif
 
-  // ##### begin Gilbert 15/2 ########//
+    // ##### begin Gilbert 15/2 ########//
 #ifdef USE_FLIP
-  use_true_front = USE_TRUE_FRONT_BUFFER;
+    use_true_front = USE_TRUE_FRONT_BUFFER;
 #else
-  use_true_front = debug_session;
+    use_true_front = debug_session;
 #endif
 
-  // where saves, config.dat, player profiles, and hall of fame are kept
-  if (!set_config_dir())
-    return FALSE;
+    // where saves, config.dat, player profiles, and hall of fame are kept
+    if (!set_config_dir())
+        return FALSE;
 
-  // ##### begin Gilbert 15/2 ########//
+    // ##### begin Gilbert 15/2 ########//
 
-  set_game_dir(); // set game directories names and game version
+    set_game_dir(); // set game directories names and game version
 
-  //------- initialize more stuff ---------//
+    //------- initialize more stuff ---------//
 
-  if (!init_directx())
-    return FALSE;
+    if (!init_directx())
+        return FALSE;
 
-  if (!init_objects()) // initialize system objects which do not change from
-                       // games to games.
-    return FALSE;
+    if (!init_objects()) // initialize system objects which do not change from
+                         // games to games.
+        return FALSE;
 
-  init_flag = 1;
+    init_flag = 1;
 
-  return TRUE;
+    return TRUE;
 }
 //------------ End of function Sys::init ----------//
 
@@ -139,68 +142,71 @@ int Sys::init() {
 //
 // Finished with all objects we use; release them
 //
-void Sys::deinit() {
-  if (!init_flag)
-    return;
+void Sys::deinit()
+{
+    if (!init_flag)
+        return;
 
-  signal_exit_flag = 1;
+    signal_exit_flag = 1;
 
-  game.deinit(); // actually game.deinit() will be called by main_win_proc() and
-                 // calling it here will have no effect
+    game.deinit(); // actually game.deinit() will be called by main_win_proc() and
+                   // calling it here will have no effect
 
-  deinit_objects();
+    deinit_objects();
 
-  //-------------------------------------//
+    //-------------------------------------//
 
-  if (vga_back.buf_locked)
-    vga_back.unlock_buf();
+    if (vga_back.buf_locked)
+        vga_back.unlock_buf();
 
-  if (vga_front.buf_locked)
-    vga_front.unlock_buf();
+    if (vga_front.buf_locked)
+        vga_front.unlock_buf();
 }
 //--------- End of function Sys::deinit ---------//
 
 //-------- Begin of function Sys::init_directx --------//
 //
-int Sys::init_directx() {
-  //   ShowCursor(FALSE);
+int Sys::init_directx()
+{
+    //   ShowCursor(FALSE);
 
-  DisplayModeInfo::set_current_display_mode(MODE_ID_DEFAULT);
+    DisplayModeInfo::set_current_display_mode(MODE_ID_DEFAULT);
 
-  //-------- initialize DirectDraw --------//
+    //-------- initialize DirectDraw --------//
 
-  DEBUG_LOG("Attempt vga.init()");
-  if (!vga.init())
-    return FALSE;
-  DEBUG_LOG("vga.init() ok");
+    DEBUG_LOG("Attempt vga.init()");
+    if (!vga.init())
+        return FALSE;
+    DEBUG_LOG("vga.init() ok");
 #if !defined(DEBUG) && !defined(_DEBUG)
-  vga.set_full_screen_mode(1);
+    vga.set_full_screen_mode(1);
 #endif
 
-  //---------- Initialize Audio ----------//
+    //---------- Initialize Audio ----------//
 
-  DEBUG_LOG("Attempt audio.init()");
-  audio.init();
-  DEBUG_LOG(audio.wav_init_flag);
-  music.init();
-  se_ctrl.init();
+    DEBUG_LOG("Attempt audio.init()");
+    audio.init();
+    DEBUG_LOG(audio.wav_init_flag);
+    music.init();
+    se_ctrl.init();
 
-  return TRUE;
+    return TRUE;
 }
 //-------- End of function Sys::init_directx --------//
 
 //-------- Begin of function Sys::deinit_directx --------//
 //
-void Sys::deinit_directx() {
-  se_ctrl.deinit();
-  music.deinit();
-  DEBUG_LOG("Attempt audio.deinit()");
-  audio.deinit();
-  DEBUG_LOG("audio.deinit() finish");
+void Sys::deinit_directx()
+{
+    se_ctrl.deinit();
+    music.deinit();
+    DEBUG_LOG("Attempt audio.deinit()");
+    audio.deinit();
+    DEBUG_LOG("audio.deinit() finish");
 
-  DEBUG_LOG("Attempt vga.deinit()");
-  vga.deinit();
-  DEBUG_LOG("vga.deinit() finish");
+    DEBUG_LOG("Attempt vga.deinit()");
+    vga.deinit();
+    DEBUG_LOG("vga.deinit() finish");
 }
 //--------- End of function Sys::deinit_directx ---------//
 
@@ -208,295 +214,296 @@ void Sys::deinit_directx() {
 //
 // Initialize system objects which do not change from games to games.
 //
-int Sys::init_objects() {
-  //--------- init system class ----------//
+int Sys::init_objects()
+{
+    //--------- init system class ----------//
 
-  game.init_remap_table(); // moved from Game::Game since vga haven't been
-                           // initializeded there
+    game.init_remap_table(); // moved from Game::Game since vga haven't been
+                             // initializeded there
 
-  mouse_cursor.init();
-  mouse_cursor.set_frame_border(ZOOM_X1, ZOOM_Y1, ZOOM_X2, ZOOM_Y2);
+    mouse_cursor.init();
+    mouse_cursor.set_frame_border(ZOOM_X1, ZOOM_Y1, ZOOM_X2, ZOOM_Y2);
 
 #ifdef VC5
-  mouse.init(app_hinstance, main_hwnd, NULL);
+    mouse.init(app_hinstance, main_hwnd, NULL);
 #else
-  mouse.init();
+    mouse.init();
 #endif
-  //	SetFocus( vga.main_hwnd );
+    //	SetFocus( vga.main_hwnd );
 
-  //------- init resource class ----------//
+    //------- init resource class ----------//
 
-  // ####### begin Gilbert 24/5 ########//
-  font_san.init("SAN", 0); // 0-zero inter-character space
-  //	#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
-  //		font_std.init("SAN", 1);
-  //	#else
-  font_std.init("STD", 2);
-  //	#endif
-  font_small.init("SMAL");
-  font_mid.init("MID");
-  font_news.init("NEWS");
-  font_hitpoint.init("HITP");
-  font_bible.init("CASA", 1, 3);
-  font_bard.init("CASA", 0);
+    // ####### begin Gilbert 24/5 ########//
+    font_san.init("SAN", 0); // 0-zero inter-character space
+    //	#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
+    //		font_std.init("SAN", 1);
+    //	#else
+    font_std.init("STD", 2);
+    //	#endif
+    font_small.init("SMAL");
+    font_mid.init("MID");
+    font_news.init("NEWS");
+    font_hitpoint.init("HITP");
+    font_bible.init("CASA", 1, 3);
+    font_bard.init("CASA", 0);
 
-  font_whbl.init("WHBL", 1);
-  font_zoom.init("WHBL", 1);
-  font_blue.init("BLUE");
+    font_whbl.init("WHBL", 1);
+    font_zoom.init("WHBL", 1);
+    font_blue.init("BLUE");
 
-  font_snds.init("SNDS", 0); // orange background
-  font_blu2.init("BLU2", 0);
-  font_red.init("RED", 0);
-  font_gren.init("GREN", 0);
-  font_cara.init("CARA", 0);   // white background of font_snds
-  font_cara_w.init("CARA", 1); // wide space font_cara
+    font_snds.init("SNDS", 0); // orange background
+    font_blu2.init("BLU2", 0);
+    font_red.init("RED", 0);
+    font_gren.init("GREN", 0);
+    font_cara.init("CARA", 0);   // white background of font_snds
+    font_cara_w.init("CARA", 1); // wide space font_cara
 
-  font_bld.init("BLD", 0);
-  font_bld.space_width -= 2; // reduce the width of space for this font
+    font_bld.init("BLD", 0);
+    font_bld.space_width -= 2; // reduce the width of space for this font
 
-  font_vill.init("VILL", 0);
-  font_vilb.init("VILB", 0);
-  font_town.init("TOWN", 0);
+    font_vill.init("VILL", 0);
+    font_vilb.init("VILB", 0);
+    font_town.init("TOWN", 0);
 
-  font_thin_black.init("TBLK", 3); // wider for the width to close to bold_black
-  font_thin_black.space_width -= 2; // reduce the width of space for this font
-  font_bold_black.init("BBLK", 1);
-  font_bold_black.space_width -= 2; // reduce the width of space for this font
-  font_bold_red.init("BRED", 1);
-  font_bold_red.space_width -= 2; // reduce the width of space for this font
+    font_thin_black.init("TBLK", 3);  // wider for the width to close to bold_black
+    font_thin_black.space_width -= 2; // reduce the width of space for this font
+    font_bold_black.init("BBLK", 1);
+    font_bold_black.space_width -= 2; // reduce the width of space for this font
+    font_bold_red.init("BRED", 1);
+    font_bold_red.space_width -= 2; // reduce the width of space for this font
 
-  font_sop.init("BOOT", 0);
+    font_sop.init("BOOT", 0);
 
-  font_tut.init("TUT", 0);
+    font_tut.init("TUT", 0);
 
-  font_scre.init("SCRE", 0);    // ending score screen
-  font_cmpa.init("CMPA", 1, 1); // italic font
-  font_cmph.init("CMPH", 1, 1); // italic font
-  font_cmpf.init("CMPF", 1);
-  font_cmpo.init("CMPO", 1);
-  font_cmpo.space_width += 2; // reduce the width of space for this font
+    font_scre.init("SCRE", 0);    // ending score screen
+    font_cmpa.init("CMPA", 1, 1); // italic font
+    font_cmph.init("CMPH", 1, 1); // italic font
+    font_cmpf.init("CMPF", 1);
+    font_cmpo.init("CMPO", 1);
+    font_cmpo.space_width += 2; // reduce the width of space for this font
 
-  font_hall.init("HALL", 1);
-  // ####### end Gilbert 24/5 ########//
+    font_hall.init("HALL", 1);
+    // ####### end Gilbert 24/5 ########//
 
-  image_icon.init(DIR_RES "I_ICON.RES", 1, 0); // 1-read into buffer
-  image_interface.init(
-      DIR_RES "I_IF.RES", 0,
-      0); // 0-don't read into the buffer, don't use common buffer
+    image_icon.init(DIR_RES "I_ICON.RES", 1, 0); // 1-read into buffer
+    image_interface.init(DIR_RES "I_IF.RES", 0,
+                         0); // 0-don't read into the buffer, don't use common buffer
 
 #ifndef DEMO // do not load these in the demo verison
-  image_menu.init(DIR_RES "I_MENU.RES", 0,
-                  0); // 0-don't read into the buffer, don't use common buffer
+    image_menu.init(DIR_RES "I_MENU.RES", 0,
+                    0); // 0-don't read into the buffer, don't use common buffer
 // image_encyc.init(DIR_RES"I_ENCYC.RES",0,0); // 0-don't read into the buffer,
 // don't use common buffer
 #endif
 
-  image_gameif.init(DIR_RES "I_GAMEIF.RES", 1, 0);
-  image_button.init(DIR_RES "I_BUTTON.RES", 1, 0);
-  image_spict.init(DIR_RES "I_SPICT.RES", 1, 0);
-  image_tutorial.init(DIR_RES "TUT_PICT.RES", 0, 0);
+    image_gameif.init(DIR_RES "I_GAMEIF.RES", 1, 0);
+    image_button.init(DIR_RES "I_BUTTON.RES", 1, 0);
+    image_spict.init(DIR_RES "I_SPICT.RES", 1, 0);
+    image_tutorial.init(DIR_RES "TUT_PICT.RES", 0, 0);
 
-  // ------ init text resource ------- //
+    // ------ init text resource ------- //
 
-  text_basic.init();
-  text_game_menu.init();
-  text_tutorial.init();
-  text_campaign.init();
-  text_unit.init();
-  text_firm.init();
-  text_end_condition.init();
-  text_reports.init();
-  text_item.init();
-  text_talk.init();
-  text_news.init();
-  text_editor.init();
+    text_basic.init();
+    text_game_menu.init();
+    text_tutorial.init();
+    text_campaign.init();
+    text_unit.init();
+    text_firm.init();
+    text_end_condition.init();
+    text_reports.init();
+    text_item.init();
+    text_talk.init();
+    text_news.init();
+    text_editor.init();
 
-  // --------------------------------//
+    // --------------------------------//
 
-  path_finder.init();
+    path_finder.init();
 
-  //------------ init flame ------------//
+    //------------ init flame ------------//
 
-  for (int i = 0; i < FLAME_GROW_STEP; ++i)
-    flame[i].init(Flame::default_width(i), Flame::default_height(i),
-                  Flame::base_width(i), FLAME_WIDE);
+    for (int i = 0; i < FLAME_GROW_STEP; ++i)
+        flame[i].init(Flame::default_width(i), Flame::default_height(i), Flame::base_width(i), FLAME_WIDE);
 
-  //------------ init animated line drawer -------//
+    //------------ init animated line drawer -------//
 
-  anim_line.init(ZOOM_X1, ZOOM_Y1, ZOOM_X2, ZOOM_Y2);
+    anim_line.init(ZOOM_X1, ZOOM_Y1, ZOOM_X2, ZOOM_Y2);
 
-  //---------- init other objects ----------//
+    //---------- init other objects ----------//
 
-  game_set.init(); // this must be called before game.init() as game.init()
-                   // assume game_set has been initialized
+    game_set.init(); // this must be called before game.init() as game.init()
+                     // assume game_set has been initialized
 
-  game_set.open_set(1); // open the default game set
+    game_set.open_set(1); // open the default game set
 
-  unit_res.init();
-  race_res.init(); // race_res is initialized here instead of in race_res
-                   // because campaign will use it (before a game is started and
-                   // game.init() is called.)
-  monster_res.init();
-  god_res.init();
-  hero_res.init();
-  tech_res.init();
+    unit_res.init();
+    race_res.init(); // race_res is initialized here instead of in race_res
+                     // because campaign will use it (before a game is started and
+                     // game.init() is called.)
+    monster_res.init();
+    god_res.init();
+    hero_res.init();
+    tech_res.init();
 
-  //----------------------------------------//
+    //----------------------------------------//
 
-  help.init("HELP.RES");
+    help.init("HELP.RES");
 
-  //#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
-  //	translate.init();		// translate never active, even in other
-  // language, use text resources #endif
+    //#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
+    //	translate.init();		// translate never active, even in other
+    // language, use text resources #endif
 
-  tutor.init();
-  // game_file_array.init("*.SAV");	// game_file_arry is inited outside
-  // game.init
+    tutor.init();
+    // game_file_array.init("*.SAV");	// game_file_arry is inited outside
+    // game.init
 
-  //---------- init game_set -----------//
+    //---------- init game_set -----------//
 
-  DEBUG_LOG("Sys::init_objects finish");
+    DEBUG_LOG("Sys::init_objects finish");
 
-  return TRUE;
+    return TRUE;
 }
 //------- End of function Sys::init_objects -----------//
 
 //------- Begin of function Sys::deinit_objects -----------//
 
-void Sys::deinit_objects() {
-  //--------- deinit system class ----------//
+void Sys::deinit_objects()
+{
+    //--------- deinit system class ----------//
 
-  mouse.deinit(); // mouse must be deinitialized first
-  mouse_cursor.deinit();
+    mouse.deinit(); // mouse must be deinitialized first
+    mouse_cursor.deinit();
 
-  //------- deinit resource class ----------//
+    //------- deinit resource class ----------//
 
-  font_san.deinit();
-  font_std.deinit();
-  font_small.deinit();
-  font_mid.deinit();
-  font_news.deinit();
+    font_san.deinit();
+    font_std.deinit();
+    font_small.deinit();
+    font_mid.deinit();
+    font_news.deinit();
 
-  font_hitpoint.deinit();
-  font_bible.deinit();
-  font_bard.deinit();
+    font_hitpoint.deinit();
+    font_bible.deinit();
+    font_bard.deinit();
 
-  font_whbl.deinit();
-  font_zoom.deinit();
-  font_blue.deinit();
+    font_whbl.deinit();
+    font_zoom.deinit();
+    font_blue.deinit();
 
-  font_snds.deinit();
-  font_blu2.deinit();
-  font_red.deinit();
-  font_gren.deinit();
-  font_cara.deinit();
-  font_cara_w.deinit();
+    font_snds.deinit();
+    font_blu2.deinit();
+    font_red.deinit();
+    font_gren.deinit();
+    font_cara.deinit();
+    font_cara_w.deinit();
 
-  font_bld.deinit();
+    font_bld.deinit();
 
-  font_vill.deinit();
-  font_vilb.deinit();
-  font_town.deinit();
+    font_vill.deinit();
+    font_vilb.deinit();
+    font_town.deinit();
 
-  font_thin_black.deinit();
-  font_bold_black.deinit();
-  font_bold_red.deinit();
+    font_thin_black.deinit();
+    font_bold_black.deinit();
+    font_bold_red.deinit();
 
-  font_sop.deinit();
+    font_sop.deinit();
 
-  font_tut.deinit();
+    font_tut.deinit();
 
-  font_scre.deinit();
-  font_cmpa.deinit();
-  font_cmph.deinit();
-  font_cmpf.deinit();
-  font_cmpo.deinit();
+    font_scre.deinit();
+    font_cmpa.deinit();
+    font_cmph.deinit();
+    font_cmpf.deinit();
+    font_cmpo.deinit();
 
-  //	#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
-  font_hall.deinit();
-  //	#endif
+    //	#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
+    font_hall.deinit();
+    //	#endif
 
-  image_gameif.deinit();
-  image_icon.deinit();
-  image_interface.deinit();
-  image_menu.deinit();
-  image_button.deinit();
-  image_spict.deinit();
-  // image_encyc.deinit();
-  image_tutorial.deinit();
+    image_gameif.deinit();
+    image_icon.deinit();
+    image_interface.deinit();
+    image_menu.deinit();
+    image_button.deinit();
+    image_spict.deinit();
+    // image_encyc.deinit();
+    image_tutorial.deinit();
 
-  // ------ deinit text resource ------- //
+    // ------ deinit text resource ------- //
 
-  text_basic.deinit();
-  text_game_menu.deinit();
-  text_tutorial.deinit();
-  text_campaign.deinit();
-  text_unit.deinit();
-  text_firm.deinit();
-  text_end_condition.deinit();
-  text_reports.deinit();
-  text_item.deinit();
-  text_talk.deinit();
-  text_news.deinit();
-  text_editor.deinit();
+    text_basic.deinit();
+    text_game_menu.deinit();
+    text_tutorial.deinit();
+    text_campaign.deinit();
+    text_unit.deinit();
+    text_firm.deinit();
+    text_end_condition.deinit();
+    text_reports.deinit();
+    text_item.deinit();
+    text_talk.deinit();
+    text_news.deinit();
+    text_editor.deinit();
 
-  // -----------------------------------//
+    // -----------------------------------//
 
-  path_finder.deinit();
+    path_finder.deinit();
 
-  //-------- deinit flame ----------//
+    //-------- deinit flame ----------//
 
-  for (int i = 0; i < FLAME_GROW_STEP; ++i)
-    flame[i].deinit();
+    for (int i = 0; i < FLAME_GROW_STEP; ++i)
+        flame[i].deinit();
 
-  //--------- deinit other objects ----------//
+    //--------- deinit other objects ----------//
 
-  game_set.deinit();
+    game_set.deinit();
 
-  unit_res.deinit();
-  race_res.deinit(); // race_res is initialized here instead of in race_res
-                     // because campaign will use it (before a game is started
-                     // and game.init() is called.)
-  monster_res.deinit();
-  god_res.deinit();
-  hero_res.deinit();
-  tech_res.deinit();
+    unit_res.deinit();
+    race_res.deinit(); // race_res is initialized here instead of in race_res
+                       // because campaign will use it (before a game is started
+                       // and game.init() is called.)
+    monster_res.deinit();
+    god_res.deinit();
+    hero_res.deinit();
+    tech_res.deinit();
 
-  //-----------------------------//
+    //-----------------------------//
 
-  help.deinit();
+    help.deinit();
 
-  //#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
-  //	translate.deinit();		// translate never active, even in other
-  // language, use text resources #endif
+    //#if( defined(GERMAN) || defined(FRENCH) || defined(SPANISH) )
+    //	translate.deinit();		// translate never active, even in other
+    // language, use text resources #endif
 
-  tutor.deinit();
-  config.deinit();
-  game_file_array.deinit();
+    tutor.deinit();
+    config.deinit();
+    game_file_array.deinit();
 }
 //------- End of function Sys::deinit_objects -----------//
 
 //-------- Begin of function Sys::set_config_dir --------//
 //
-int Sys::set_config_dir() {
-  // Get the path for the config directory from SDL. Guaranteed to end with a
-  // path separator
-  char *home =
-      SDL_GetPrefPath(CONFIG_ORGANIZATION_NAME, CONFIG_APPLICATION_NAME);
-  strcpy(dir_config, home);
-  SDL_free(home);
-  home = NULL;
+int Sys::set_config_dir()
+{
+    // Get the path for the config directory from SDL. Guaranteed to end with a
+    // path separator
+    char *home = SDL_GetPrefPath(CONFIG_ORGANIZATION_NAME, CONFIG_APPLICATION_NAME);
+    strcpy(dir_config, home);
+    SDL_free(home);
+    home = NULL;
 
-  MSG("Game config dir path: %s\n", dir_config);
+    MSG("Game config dir path: %s\n", dir_config);
 
-  // create the config directory
-  if (!misc.mkpath(dir_config)) {
-    ERR("Unable to acquire a usable game config dir.\n");
-    dir_config[0] = 0;
-    return 0;
-  }
+    // create the config directory
+    if (!misc.mkpath(dir_config))
+    {
+        ERR("Unable to acquire a usable game config dir.\n");
+        dir_config[0] = 0;
+        return 0;
+    }
 
-  return 1;
+    return 1;
 }
 //------- End of function Sys::set_config_dir -----------//
 
@@ -504,32 +511,33 @@ int Sys::set_config_dir() {
 //
 // Set all game directories.
 //
-void Sys::set_game_dir() {
-  strcpy(dir_image, DIR_IMAGE);
-  strcpy(dir_campaign, DIR_CAMPAIGN);
-  strcpy(dir_music, DIR_MUSIC);
-  strcpy(dir_tutorial, DIR_TUTORIAL);
-  strcpy(dir_scenario, DIR_SCENARIO);
+void Sys::set_game_dir()
+{
+    strcpy(dir_image, DIR_IMAGE);
+    strcpy(dir_campaign, DIR_CAMPAIGN);
+    strcpy(dir_music, DIR_MUSIC);
+    strcpy(dir_tutorial, DIR_TUTORIAL);
+    strcpy(dir_scenario, DIR_SCENARIO);
 
-  // ####### begin Gilbert 26/5 #########//
+    // ####### begin Gilbert 26/5 #########//
 #if (MAX_SCENARIO_PATH >= 2)
-  strcpy(dir_scenario_path[1], DIR_SCENARIO_PREMADE);
+    strcpy(dir_scenario_path[1], DIR_SCENARIO_PREMADE);
 #endif
-  // ####### end Gilbert 26/5 #########//
+    // ####### end Gilbert 26/5 #########//
 
-  //-------- set game version ---------//
+    //-------- set game version ---------//
 
 #ifdef BETA
-  game_version = VERSION_FULL;
+    game_version = VERSION_FULL;
 #else
 #ifdef DEMO
-  game_version = VERSION_DEMO;
+    game_version = VERSION_DEMO;
 #else
-  if (1)                         // no longer checkcd if( cdrom_drive )
-    game_version = VERSION_FULL; // single player game is not available when
-                                 // game_version == VERSION_FULL
-  else
-    game_version = VERSION_MULTIPLAYER_ONLY;
+    if (1)                           // no longer checkcd if( cdrom_drive )
+        game_version = VERSION_FULL; // single player game is not available when
+                                     // game_version == VERSION_FULL
+    else
+        game_version = VERSION_MULTIPLAYER_ONLY;
 #endif
 #endif
 }

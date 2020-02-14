@@ -37,15 +37,22 @@
 
 // ----- begin of function FirmOffensive::FirmOffensive --------//
 //
-FirmOffensive::FirmOffensive() : FirmMagic() {}
+FirmOffensive::FirmOffensive() : FirmMagic()
+{
+}
 // ----- end of function FirmOffensive::FirmOffensive --------//
 
 // ----- begin of function FirmOffensive::~FirmOffensive --------//
 //
-FirmOffensive::~FirmOffensive() {}
+FirmOffensive::~FirmOffensive()
+{
+}
 // ----- end of function FirmOffensive::~FirmOffensive --------//
 
 //--------- Begin of function FirmOffensive::is_operating ---------//
 //
-int FirmOffensive::is_operating() { return (delayed_magic_count > 0); }
+int FirmOffensive::is_operating()
+{
+    return (delayed_magic_count > 0);
+}
 //----------- End of function FirmOffensive::is_operating -----------//

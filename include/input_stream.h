@@ -23,34 +23,40 @@
 #include <stdint.h>
 #include <stdio.h>
 
-class InputStream {
-public:
-  virtual ~InputStream() {}
-  virtual long read(void *buffer, long length) = 0;
-  virtual bool seek(long offset, int whence) = 0;
-  virtual long tell() = 0;
-  virtual void close() = 0;
+class InputStream
+{
+  public:
+    virtual ~InputStream()
+    {
+    }
+    virtual long read(void *buffer, long length) = 0;
+    virtual bool seek(long offset, int whence) = 0;
+    virtual long tell() = 0;
+    virtual void close() = 0;
 };
 
 /* Reads a little-endian integer */
-template <typename T> bool read_le_integer(InputStream *is, T *valp) {
-  T val = T();
-  unsigned char c;
+template <typename T> bool read_le_integer(InputStream *is, T *valp)
+{
+    T val = T();
+    unsigned char c;
 
-  for (int n = 0; n < static_cast<int>(sizeof(T)); n++) {
-    if (is->read(&c, 1) != 1)
-      return false;
+    for (int n = 0; n < static_cast<int>(sizeof(T)); n++)
+    {
+        if (is->read(&c, 1) != 1)
+            return false;
 
-    val |= static_cast<T>(c) << (8 * n);
-  }
+        val |= static_cast<T>(c) << (8 * n);
+    }
 
-  *valp = val;
+    *valp = val;
 
-  return true;
+    return true;
 }
 
-template <typename T> bool read_le(InputStream *is, T *valp) {
-  return read_le_integer<T>(is, valp);
+template <typename T> bool read_le(InputStream *is, T *valp)
+{
+    return read_le_integer<T>(is, valp);
 }
 
 template <> bool read_le<float>(InputStream *is, float *valp);

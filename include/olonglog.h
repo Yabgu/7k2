@@ -26,12 +26,13 @@
 
 #include <ofile.h>
 
-class LongLog : public File {
-public:
-  LongLog(char suffix);
-  ~LongLog();
+class LongLog : public File
+{
+  public:
+    LongLog(char suffix);
+    ~LongLog();
 
-  void printf(const char *, ...);
+    void printf(const char *, ...);
 };
 
 #ifdef DEBUG

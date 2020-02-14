@@ -23,20 +23,21 @@
 #include <input_stream.h>
 #include <ofile.h>
 
-class FileInputStream : public InputStream {
-private:
-  File *file;
-  bool own_file;
+class FileInputStream : public InputStream
+{
+  private:
+    File *file;
+    bool own_file;
 
-public:
-  FileInputStream();
-  ~FileInputStream();
-  bool open(File *file, bool own_file = true);
-  bool open(const char *file_name);
-  long read(void *buffer, long length);
-  bool seek(long offset, int whence);
-  long tell();
-  void close();
+  public:
+    FileInputStream();
+    ~FileInputStream();
+    bool open(File *file, bool own_file = true);
+    bool open(const char *file_name);
+    long read(void *buffer, long length);
+    bool seek(long offset, int whence);
+    long tell();
+    void close();
 };
 
 /* vim: set ts=8 sw=3: */

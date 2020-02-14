@@ -28,20 +28,21 @@
 #include <enet/enet.h>
 #include <mptypes.h>
 
-class PlayerDesc {
-public:
-  uint32_t id;
-  char name[MP_FRIENDLY_NAME_LEN + 1];
-  char authorized;
-  ENetAddress address;
+class PlayerDesc
+{
+  public:
+    uint32_t id;
+    char name[MP_FRIENDLY_NAME_LEN + 1];
+    char authorized;
+    ENetAddress address;
 
-  PlayerDesc();
-  PlayerDesc(ENetAddress *address);
-  PlayerDesc(char *name);
+    PlayerDesc();
+    PlayerDesc(ENetAddress *address);
+    PlayerDesc(char *name);
 
-  uint32_t pid();
-  char *friendly_name_str();
-  ENetAddress *get_address();
+    uint32_t pid();
+    char *friendly_name_str();
+    ENetAddress *get_address();
 };
 
 #endif // __PLAYER_DESC_H

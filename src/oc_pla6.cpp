@@ -43,123 +43,132 @@ indepedent towns into yours and develop a strong military base to help you
 battle the Fryhtans
 */
 
-void CampaignEastWest::plot_a6_create_game() {
-  // the largest independent population town
+void CampaignEastWest::plot_a6_create_game()
+{
+    // the largest independent population town
 
-  const int maxSelectedTownCount = 3;
-  int selectedTownCount = 0;
-  int townRecnoArray[maxSelectedTownCount];
+    const int maxSelectedTownCount = 3;
+    int selectedTownCount = 0;
+    int townRecnoArray[maxSelectedTownCount];
 
-  int i;
-  for (i = 1; i <= town_array.size(); ++i) {
-    if (town_array.is_deleted(i))
-      continue;
-
-    Town *townPtr = town_array[i];
-
-    if (townPtr->nation_recno) // independent
-      continue;
-
-    int r;
-    if (selectedTownCount < maxSelectedTownCount) {
-      townRecnoArray[selectedTownCount] = i;
-    } else if ((r = misc.random(selectedTownCount + 1)) <
-               maxSelectedTownCount) {
-      // replace with any
-      townRecnoArray[r] = i;
-    }
-    selectedTownCount++;
-  }
-
-  if (selectedTownCount > maxSelectedTownCount)
-    selectedTownCount = maxSelectedTownCount;
-
-  // ---- add resistance and population of the selected towns -------//
-
-  for (i = 0; i < selectedTownCount; ++i) {
-    Town *townPtr = town_array[townRecnoArray[i]];
-
-    int newPop = townPtr->population + 20 + misc.random(20);
-    if (newPop > MAX_TOWN_POPULATION)
-      newPop = MAX_TOWN_POPULATION;
-
-    for (int j = newPop - townPtr->population; j > 0; --j) {
-      townPtr->inc_pop(50);
-    }
-    townPtr->change_resistance(nation_array.player_recno, 30.0f);
-  }
-
-  // ------ other item ITEM_TOWN_CHANGE_NATION randomly on the map -------//
-
-  int itemToCreate = 0;
-  int nearDist[maxSelectedTownCount];
-  int itemX[maxSelectedTownCount];
-  int itemY[maxSelectedTownCount];
-
-  short kingX, kingY;
-
-  if (!unit_array[(~nation_array)->king_unit_recno]->get_cur_loc(kingX, kingY))
-    return;
-
-  int trial = 200;
-
-  // find the nearest 3 location close to the king
-
-  while (--trial > 0) {
-    int xLoc = misc.random(MAX_WORLD_X_LOC);
-    int yLoc = misc.random(MAX_WORLD_Y_LOC);
-    int dist = misc.points_distance(xLoc, yLoc, kingX, kingY);
-
-    if (dist >= 10 &&
-        world.can_build_site(xLoc, yLoc, 1, 1, 3)) // some space there
+    int i;
+    for (i = 1; i <= town_array.size(); ++i)
     {
-      // avoid too close with other itemX/Y
+        if (town_array.is_deleted(i))
+            continue;
 
-      int minItemDist = MAX_WORLD_X_LOC + MAX_WORLD_Y_LOC;
-      int j;
-      for (j = 0; j < itemToCreate; ++j) {
-        int itemDist = misc.points_distance(xLoc, yLoc, itemX[j], itemY[j]);
-        if (itemDist < minItemDist)
-          minItemDist = itemDist;
-      }
+        Town *townPtr = town_array[i];
 
-      if (minItemDist < 10)
-        continue; // reject this xLoc/yLoc
+        if (townPtr->nation_recno) // independent
+            continue;
 
-      // add to nearDist[], itemX[], itemY[];
-
-      for (j = 0; j < itemToCreate; ++j) {
-        if (dist < nearDist[j])
-          break;
-      }
-
-      if (j < maxSelectedTownCount) {
-        // shift record back
-        if (j + 1 < maxSelectedTownCount) {
-          memmove(&nearDist[j + 1], &nearDist[j],
-                  (char *)&nearDist[maxSelectedTownCount] -
-                      (char *)&nearDist[j + 1]);
-          memmove(&itemX[j + 1], &itemX[j],
-                  (char *)&itemX[maxSelectedTownCount] - (char *)&itemX[j + 1]);
-          memmove(&itemY[j + 1], &itemY[j],
-                  (char *)&itemY[maxSelectedTownCount] - (char *)&itemY[j + 1]);
+        int r;
+        if (selectedTownCount < maxSelectedTownCount)
+        {
+            townRecnoArray[selectedTownCount] = i;
         }
-
-        itemX[j] = xLoc;
-        itemY[j] = yLoc;
-        nearDist[j] = dist;
-
-        if (itemToCreate < maxSelectedTownCount)
-          ++itemToCreate;
-      }
+        else if ((r = misc.random(selectedTownCount + 1)) < maxSelectedTownCount)
+        {
+            // replace with any
+            townRecnoArray[r] = i;
+        }
+        selectedTownCount++;
     }
-  }
 
-  for (i = 0; i < itemToCreate; ++i) {
-    site_array.add_site(
-        itemX[i], itemY[i], SITE_ITEM, ITEM_TOWN_CHANGE_NATION,
-        item_res.random_para(ITEM_TOWN_CHANGE_NATION, misc.rand()));
-  }
+    if (selectedTownCount > maxSelectedTownCount)
+        selectedTownCount = maxSelectedTownCount;
+
+    // ---- add resistance and population of the selected towns -------//
+
+    for (i = 0; i < selectedTownCount; ++i)
+    {
+        Town *townPtr = town_array[townRecnoArray[i]];
+
+        int newPop = townPtr->population + 20 + misc.random(20);
+        if (newPop > MAX_TOWN_POPULATION)
+            newPop = MAX_TOWN_POPULATION;
+
+        for (int j = newPop - townPtr->population; j > 0; --j)
+        {
+            townPtr->inc_pop(50);
+        }
+        townPtr->change_resistance(nation_array.player_recno, 30.0f);
+    }
+
+    // ------ other item ITEM_TOWN_CHANGE_NATION randomly on the map -------//
+
+    int itemToCreate = 0;
+    int nearDist[maxSelectedTownCount];
+    int itemX[maxSelectedTownCount];
+    int itemY[maxSelectedTownCount];
+
+    short kingX, kingY;
+
+    if (!unit_array[(~nation_array)->king_unit_recno]->get_cur_loc(kingX, kingY))
+        return;
+
+    int trial = 200;
+
+    // find the nearest 3 location close to the king
+
+    while (--trial > 0)
+    {
+        int xLoc = misc.random(MAX_WORLD_X_LOC);
+        int yLoc = misc.random(MAX_WORLD_Y_LOC);
+        int dist = misc.points_distance(xLoc, yLoc, kingX, kingY);
+
+        if (dist >= 10 && world.can_build_site(xLoc, yLoc, 1, 1, 3)) // some space there
+        {
+            // avoid too close with other itemX/Y
+
+            int minItemDist = MAX_WORLD_X_LOC + MAX_WORLD_Y_LOC;
+            int j;
+            for (j = 0; j < itemToCreate; ++j)
+            {
+                int itemDist = misc.points_distance(xLoc, yLoc, itemX[j], itemY[j]);
+                if (itemDist < minItemDist)
+                    minItemDist = itemDist;
+            }
+
+            if (minItemDist < 10)
+                continue; // reject this xLoc/yLoc
+
+            // add to nearDist[], itemX[], itemY[];
+
+            for (j = 0; j < itemToCreate; ++j)
+            {
+                if (dist < nearDist[j])
+                    break;
+            }
+
+            if (j < maxSelectedTownCount)
+            {
+                // shift record back
+                if (j + 1 < maxSelectedTownCount)
+                {
+                    memmove(&nearDist[j + 1], &nearDist[j],
+                            (char *)&nearDist[maxSelectedTownCount] - (char *)&nearDist[j + 1]);
+                    memmove(&itemX[j + 1], &itemX[j], (char *)&itemX[maxSelectedTownCount] - (char *)&itemX[j + 1]);
+                    memmove(&itemY[j + 1], &itemY[j], (char *)&itemY[maxSelectedTownCount] - (char *)&itemY[j + 1]);
+                }
+
+                itemX[j] = xLoc;
+                itemY[j] = yLoc;
+                nearDist[j] = dist;
+
+                if (itemToCreate < maxSelectedTownCount)
+                    ++itemToCreate;
+            }
+        }
+    }
+
+    for (i = 0; i < itemToCreate; ++i)
+    {
+        site_array.add_site(itemX[i], itemY[i], SITE_ITEM, ITEM_TOWN_CHANGE_NATION,
+                            item_res.random_para(ITEM_TOWN_CHANGE_NATION, misc.rand()));
+    }
 }
 
-void CampaignEastWest::plot_a6_next_day() {}
+void CampaignEastWest::plot_a6_next_day()
+{
+}

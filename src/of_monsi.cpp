@@ -40,28 +40,30 @@
 
 //--------- Begin of function FirmMonster::put_info ---------//
 //
-void FirmMonster::put_info(int refreshFlag) {
-  /*
-          disp_basic_info(INFO_Y1, refreshFlag);
+void FirmMonster::put_info(int refreshFlag)
+{
+    /*
+            disp_basic_info(INFO_Y1, refreshFlag);
 
-          if( !config.show_ai_info && nation_recno!=nation_array.player_recno )
-                  return;
+            if( !config.show_ai_info && nation_recno!=nation_array.player_recno )
+                    return;
 
-          disp_monster_info(INFO_Y1+54, refreshFlag);
-  */
+            disp_monster_info(INFO_Y1+54, refreshFlag);
+    */
 }
 //----------- End of function FirmMonster::put_info -----------//
 
 //--------- Begin of function FirmMonster::detect_info ---------//
 //
-void FirmMonster::detect_info() {
-  /*
-          if( detect_basic_info() )
-                  return;
+void FirmMonster::detect_info()
+{
+    /*
+            if( detect_basic_info() )
+                    return;
 
-          if( !config.show_ai_info && nation_recno!=nation_array.player_recno )
-                  return;
-  */
+            if( !config.show_ai_info && nation_recno!=nation_array.player_recno )
+                    return;
+    */
 }
 //----------- End of function FirmMonster::detect_info -----------//
 

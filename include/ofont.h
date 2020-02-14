@@ -48,8 +48,8 @@
 //#else
 // english and german uses f0-ff
 //	#define FIRST_NATION_COLOR_CODE_IN_TEXT  0xF0	// 0xF0 to 0xFF are
-//nation color code, must be this range as other ranges are used by foreign
-//characters 	#define LAST_NATION_COLOR_CODE_IN_TEXT   0xFF #endif
+// nation color code, must be this range as other ranges are used by foreign
+// characters 	#define LAST_NATION_COLOR_CODE_IN_TEXT   0xFF #endif
 #define FIRST_NATION_COLOR_CODE_IN_TEXT 0x80
 #define LAST_NATION_COLOR_CODE_IN_TEXT 0x8f
 // ###### end begin Gilbert 20/2 ########//
@@ -61,19 +61,21 @@
 
 #define MAX_HYPER_FIELD 30 // Maximum no. of hyper-text fields in a single page
 
-struct HyperField {
-  short x1, y1, x2, y2;
-  const char *text_ptr; // pointer to the hyper-field name in the text
-  short text_len;       // length of the hyper-field name
+struct HyperField
+{
+    short x1, y1, x2, y2;
+    const char *text_ptr; // pointer to the hyper-field name in the text
+    short text_len;       // length of the hyper-field name
 };
 
 #if (defined(CHINESE))
 // SXM: Definition of Chinese Font set
-struct TChineseFont {
-  int m_Width;
-  int m_Height;
-  BYTE m_FontData[1]; // We assume font data will have all the 94 sector of font
-                      // data
+struct TChineseFont
+{
+    int m_Width;
+    int m_Height;
+    BYTE m_FontData[1]; // We assume font data will have all the 94 sector of font
+                        // data
 };
 // SXM
 #endif
@@ -82,161 +84,168 @@ struct TChineseFont {
 
 struct FontInfo;
 
-class Font {
-public:
-  char init_flag;
+class Font
+{
+  public:
+    char init_flag;
 
-  const char *next_text_ptr; // these 3 vars are used for storing
-  short next_text_y;         // the result parameters after calling
-  short line_count;          // put_paragraph(). Refer to put_paragraph()
+    const char *next_text_ptr; // these 3 vars are used for storing
+    short next_text_y;         // the result parameters after calling
+    short line_count;          // put_paragraph(). Refer to put_paragraph()
 
-  short font_height; // height of a character
-  short std_font_height;
-  short max_font_height;
-  short max_font_width;   // width of the widest character in the font
-  short space_width;      // width of the space character
-  short inter_char_space; // inter-character space
+    short font_height; // height of a character
+    short std_font_height;
+    short max_font_height;
+    short max_font_width;   // width of the widest character in the font
+    short space_width;      // width of the space character
+    short inter_char_space; // inter-character space
 
-  unsigned short first_char; // the starting available character
-  unsigned short last_char;  // the ending available character
+    unsigned short first_char; // the starting available character
+    unsigned short last_char;  // the ending available character
 
-  FontInfo *font_info_array;
-  char *font_bitmap_buf; // pointer to the buffer of the font
+    FontInfo *font_info_array;
+    char *font_bitmap_buf; // pointer to the buffer of the font
 
-public:
-  static short hyper_field_count;
-  static HyperField hyper_field_array[MAX_HYPER_FIELD];
+  public:
+    static short hyper_field_count;
+    static HyperField hyper_field_array[MAX_HYPER_FIELD];
 
-  //---------------------------------------//
+    //---------------------------------------//
 
-public:
-  Font(const char * = NULL);
-  ~Font();
+  public:
+    Font(const char * = NULL);
+    ~Font();
 
-  void init(const char *fontName, int interCharSpace = 1, int italicShift = 0);
-  void deinit();
+    void init(const char *fontName, int interCharSpace = 1, int italicShift = 0);
+    void deinit();
 
-  int height() { return font_height; }
-  int width() { return space_width; }
+    int height()
+    {
+        return font_height;
+    }
+    int width()
+    {
+        return space_width;
+    }
 
-  void use_std_height() { font_height = std_font_height; }
-  void use_max_height() { font_height = max_font_height; }
+    void use_std_height()
+    {
+        font_height = std_font_height;
+    }
+    void use_max_height()
+    {
+        font_height = max_font_height;
+    }
 
-  int text_width(const char *, int = -1, int = 0, int = 0);
-  int text_height(int = DEFAULT_LINE_SPACE);
+    int text_width(const char *, int = -1, int = 0, int = 0);
+    int text_height(int = DEFAULT_LINE_SPACE);
 
-  int put(int, int, const char *, char = 0, int = -1, int = 0);
+    int put(int, int, const char *, char = 0, int = -1, int = 0);
 
-  int put(int x, int y, int value, char clearBack = 0, int x2 = -1) {
-    return put(x, y, misc.format(value), clearBack, x2);
-  }
+    int put(int x, int y, int value, char clearBack = 0, int x2 = -1)
+    {
+        return put(x, y, misc.format(value), clearBack, x2);
+    }
 
-  void put_char(int, int, unsigned short);
-  void right_put(int, int, const char *, char clearBack = 0, char cap = 0);
+    void put_char(int, int, unsigned short);
+    void right_put(int, int, const char *, char clearBack = 0, char cap = 0);
 
-  int d3_put(int, int, const char *);
-  void d3_put(int, int, int, int, const char *);
-  int center_put(int, int, int, int, const char *, char clearBack = 0, int = 0);
+    int d3_put(int, int, const char *);
+    void d3_put(int, int, int, int, const char *);
+    int center_put(int, int, int, int, const char *, char clearBack = 0, int = 0);
 
-  void put_paragraph(int, int, int, int, const char *, int = DEFAULT_LINE_SPACE,
-                     int = 1, char = 1);
+    void put_paragraph(int, int, int, int, const char *, int = DEFAULT_LINE_SPACE, int = 1, char = 1);
 
-  void center_put_paragraph(int, int, int, int, const char *,
-                            int = DEFAULT_LINE_SPACE, char clearBack = 0,
-                            int = 1);
+    void center_put_paragraph(int, int, int, int, const char *, int = DEFAULT_LINE_SPACE, char clearBack = 0, int = 1);
 
-  void count_line(int x1, int y1, int x2, int y2, const char *text,
-                  int lineSpace, int &totalLines, int &dispLines);
+    void count_line(int x1, int y1, int x2, int y2, const char *text, int lineSpace, int &totalLines, int &dispLines);
 
-  void put_char_to_buffer(char *dest, int destPitch, int x1, int y1,
-                          unsigned short text);
-  void put_to_buffer(char *dest, int destPitch, int x1, int y1,
-                     const char *text);
-  void center_put_to_buffer(char *dest, int destPitch, int x1, int y1, int x2,
-                            int y2, const char *text);
+    void put_char_to_buffer(char *dest, int destPitch, int x1, int y1, unsigned short text);
+    void put_to_buffer(char *dest, int destPitch, int x1, int y1, const char *text);
+    void center_put_to_buffer(char *dest, int destPitch, int x1, int y1, int x2, int y2, const char *text);
 
-  void put_char_to_bufferW(short *dest, int destPitch, int x1, int y1,
-                           unsigned short text);
-  void put_to_bufferW(short *dest, int destPitch, int x1, int y1,
-                      const char *text);
-  void center_put_to_bufferW(short *dest, int destPitch, int x1, int y1, int x2,
-                             int y2, const char *text);
+    void put_char_to_bufferW(short *dest, int destPitch, int x1, int y1, unsigned short text);
+    void put_to_bufferW(short *dest, int destPitch, int x1, int y1, const char *text);
+    void center_put_to_bufferW(short *dest, int destPitch, int x1, int y1, int x2, int y2, const char *text);
 
-  short translate_german_char(short textChar);
+    short translate_german_char(short textChar);
 
-  //----------- <int> version -------------//
+    //----------- <int> version -------------//
 
-  void put_field(int, int, const char *, int, int, int = 1);
-  void update_field(int, int, int, int, int);
-  void field(int, int, const char *, int, int, int, int, int,
-             const char *helpCode = NULL);
-  int disp(int, int, int, int, int);
+    void put_field(int, int, const char *, int, int, int = 1);
+    void update_field(int, int, int, int, int);
+    void field(int, int, const char *, int, int, int, int, int, const char *helpCode = NULL);
+    int disp(int, int, int, int, int);
 
-  //----- <short> version, call <int> version directly -----//
+    //----- <short> version, call <int> version directly -----//
 
-  void put_field(int a, int b, const char *c, int d, short e, int f = 1) {
-    put_field(a, b, c, d, (int)e, f);
-  }
+    void put_field(int a, int b, const char *c, int d, short e, int f = 1)
+    {
+        put_field(a, b, c, d, (int)e, f);
+    }
 
-  void update_field(int a, int b, short c, int d, int e) {
-    update_field(a, b, (int)c, d, e);
-  }
+    void update_field(int a, int b, short c, int d, int e)
+    {
+        update_field(a, b, (int)c, d, e);
+    }
 
-  void field(int a, int b, const char *c, int d, short e, int f, int g, int h,
-             const char *helpCode = NULL) {
-    field(a, b, c, d, (int)e, f, g, h);
-  }
+    void field(int a, int b, const char *c, int d, short e, int f, int g, int h, const char *helpCode = NULL)
+    {
+        field(a, b, c, d, (int)e, f, g, h);
+    }
 
-  int disp(int a, int b, short c, int d, int e) {
-    return disp(a, b, (int)c, d, e);
-  }
+    int disp(int a, int b, short c, int d, int e)
+    {
+        return disp(a, b, (int)c, d, e);
+    }
 
-  //---- <long> version, call <int> version directly ------//
+    //---- <long> version, call <int> version directly ------//
 
-  void put_field(int a, int b, const char *c, int d, long e, int f = 1) {
-    put_field(a, b, c, d, (int)e, f);
-  }
+    void put_field(int a, int b, const char *c, int d, long e, int f = 1)
+    {
+        put_field(a, b, c, d, (int)e, f);
+    }
 
-  void update_field(int a, int b, long c, int d, int e) {
-    update_field(a, b, (int)c, d, e);
-  }
+    void update_field(int a, int b, long c, int d, int e)
+    {
+        update_field(a, b, (int)c, d, e);
+    }
 
-  void field(int a, int b, const char *c, int d, long e, int f, int g, int h,
-             const char *helpCode = NULL) {
-    field(a, b, c, d, (int)e, f, g, h);
-  }
+    void field(int a, int b, const char *c, int d, long e, int f, int g, int h, const char *helpCode = NULL)
+    {
+        field(a, b, c, d, (int)e, f, g, h);
+    }
 
-  int disp(int a, int b, long c, int d, int e) {
-    return disp(a, b, (int)c, d, e);
-  }
+    int disp(int a, int b, long c, int d, int e)
+    {
+        return disp(a, b, (int)c, d, e);
+    }
 
-  //------------- <double> version ---------------//
+    //------------- <double> version ---------------//
 
-  void put_field(int, int, const char *, int, double, int = 1);
-  void update_field(int, int, double, int, int);
-  void field(int, int, const char *, int, double, int, int, int,
-             const char *helpCode = NULL);
-  int disp(int, int, double, int, int);
+    void put_field(int, int, const char *, int, double, int = 1);
+    void update_field(int, int, double, int, int);
+    void field(int, int, const char *, int, double, int, int, int, const char *helpCode = NULL);
+    int disp(int, int, double, int, int);
 
-  //-------------- <char*> version ---------------//
+    //-------------- <char*> version ---------------//
 
-  void put_field(int, int, const char *, int, const char *);
-  void update_field(int, int, const char *, int);
-  void field(int, int, const char *, int, const char *, int, int,
-             const char *helpCode = NULL);
-  int disp(int, int, const char *, int, int = 0);
-  short upper_case(short textChar);
+    void put_field(int, int, const char *, int, const char *);
+    void update_field(int, int, const char *, int);
+    void field(int, int, const char *, int, const char *, int, int, const char *helpCode = NULL);
+    int disp(int, int, const char *, int, int = 0);
+    short upper_case(short textChar);
 
 #if (defined(CHINESE))
-  // SXM
-  unsigned char m_ChineseShadowColor;
-  unsigned char m_ChineseBackgroundColor;
-  unsigned char m_ChineseForegroundColor;
-  unsigned char m_ChineseShadowX;
-  unsigned char m_ChineseShadowY;
-  char FontName[256];
-  void BreakOnString(char *String);
-  // SXM
+    // SXM
+    unsigned char m_ChineseShadowColor;
+    unsigned char m_ChineseBackgroundColor;
+    unsigned char m_ChineseForegroundColor;
+    unsigned char m_ChineseShadowX;
+    unsigned char m_ChineseShadowY;
+    char FontName[256];
+    void BreakOnString(char *String);
+    // SXM
 #endif
 };
 

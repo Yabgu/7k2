@@ -35,156 +35,152 @@
 
 // ------- begin of function TownWallRes::TownWallRes -----------//
 //
-TownWallRes::TownWallRes() { init_flag = 0; }
+TownWallRes::TownWallRes()
+{
+    init_flag = 0;
+}
 // ------- end of function TownWallRes::TownWallRes -----------//
 
 // ------- begin of function TownWallRes::~TownWallRes -----------//
 //
-TownWallRes::~TownWallRes() { deinit(); }
+TownWallRes::~TownWallRes()
+{
+    deinit();
+}
 // ------- end of function TownWallRes::~TownWallRes -----------//
 
 // ------- begin of function TownWallRes::init -----------//
 //
-void TownWallRes::init() {
-  deinit();
+void TownWallRes::init()
+{
+    deinit();
 
-  //----- open town material bitmap resource file -------//
+    //----- open town material bitmap resource file -------//
 
-  String str;
+    String str;
 
-  str = DIR_RES;
-  str += "I_TWALL.RES";
+    str = DIR_RES;
+    str += "I_TWALL.RES";
 
-  res_bitmap.init_imported(str, 1); // 1-read all into buffer
+    res_bitmap.init_imported(str, 1); // 1-read all into buffer
 
-  load_town_race_wall();
-  load_town_wall();
-  load_town_wall_bitmap();
+    load_town_race_wall();
+    load_town_wall();
+    load_town_wall_bitmap();
 
-  init_flag = 1;
+    init_flag = 1;
 }
 // ------- end of function TownWallRes::init -----------//
 
 // ------- begin of function TownWallRes::deinit -----------//
 //
-void TownWallRes::deinit() {
-  if (init_flag) {
-    mem_del(town_race_wall_array);
-    mem_del(town_wall_array);
-    mem_del(town_wall_bitmap_array);
+void TownWallRes::deinit()
+{
+    if (init_flag)
+    {
+        mem_del(town_race_wall_array);
+        mem_del(town_wall_array);
+        mem_del(town_wall_bitmap_array);
 
-    res_bitmap.deinit();
+        res_bitmap.deinit();
 
-    init_flag = 0;
-  }
+        init_flag = 0;
+    }
 }
 // ------- end of function TownWallRes::deinit -----------//
 
 // ------- begin of function TownWallRes::load_town_race_wall -----------//
 //
-void TownWallRes::load_town_race_wall() {
-  TownRaceWallRec *townRaceWallRec;
-  TownRaceWallInfo *townRaceWallInfo;
-  Database *database = game_set.open_db(TOWN_RACE_WALL_DB);
+void TownWallRes::load_town_race_wall()
+{
+    TownRaceWallRec *townRaceWallRec;
+    TownRaceWallInfo *townRaceWallInfo;
+    Database *database = game_set.open_db(TOWN_RACE_WALL_DB);
 
-  int i;
+    int i;
 
-  town_race_wall_count = database->rec_count();
-  town_race_wall_array = (TownRaceWallInfo *)mem_add(sizeof(TownRaceWallInfo) *
-                                                     town_race_wall_count);
+    town_race_wall_count = database->rec_count();
+    town_race_wall_array = (TownRaceWallInfo *)mem_add(sizeof(TownRaceWallInfo) * town_race_wall_count);
 
-  memset(town_race_wall_array, 0,
-         sizeof(TownRaceWallInfo) * town_race_wall_count);
+    memset(town_race_wall_array, 0, sizeof(TownRaceWallInfo) * town_race_wall_count);
 
-  for (i = 0; i < town_race_wall_count; ++i) {
-    townRaceWallRec = (TownRaceWallRec *)database->read(i + 1);
-    townRaceWallInfo = town_race_wall_array + i;
+    for (i = 0; i < town_race_wall_count; ++i)
+    {
+        townRaceWallRec = (TownRaceWallRec *)database->read(i + 1);
+        townRaceWallInfo = town_race_wall_array + i;
 
-    townRaceWallInfo->race_id =
-        misc.atoi(townRaceWallRec->race_id, townRaceWallRec->RACE_ID_LEN);
-    townRaceWallInfo->fence_id =
-        misc.atoi(townRaceWallRec->fence_id, townRaceWallRec->WALL_ID_LEN);
-    townRaceWallInfo->basic_wall_id =
-        misc.atoi(townRaceWallRec->basic_wall_id, townRaceWallRec->WALL_ID_LEN);
-    townRaceWallInfo->adv_wall_id =
-        misc.atoi(townRaceWallRec->adv_wall_id, townRaceWallRec->WALL_ID_LEN);
-  }
+        townRaceWallInfo->race_id = misc.atoi(townRaceWallRec->race_id, townRaceWallRec->RACE_ID_LEN);
+        townRaceWallInfo->fence_id = misc.atoi(townRaceWallRec->fence_id, townRaceWallRec->WALL_ID_LEN);
+        townRaceWallInfo->basic_wall_id = misc.atoi(townRaceWallRec->basic_wall_id, townRaceWallRec->WALL_ID_LEN);
+        townRaceWallInfo->adv_wall_id = misc.atoi(townRaceWallRec->adv_wall_id, townRaceWallRec->WALL_ID_LEN);
+    }
 }
 // ------- end of function TownWallRes::load_town_race_wall -----------//
 
 // ------- begin of function TownWallRes::load_town_wall -----------//
 //
-void TownWallRes::load_town_wall() {
-  TownWallRec *townWallRec;
-  TownWallInfo *townWallInfo;
-  Database *database = game_set.open_db(TOWN_WALL_DB);
+void TownWallRes::load_town_wall()
+{
+    TownWallRec *townWallRec;
+    TownWallInfo *townWallInfo;
+    Database *database = game_set.open_db(TOWN_WALL_DB);
 
-  int i;
+    int i;
 
-  town_wall_count = database->rec_count();
-  town_wall_array =
-      (TownWallInfo *)mem_add(sizeof(TownWallInfo) * town_wall_count);
+    town_wall_count = database->rec_count();
+    town_wall_array = (TownWallInfo *)mem_add(sizeof(TownWallInfo) * town_wall_count);
 
-  memset(town_wall_array, 0, sizeof(TownWallInfo) * town_wall_count);
+    memset(town_wall_array, 0, sizeof(TownWallInfo) * town_wall_count);
 
-  for (i = 0; i < town_wall_count; ++i) {
-    townWallRec = (TownWallRec *)database->read(i + 1);
-    townWallInfo = town_wall_array + i;
+    for (i = 0; i < town_wall_count; ++i)
+    {
+        townWallRec = (TownWallRec *)database->read(i + 1);
+        townWallInfo = town_wall_array + i;
 
-    townWallInfo->first_recno =
-        misc.atoi(townWallRec->first_recno, townWallRec->RECNO_LEN);
-    townWallInfo->rec_count =
-        misc.atoi(townWallRec->rec_count, townWallRec->RECNO_LEN);
-    townWallInfo->max_frame =
-        misc.atoi(townWallRec->max_frame, townWallRec->FRAME_LEN);
-  }
+        townWallInfo->first_recno = misc.atoi(townWallRec->first_recno, townWallRec->RECNO_LEN);
+        townWallInfo->rec_count = misc.atoi(townWallRec->rec_count, townWallRec->RECNO_LEN);
+        townWallInfo->max_frame = misc.atoi(townWallRec->max_frame, townWallRec->FRAME_LEN);
+    }
 }
 // ------- end of function TownWallRes::load_town_wall -----------//
 
 // ------- begin of function TownWallRes::load_town_wall_bitmap -----------//
 //
-void TownWallRes::load_town_wall_bitmap() {
-  TownWallBitmapRec *townWallBitmapRec;
-  TownWallBitmapInfo *townWallBitmapInfo;
-  Database *database = game_set.open_db(TOWN_WALL_BITMAP_DB);
+void TownWallRes::load_town_wall_bitmap()
+{
+    TownWallBitmapRec *townWallBitmapRec;
+    TownWallBitmapInfo *townWallBitmapInfo;
+    Database *database = game_set.open_db(TOWN_WALL_BITMAP_DB);
 
-  int i;
+    int i;
 
-  town_wall_bitmap_count = database->rec_count();
-  town_wall_bitmap_array = (TownWallBitmapInfo *)mem_add(
-      sizeof(TownWallBitmapInfo) * town_wall_bitmap_count);
+    town_wall_bitmap_count = database->rec_count();
+    town_wall_bitmap_array = (TownWallBitmapInfo *)mem_add(sizeof(TownWallBitmapInfo) * town_wall_bitmap_count);
 
-  memset(town_wall_bitmap_array, 0,
-         sizeof(TownWallBitmapInfo) * town_wall_bitmap_count);
+    memset(town_wall_bitmap_array, 0, sizeof(TownWallBitmapInfo) * town_wall_bitmap_count);
 
-  for (i = 0; i < town_wall_bitmap_count; ++i) {
-    townWallBitmapRec = (TownWallBitmapRec *)database->read(i + 1);
-    townWallBitmapInfo = town_wall_bitmap_array + i;
+    for (i = 0; i < town_wall_bitmap_count; ++i)
+    {
+        townWallBitmapRec = (TownWallBitmapRec *)database->read(i + 1);
+        townWallBitmapInfo = town_wall_bitmap_array + i;
 
-    townWallBitmapInfo->frame =
-        misc.atoi(townWallBitmapRec->frame, townWallBitmapRec->FRAME_LEN);
-    townWallBitmapInfo->offset_x =
-        misc.atoi(townWallBitmapRec->offset_x, townWallBitmapRec->OFFSET_LEN);
-    townWallBitmapInfo->offset_y =
-        misc.atoi(townWallBitmapRec->offset_y, townWallBitmapRec->OFFSET_LEN);
-    townWallBitmapInfo->mode = townWallBitmapRec->mode;
+        townWallBitmapInfo->frame = misc.atoi(townWallBitmapRec->frame, townWallBitmapRec->FRAME_LEN);
+        townWallBitmapInfo->offset_x = misc.atoi(townWallBitmapRec->offset_x, townWallBitmapRec->OFFSET_LEN);
+        townWallBitmapInfo->offset_y = misc.atoi(townWallBitmapRec->offset_y, townWallBitmapRec->OFFSET_LEN);
+        townWallBitmapInfo->mode = townWallBitmapRec->mode;
 
-    uint32_t bitmapOffset;
-    memcpy(&bitmapOffset, townWallBitmapRec->bitmap_ptr, sizeof(uint32_t));
-    townWallBitmapInfo->bitmap_ptr = res_bitmap.read_imported(bitmapOffset);
+        uint32_t bitmapOffset;
+        memcpy(&bitmapOffset, townWallBitmapRec->bitmap_ptr, sizeof(uint32_t));
+        townWallBitmapInfo->bitmap_ptr = res_bitmap.read_imported(bitmapOffset);
 
-    // modify offset_x/y for 7k2
-    int locWidth =
-        misc.atoi(townWallBitmapRec->loc_width, townWallBitmapRec->LOC_LEN);
-    int locHeight =
-        misc.atoi(townWallBitmapRec->loc_height, townWallBitmapRec->LOC_LEN);
-    townWallBitmapInfo->offset_x +=
-        -locWidth * LOCATE_WIDTH / 2 -
-        (-locWidth * ZOOM_LOC_X_WIDTH / 2 + -locHeight * ZOOM_LOC_Y_WIDTH / 2);
-    townWallBitmapInfo->offset_y +=
-        -locHeight * LOCATE_HEIGHT / 2 - (-locWidth * ZOOM_LOC_X_HEIGHT / 2 +
-                                          -locHeight * ZOOM_LOC_Y_HEIGHT / 2);
-  }
+        // modify offset_x/y for 7k2
+        int locWidth = misc.atoi(townWallBitmapRec->loc_width, townWallBitmapRec->LOC_LEN);
+        int locHeight = misc.atoi(townWallBitmapRec->loc_height, townWallBitmapRec->LOC_LEN);
+        townWallBitmapInfo->offset_x +=
+            -locWidth * LOCATE_WIDTH / 2 - (-locWidth * ZOOM_LOC_X_WIDTH / 2 + -locHeight * ZOOM_LOC_Y_WIDTH / 2);
+        townWallBitmapInfo->offset_y +=
+            -locHeight * LOCATE_HEIGHT / 2 - (-locWidth * ZOOM_LOC_X_HEIGHT / 2 + -locHeight * ZOOM_LOC_Y_HEIGHT / 2);
+    }
 }
 // ------- end of function TownWallRes::load_town_wall_bitmap -----------//
 
@@ -199,55 +195,57 @@ void TownWallRes::load_town_wall_bitmap() {
 //
 // return TownWallBitmapInfo struct pointer, NULL if not found
 //
-TownWallBitmapInfo *TownWallRes::search(int raceId, int wallLevel, int frame,
-                                        char mode) {
-  // ------ get the wall id from race and wallLevel --------//
+TownWallBitmapInfo *TownWallRes::search(int raceId, int wallLevel, int frame, char mode)
+{
+    // ------ get the wall id from race and wallLevel --------//
 
-  TownRaceWallInfo *townRaceWallInfo = town_race_wall_array + raceId - 1;
-  err_when(townRaceWallInfo->race_id != raceId);
+    TownRaceWallInfo *townRaceWallInfo = town_race_wall_array + raceId - 1;
+    err_when(townRaceWallInfo->race_id != raceId);
 
-  int wallId;
-  switch (wallLevel) {
-  case 0:
-    wallId = townRaceWallInfo->fence_id;
-    break;
-  case 1:
-    wallId = townRaceWallInfo->basic_wall_id;
-    break;
-  case 2:
-    wallId = townRaceWallInfo->adv_wall_id;
-    break;
-  default:
-    err_here();
+    int wallId;
+    switch (wallLevel)
+    {
+    case 0:
+        wallId = townRaceWallInfo->fence_id;
+        break;
+    case 1:
+        wallId = townRaceWallInfo->basic_wall_id;
+        break;
+    case 2:
+        wallId = townRaceWallInfo->adv_wall_id;
+        break;
+    default:
+        err_here();
+        return NULL;
+    }
+
+    if (wallId <= 0 || wallId > town_wall_count)
+    {
+        err_here();
+        return NULL;
+    }
+
+    // -------- search wall Bitmap for that frame and mode ---------- //
+
+    TownWallInfo *townWallInfo = town_wall_array + wallId - 1;
+
+    int townWallBitmapRecno = townWallInfo->first_recno;
+
+    if (townWallBitmapRecno <= 0 || townWallBitmapRecno > town_wall_bitmap_count)
+    {
+        err_here();
+        return NULL;
+    }
+
+    TownWallBitmapInfo *townWallBitmapInfo = town_wall_bitmap_array + townWallBitmapRecno - 1;
+
+    for (int i = townWallInfo->rec_count; i > 0; --i, ++townWallBitmapInfo)
+    {
+        if (townWallBitmapInfo->frame == frame && townWallBitmapInfo->mode == mode)
+            return townWallBitmapInfo;
+    }
+
     return NULL;
-  }
-
-  if (wallId <= 0 || wallId > town_wall_count) {
-    err_here();
-    return NULL;
-  }
-
-  // -------- search wall Bitmap for that frame and mode ---------- //
-
-  TownWallInfo *townWallInfo = town_wall_array + wallId - 1;
-
-  int townWallBitmapRecno = townWallInfo->first_recno;
-
-  if (townWallBitmapRecno <= 0 ||
-      townWallBitmapRecno > town_wall_bitmap_count) {
-    err_here();
-    return NULL;
-  }
-
-  TownWallBitmapInfo *townWallBitmapInfo =
-      town_wall_bitmap_array + townWallBitmapRecno - 1;
-
-  for (int i = townWallInfo->rec_count; i > 0; --i, ++townWallBitmapInfo) {
-    if (townWallBitmapInfo->frame == frame && townWallBitmapInfo->mode == mode)
-      return townWallBitmapInfo;
-  }
-
-  return NULL;
 }
 // ------- end of function TownWallRes::search -----------//
 
@@ -263,61 +261,63 @@ TownWallBitmapInfo *TownWallRes::search(int raceId, int wallLevel, int frame,
 //
 // return TownWallBitmapInfo struct pointer, NULL if not found
 //
-TownWallBitmapInfo *TownWallRes::search(int raceId, int wallLevel, float hp,
-                                        float fullHp, char mode) {
-  // ------ get the wall id from race and wallLevel --------//
+TownWallBitmapInfo *TownWallRes::search(int raceId, int wallLevel, float hp, float fullHp, char mode)
+{
+    // ------ get the wall id from race and wallLevel --------//
 
-  TownRaceWallInfo *townRaceWallInfo = town_race_wall_array + raceId - 1;
-  err_when(townRaceWallInfo->race_id != raceId);
+    TownRaceWallInfo *townRaceWallInfo = town_race_wall_array + raceId - 1;
+    err_when(townRaceWallInfo->race_id != raceId);
 
-  int wallId;
-  switch (wallLevel) {
-  case 0:
-    wallId = townRaceWallInfo->fence_id;
-    break;
-  case 1:
-    wallId = townRaceWallInfo->basic_wall_id;
-    break;
-  case 2:
-    wallId = townRaceWallInfo->adv_wall_id;
-    break;
-  default:
-    err_here();
+    int wallId;
+    switch (wallLevel)
+    {
+    case 0:
+        wallId = townRaceWallInfo->fence_id;
+        break;
+    case 1:
+        wallId = townRaceWallInfo->basic_wall_id;
+        break;
+    case 2:
+        wallId = townRaceWallInfo->adv_wall_id;
+        break;
+    default:
+        err_here();
+        return NULL;
+    }
+
+    if (wallId <= 0 || wallId > town_wall_count)
+    {
+        err_here();
+        return NULL;
+    }
+
+    // --------- calculate frame ----------//
+
+    TownWallInfo *townWallInfo = town_wall_array + wallId - 1;
+
+    int townWallBitmapRecno = townWallInfo->first_recno;
+    int townWallBitmapMaxFrame = townWallInfo->max_frame;
+    err_when(fullHp < 1.0f);
+    int frame = 1 + int(hp * townWallBitmapMaxFrame / fullHp);
+    if (frame > townWallBitmapMaxFrame)
+        frame = townWallBitmapMaxFrame;
+
+    if (townWallBitmapRecno <= 0 || townWallBitmapRecno > town_wall_bitmap_count)
+    {
+        err_here();
+        return NULL;
+    }
+
+    // -------- search wall Bitmap for that frame and mode ---------- //
+
+    TownWallBitmapInfo *townWallBitmapInfo = town_wall_bitmap_array + townWallBitmapRecno - 1;
+
+    for (int i = townWallInfo->rec_count; i > 0; --i, ++townWallBitmapInfo)
+    {
+        if (townWallBitmapInfo->frame == frame && townWallBitmapInfo->mode == mode)
+            return townWallBitmapInfo;
+    }
+
     return NULL;
-  }
-
-  if (wallId <= 0 || wallId > town_wall_count) {
-    err_here();
-    return NULL;
-  }
-
-  // --------- calculate frame ----------//
-
-  TownWallInfo *townWallInfo = town_wall_array + wallId - 1;
-
-  int townWallBitmapRecno = townWallInfo->first_recno;
-  int townWallBitmapMaxFrame = townWallInfo->max_frame;
-  err_when(fullHp < 1.0f);
-  int frame = 1 + int(hp * townWallBitmapMaxFrame / fullHp);
-  if (frame > townWallBitmapMaxFrame)
-    frame = townWallBitmapMaxFrame;
-
-  if (townWallBitmapRecno <= 0 ||
-      townWallBitmapRecno > town_wall_bitmap_count) {
-    err_here();
-    return NULL;
-  }
-
-  // -------- search wall Bitmap for that frame and mode ---------- //
-
-  TownWallBitmapInfo *townWallBitmapInfo =
-      town_wall_bitmap_array + townWallBitmapRecno - 1;
-
-  for (int i = townWallInfo->rec_count; i > 0; --i, ++townWallBitmapInfo) {
-    if (townWallBitmapInfo->frame == frame && townWallBitmapInfo->mode == mode)
-      return townWallBitmapInfo;
-  }
-
-  return NULL;
 }
 // ------- end of function TownWallRes::search -----------//

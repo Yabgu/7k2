@@ -22,21 +22,22 @@
 
 #include <input_stream.h>
 
-class MemInputStream : public InputStream {
-private:
-  uint8_t *data;
-  size_t length;
-  size_t pos;
-  bool own_data;
+class MemInputStream : public InputStream
+{
+  private:
+    uint8_t *data;
+    size_t length;
+    size_t pos;
+    bool own_data;
 
-public:
-  MemInputStream();
-  ~MemInputStream();
-  void open(void *data, size_t length, bool own_data = true);
-  long read(void *buffer, long length);
-  bool seek(long offset, int whence);
-  long tell();
-  void close();
+  public:
+    MemInputStream();
+    ~MemInputStream();
+    void open(void *data, size_t length, bool own_data = true);
+    long read(void *buffer, long length);
+    bool seek(long offset, int whence);
+    long tell();
+    void close();
 };
 
 #endif

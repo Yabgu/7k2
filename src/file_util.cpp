@@ -22,24 +22,26 @@
 
 #include <file_util.h>
 
-bool seek(File *file, long off, int whence) {
-  long target;
-  long pos;
+bool seek(File *file, long off, int whence)
+{
+    long target;
+    long pos;
 
-  switch (whence) {
-  case SEEK_SET:
-    target = off;
-    break;
-  case SEEK_CUR:
-    target = file->file_pos() + off;
-    break;
-  case SEEK_END:
-    target = file->file_size() + off;
-    break;
-  default:
-    abort();
-  }
+    switch (whence)
+    {
+    case SEEK_SET:
+        target = off;
+        break;
+    case SEEK_CUR:
+        target = file->file_pos() + off;
+        break;
+    case SEEK_END:
+        target = file->file_size() + off;
+        break;
+    default:
+        abort();
+    }
 
-  pos = file->file_seek(off, whence);
-  return (pos == target);
+    pos = file->file_seek(off, whence);
+    return (pos == target);
 }

@@ -20,61 +20,72 @@
 #include <file_input_stream.h>
 #include <file_util.h>
 
-FileInputStream::FileInputStream() {
-  this->file = NULL;
-  this->own_file = false;
+FileInputStream::FileInputStream()
+{
+    this->file = NULL;
+    this->own_file = false;
 }
 
-FileInputStream::~FileInputStream() { this->close(); }
-
-long FileInputStream::read(void *buffer, long length) {
-  if (this->file == NULL)
-    return 0;
-
-  if (!this->file->file_read(buffer, length))
-    return 0;
-
-  return length;
-}
-
-bool FileInputStream::seek(long offset, int whence) {
-  if (this->file == NULL)
-    return false;
-
-  return ::seek(this->file, offset, whence);
-}
-
-long FileInputStream::tell() {
-  if (this->file == NULL)
-    return -1;
-
-  return this->file->file_pos();
-}
-
-bool FileInputStream::open(File *file, bool own_file) {
-  this->close();
-  this->file = file;
-  this->own_file = own_file;
-  return (file != NULL);
-}
-
-bool FileInputStream::open(const char *file_name) {
-  this->open(new File);
-
-  if (!this->file->file_open(file_name)) {
+FileInputStream::~FileInputStream()
+{
     this->close();
-    return false;
-  }
-
-  return true;
 }
 
-void FileInputStream::close() {
-  if (this->own_file)
-    delete this->file;
+long FileInputStream::read(void *buffer, long length)
+{
+    if (this->file == NULL)
+        return 0;
 
-  this->file = NULL;
-  this->own_file = false;
+    if (!this->file->file_read(buffer, length))
+        return 0;
+
+    return length;
+}
+
+bool FileInputStream::seek(long offset, int whence)
+{
+    if (this->file == NULL)
+        return false;
+
+    return ::seek(this->file, offset, whence);
+}
+
+long FileInputStream::tell()
+{
+    if (this->file == NULL)
+        return -1;
+
+    return this->file->file_pos();
+}
+
+bool FileInputStream::open(File *file, bool own_file)
+{
+    this->close();
+    this->file = file;
+    this->own_file = own_file;
+    return (file != NULL);
+}
+
+bool FileInputStream::open(const char *file_name)
+{
+    this->open(new File);
+
+    if (!this->file->file_open(file_name))
+    {
+        this->close();
+        return false;
+    }
+
+    return true;
+}
+
+void FileInputStream::close()
+{
+    if (this->own_file)
+        delete this->file;
+
+    this->file = NULL;
+    this->own_file = false;
 }
 
 /* vim: set ts=8 sw=3: */

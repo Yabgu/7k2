@@ -37,110 +37,142 @@
 
 // ------- begin of function LinearCounter::LinearCount ------- //
 //
-LinearCounter::LinearCounter() {}
+LinearCounter::LinearCounter()
+{
+}
 // ------- end of function LinearCounter::LinearCount ------- //
 
 // ------- begin of function LinearCounter::LinearCount ------- //
 //
-LinearCounter::LinearCounter(int x0, int y0, int x1, int y1) {
-  init(x0, y0, x1, y1);
+LinearCounter::LinearCounter(int x0, int y0, int x1, int y1)
+{
+    init(x0, y0, x1, y1);
 }
 // ------- end of function LinearCounter::LinearCount ------- //
 
 // ------- begin of function LinearCounter::init ------- //
 //
-void LinearCounter::init(int x0, int y0, int x1, int y1) {
-  dx = x1 - x0;
-  dy = y1 - y0;
+void LinearCounter::init(int x0, int y0, int x1, int y1)
+{
+    dx = x1 - x0;
+    dy = y1 - y0;
 
-  x_dest = x1;
-  x = x0;
-  y = y0;
+    x_dest = x1;
+    x = x0;
+    y = y0;
 
-  err_when(dx < 0);
+    err_when(dx < 0);
 
-  if (dx > 0) {
-    q = dy / dx; // quotient
-    r = dy % dx; // remainder
+    if (dx > 0)
+    {
+        q = dy / dx; // quotient
+        r = dy % dx; // remainder
 
-    err_when(q * dx + r != dy);
+        err_when(q * dx + r != dy);
 
-    if (dy >= 0)
-      d = r * 2 - dx;
-    else
-      d = r * 2 + dx;
-  } else if (dx < 0) {
-    err_here(); // not support negative dx yet
-  } else        // dx == 0
-  {
-    q = dy / dx; // quotient
-    r = dy % dx; // remainder
+        if (dy >= 0)
+            d = r * 2 - dx;
+        else
+            d = r * 2 + dx;
+    }
+    else if (dx < 0)
+    {
+        err_here(); // not support negative dx yet
+    }
+    else // dx == 0
+    {
+        q = dy / dx; // quotient
+        r = dy % dx; // remainder
 
-    err_when(q * dx + r != dy);
+        err_when(q * dx + r != dy);
 
-    if (dy >= 0)
-      d = r * -2 - dx;
-    else
-      d = r * -2 + dx;
-  }
+        if (dy >= 0)
+            d = r * -2 - dx;
+        else
+            d = r * -2 + dx;
+    }
 }
 // ------- end of function LinearCounter::init ------- //
 
 // ------- begin of function LinearCounter::is_end ------- //
 //
-int LinearCounter::is_end() {
-  if (dx >= 0)
-    return x > x_dest;
-  else
-    return x < x_dest;
+int LinearCounter::is_end()
+{
+    if (dx >= 0)
+        return x > x_dest;
+    else
+        return x < x_dest;
 }
 // ------- end of function LinearCounter::is_end ------- //
 
 // ------- begin of function LinearCounter::inc ------- //
 //
-void LinearCounter::inc() {
-  if (dx > 0) {
-    if (dy >= 0) {
-      if (d < 0) {
-        y += q;
-        d += r * 2;
-      } else {
-        y += q + 1;
-        d += (r - dx) * 2;
-      }
-    } else {
-      if (d >= 0) {
-        y += q;
-        d += r * 2;
-      } else {
-        y += q - 1;
-        d += (r + dx) * 2;
-      }
+void LinearCounter::inc()
+{
+    if (dx > 0)
+    {
+        if (dy >= 0)
+        {
+            if (d < 0)
+            {
+                y += q;
+                d += r * 2;
+            }
+            else
+            {
+                y += q + 1;
+                d += (r - dx) * 2;
+            }
+        }
+        else
+        {
+            if (d >= 0)
+            {
+                y += q;
+                d += r * 2;
+            }
+            else
+            {
+                y += q - 1;
+                d += (r + dx) * 2;
+            }
+        }
+        ++x;
     }
-    ++x;
-  } else if (dx < 0) {
-    err_here(); // not tested
-    if (dy < 0) {
-      if (d >= 0) {
-        y -= q;
-        d -= r * 2;
-      } else {
-        y -= q + 1;
-        d -= (r - dx) * 2;
-      }
-    } else {
-      if (d < 0) {
-        y -= q;
-        d -= r * 2;
-      } else {
-        y -= q - 1;
-        d -= (r + dx) * 2;
-      }
+    else if (dx < 0)
+    {
+        err_here(); // not tested
+        if (dy < 0)
+        {
+            if (d >= 0)
+            {
+                y -= q;
+                d -= r * 2;
+            }
+            else
+            {
+                y -= q + 1;
+                d -= (r - dx) * 2;
+            }
+        }
+        else
+        {
+            if (d < 0)
+            {
+                y -= q;
+                d -= r * 2;
+            }
+            else
+            {
+                y -= q - 1;
+                d -= (r + dx) * 2;
+            }
+        }
+        --x;
     }
-    --x;
-  } else // dx == 0
-  {
-    ++x; // so that is_end return true after inc() once
-  }
+    else // dx == 0
+    {
+        ++x; // so that is_end return true after inc() once
+    }
 }
 // ------- end of function LinearCounter::is_end ------- //

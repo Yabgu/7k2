@@ -25,16 +25,20 @@
 #ifndef AUDIO_STREAM_H
 #define AUDIO_STREAM_H
 
-class AudioStream {
-public:
-  virtual ~AudioStream(){};
-  virtual long read(void *buffer, size_t frame_count) = 0;
-  virtual bool seek(size_t frame_no) = 0;
-  virtual int32_t frame_rate() const = 0; /* in PCM frames per sec */
-  virtual int channels() const = 0;
-  virtual int sample_size() const = 0; /* in bytes */
+class AudioStream
+{
+  public:
+    virtual ~AudioStream(){};
+    virtual long read(void *buffer, size_t frame_count) = 0;
+    virtual bool seek(size_t frame_no) = 0;
+    virtual int32_t frame_rate() const = 0; /* in PCM frames per sec */
+    virtual int channels() const = 0;
+    virtual int sample_size() const = 0; /* in bytes */
 
-  int frame_size() const { return (this->channels() * this->sample_size()); }
+    int frame_size() const
+    {
+        return (this->channels() * this->sample_size());
+    }
 };
 
 #endif

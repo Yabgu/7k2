@@ -37,25 +37,29 @@
 // -1 to force disable debug log of that module, even though DEBUG_LOG_GLOBAL is
 // 1 0 to follow DEBUG_LOG_GLOBAL
 
-class Log {
-private:
-  enum { LOG_VERSION = 12 };
-  VLenQueue text_buffer[LOG_VERSION];
-  String log_text;
-  String log_file;
-  int log_line;
+class Log
+{
+  private:
+    enum
+    {
+        LOG_VERSION = 12
+    };
+    VLenQueue text_buffer[LOG_VERSION];
+    String log_text;
+    String log_file;
+    int log_line;
 
-public:
-  Log();
-  ~Log();
-  void mark_begin();
-  void mark_end();
-  void mark(const char *msg, const char *file, int line);
-  void mark(int n, const char *file, int line);
-  void dump();
+  public:
+    Log();
+    ~Log();
+    void mark_begin();
+    void mark_end();
+    void mark(const char *msg, const char *file, int line);
+    void mark(int n, const char *file, int line);
+    void dump();
 
-  static void debug_log(const char *msg);
-  static void debug_log(int n);
+    static void debug_log(const char *msg);
+    static void debug_log(int n);
 };
 
 extern Log msg_log;

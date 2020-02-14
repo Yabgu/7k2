@@ -28,12 +28,13 @@
 
 //------- constant for arrow box ----------//
 
-enum {
-  ARROW_BOX_WIDTH = 390,
-  ARROW_BOX_X_MARGIN = 15,
-  ARROW_BOX_Y_MARGIN = 15,
-  ARROW_BOX_TITLE_HEIGHT = 20,
-  ARROW_BOX_LINE_SPACE = 4
+enum
+{
+    ARROW_BOX_WIDTH = 390,
+    ARROW_BOX_X_MARGIN = 15,
+    ARROW_BOX_Y_MARGIN = 15,
+    ARROW_BOX_TITLE_HEIGHT = 20,
+    ARROW_BOX_LINE_SPACE = 4
 };
 
 // ------- declare class ----------//
@@ -42,46 +43,46 @@ class Button;
 
 //--------- Define class Box ------------//
 
-class Box {
-public:
-  int box_x1, box_y1, box_x2, box_y2;
-  int arrow_x, arrow_y;
-  int save_scr_flag;
-  short *save_scr_area;
+class Box
+{
+  public:
+    int box_x1, box_y1, box_x2, box_y2;
+    int arrow_x, arrow_y;
+    int save_scr_flag;
+    short *save_scr_area;
 
-  static char opened_flag;
+    static char opened_flag;
 
-public:
-  Box();
-  ~Box();
-  // ready to use one-step call functions
+  public:
+    Box();
+    ~Box();
+    // ready to use one-step call functions
 
-  int ask(const char *, const char * = NULL, const char * = NULL, int = -1,
-          int = -1);
-  void msg(const char *msgStr, int enableTimeOut = 1, int x1 = -1, int y1 = -1);
-  void print(char *, ...);
-  void tell(const char *, int = -1, int = -1);
+    int ask(const char *, const char * = NULL, const char * = NULL, int = -1, int = -1);
+    void msg(const char *msgStr, int enableTimeOut = 1, int x1 = -1, int y1 = -1);
+    void print(char *, ...);
+    void tell(const char *, int = -1, int = -1);
 
-  // lower level box control functions
+    // lower level box control functions
 
-  void open(int, int, int, int, int = 1);
-  void open(int, int, int = 1);
-  void paint(int);
-  void close();
+    void open(int, int, int, int, int = 1);
+    void open(int, int, int = 1);
+    void paint(int);
+    void close();
 
-  void calc_size(const char *, int, int = -1, int = -1);
+    void calc_size(const char *, int, int = -1, int = -1);
 
-  int ask_button(const char * = NULL, const char * = NULL, int = 1);
-  void ask_button(Button &, Button &, const char * = NULL, const char * = NULL);
-  void ok_button(int = 1);
+    int ask_button(const char * = NULL, const char * = NULL, int = 1);
+    void ask_button(Button &, Button &, const char * = NULL, const char * = NULL);
+    void ok_button(int = 1);
 
-  // arrow box
+    // arrow box
 
-  void arrow_box(char *, char * = NULL, int = 1);
-  void close_arrow_box();
-  void calc_arrow_box(char *, int, int, int = 0);
-  void calc_arrow_box(int, int, int, int);
-  void draw_arrow();
+    void arrow_box(char *, char * = NULL, int = 1);
+    void close_arrow_box();
+    void calc_arrow_box(char *, int, int, int = 0);
+    void calc_arrow_box(int, int, int, int);
+    void draw_arrow();
 };
 
 extern Box box;

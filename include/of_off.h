@@ -28,29 +28,33 @@
 #include <ofirm.h>
 
 #pragma pack(1)
-class FirmOffensive : public FirmMagic {
+class FirmOffensive : public FirmMagic
+{
 
-public:
-  FirmOffensive();
-  ~FirmOffensive();
+  public:
+    FirmOffensive();
+    ~FirmOffensive();
 
-  int is_operating();
+    int is_operating();
 
-  // ------ interface function ------//
+    // ------ interface function ------//
 
-  void put_info(int refreshFlag);
-  void detect_info();
+    void put_info(int refreshFlag);
+    void detect_info();
 
-  virtual FirmOffensive *cast_to_FirmOffensive() { return this; }
+    virtual FirmOffensive *cast_to_FirmOffensive()
+    {
+        return this;
+    }
 
-protected:
-  // ------- protected interface function ------//
+  protected:
+    // ------- protected interface function ------//
 
-  void disp_main_menu(int refreshFlag);
-  void detect_main_menu();
+    void disp_main_menu(int refreshFlag);
+    void detect_main_menu();
 
-  void disp_magic_menu(int refreshFlag);
-  void detect_magic_menu();
+    void disp_magic_menu(int refreshFlag);
+    void detect_magic_menu();
 };
 #pragma pack()
 

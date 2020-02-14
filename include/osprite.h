@@ -45,15 +45,16 @@
 
 //---------- Define action types ---------//
 
-enum {
-  SPRITE_IDLE = 1,
-  SPRITE_READY_TO_MOVE,
-  SPRITE_MOVE,
-  SPRITE_WAIT, // During a movement course, waiting for blocked sprites to pass
-  SPRITE_ATTACK,
-  SPRITE_TURN,
-  SPRITE_SHIP_EXTRA_MOVE, // for ship only
-  SPRITE_DIE,
+enum
+{
+    SPRITE_IDLE = 1,
+    SPRITE_READY_TO_MOVE,
+    SPRITE_MOVE,
+    SPRITE_WAIT, // During a movement course, waiting for blocked sprites to pass
+    SPRITE_ATTACK,
+    SPRITE_TURN,
+    SPRITE_SHIP_EXTRA_MOVE, // for ship only
+    SPRITE_DIE,
 };
 
 //----------- Define constant ----------//
@@ -65,171 +66,228 @@ struct SpriteFrame;
 //---------- Define class Sprite -----------//
 
 #pragma pack(1)
-class Sprite : public BaseObj {
-public:
-  //------------------------------------------//
+class Sprite : public BaseObj
+{
+  public:
+    //------------------------------------------//
 
-  short sprite_id; // sprite id. in SpriteRes
-  short sprite_recno;
+    short sprite_id; // sprite id. in SpriteRes
+    short sprite_recno;
 
-  char mobile_type;
+    char mobile_type;
 
-  UCHAR cur_action;   // current action
-  UCHAR saved_action; // saved action
-  UCHAR cur_dir;      // current direction
-  UCHAR cur_frame;    // current frame
-  UCHAR cur_attack;   // current attack mode
-  UCHAR final_dir;    // for turning dir before attacking or moving
-  char turn_delay;    // value between -60 and 60
-  char guard_count;   // shield guarding, affecting move/stop frame
-                    // 0=not guarding, count up from 1 when guarding, reset to 0
-                    // after guard
-  int freeze_frame_left;
+    UCHAR cur_action;   // current action
+    UCHAR saved_action; // saved action
+    UCHAR cur_dir;      // current direction
+    UCHAR cur_frame;    // current frame
+    UCHAR cur_attack;   // current attack mode
+    UCHAR final_dir;    // for turning dir before attacking or moving
+    char turn_delay;    // value between -60 and 60
+    char guard_count;   // shield guarding, affecting move/stop frame
+                        // 0=not guarding, count up from 1 when guarding, reset to 0
+                        // after guard
+    int freeze_frame_left;
 
-  UCHAR remain_attack_delay; // no. of frames has to be delayed before the next
-                             // attack motion
-  UCHAR remain_frames_per_step; // no. of frames remained in this step
+    UCHAR remain_attack_delay;    // no. of frames has to be delayed before the next
+                                  // attack motion
+    UCHAR remain_frames_per_step; // no. of frames remained in this step
 
-  short cur_x, cur_y;   // current location
-  short go_x, go_y;     // the destination of the path
-  short next_x, next_y; // next tile in the moving path
+    short cur_x, cur_y;   // current location
+    short go_x, go_y;     // the destination of the path
+    short next_x, next_y; // next tile in the moving path
 
-  //----- clone vars from sprite_res for fast access -----//
+    //----- clone vars from sprite_res for fast access -----//
 
-  SpriteInfo *sprite_info;
+    SpriteInfo *sprite_info;
 
-  //--------- static member vars --------------//
+    //--------- static member vars --------------//
 
-  static short view_top_x,
-      view_top_y; // the view window in the scene, they are relative
-                  // coordinations on the entire virtual surface.
+    static short view_top_x,
+        view_top_y; // the view window in the scene, they are relative
+                    // coordinations on the entire virtual surface.
 
-  //---------- function member vars -------------//
+    //---------- function member vars -------------//
 
-  short cur_x_loc() {
-    return cur_x >> ZOOM_X_SHIFT_COUNT;
-  } // >>5 = divided by 32, which is ZOOM_LOC_WIDTH & ZOOM_LOC_HEIGHT
-  short cur_y_loc() { return cur_y >> ZOOM_Y_SHIFT_COUNT; }
+    short cur_x_loc()
+    {
+        return cur_x >> ZOOM_X_SHIFT_COUNT;
+    } // >>5 = divided by 32, which is ZOOM_LOC_WIDTH & ZOOM_LOC_HEIGHT
+    short cur_y_loc()
+    {
+        return cur_y >> ZOOM_Y_SHIFT_COUNT;
+    }
 
-  short next_x_loc() {
-    return next_x >> ZOOM_X_SHIFT_COUNT;
-  } // >>5 = divided by 32, which is ZOOM_LOC_WIDTH & ZOOM_LOC_HEIGHT
-  short next_y_loc() { return next_y >> ZOOM_Y_SHIFT_COUNT; }
+    short next_x_loc()
+    {
+        return next_x >> ZOOM_X_SHIFT_COUNT;
+    } // >>5 = divided by 32, which is ZOOM_LOC_WIDTH & ZOOM_LOC_HEIGHT
+    short next_y_loc()
+    {
+        return next_y >> ZOOM_Y_SHIFT_COUNT;
+    }
 
-  short go_x_loc() { return go_x >> ZOOM_X_SHIFT_COUNT; }
-  short go_y_loc() { return go_y >> ZOOM_Y_SHIFT_COUNT; }
+    short go_x_loc()
+    {
+        return go_x >> ZOOM_X_SHIFT_COUNT;
+    }
+    short go_y_loc()
+    {
+        return go_y >> ZOOM_Y_SHIFT_COUNT;
+    }
 
-  SpriteMove *cur_sprite_move() { return sprite_info->move_array + cur_dir; }
-  SpriteAttack *cur_sprite_attack() {
-    return sprite_info->attack_array[cur_attack] + cur_dir;
-  }
-  SpriteStop *cur_sprite_stop() { return sprite_info->stop_array + cur_dir; }
-  SpriteDie *cur_sprite_die() { return &(sprite_info->die); }
-  SpriteFrame *cur_sprite_frame(int *needMirror = 0);
+    SpriteMove *cur_sprite_move()
+    {
+        return sprite_info->move_array + cur_dir;
+    }
+    SpriteAttack *cur_sprite_attack()
+    {
+        return sprite_info->attack_array[cur_attack] + cur_dir;
+    }
+    SpriteStop *cur_sprite_stop()
+    {
+        return sprite_info->stop_array + cur_dir;
+    }
+    SpriteDie *cur_sprite_die()
+    {
+        return &(sprite_info->die);
+    }
+    SpriteFrame *cur_sprite_frame(int *needMirror = 0);
 
-  //----------- static variables -------------//
+    //----------- static variables -------------//
 
-  static short abs_x1,
-      abs_y1; // the absolute postion, taking in account of sprite offset
-  static short abs_x2, abs_y2;
+    static short abs_x1,
+        abs_y1; // the absolute postion, taking in account of sprite offset
+    static short abs_x2, abs_y2;
 
-public:
-  Sprite();
-  virtual ~Sprite();
+  public:
+    Sprite();
+    virtual ~Sprite();
 
-  void init(short spriteId, short startX, short startY);
-  void deinit();
+    void init(short spriteId, short startX, short startY);
+    void deinit();
 
-  virtual short get_z();
-  virtual void draw(int outLine, int drawFlag);
+    virtual short get_z();
+    virtual void draw(int outLine, int drawFlag);
 
-  // ------- special draw function to draw to screen directly -------//
+    // ------- special draw function to draw to screen directly -------//
 
-  void draw_abs(int colorSchemeId, int scrnX, int scrnY, int clipX1, int clipY1,
-                int clipX2, int clipY2);
-  int get_abs_rect(int scrnX, int scrnY, int clipX1, int clipY1, int clipX2,
-                   int clipY2, int *rectX1, int *rectY1, int *rectX2,
-                   int *rectY2);
+    void draw_abs(int colorSchemeId, int scrnX, int scrnY, int clipX1, int clipY1, int clipX2, int clipY2);
+    int get_abs_rect(int scrnX, int scrnY, int clipX1, int clipY1, int clipX2, int clipY2, int *rectX1, int *rectY1,
+                     int *rectX2, int *rectY2);
 
-  //------------------------------------------------------------------//
+    //------------------------------------------------------------------//
 
-  void sprite_move(int desX, int desY);
+    void sprite_move(int desX, int desY);
 
-  void set_cur(int curX, int curY) {
-    cur_x = curX;
-    cur_y = curY;
-    update_abs_pos();
-  }
-  virtual int set_next(int nextX, int nextY, int para = 0,
-                       int blockedChecked = 0);
-  int move_step_magn();
+    void set_cur(int curX, int curY)
+    {
+        cur_x = curX;
+        cur_y = curY;
+        update_abs_pos();
+    }
+    virtual int set_next(int nextX, int nextY, int para = 0, int blockedChecked = 0);
+    int move_step_magn();
 
-  virtual void pre_process() { ; }
-  virtual void process_idle();
-  virtual void process_move();
-  virtual void process_wait() { ; }
-  virtual int process_attack();
-  virtual int process_die();
-  void process_turn();
-  virtual void process_extra_move() { ; } // for ship only
+    virtual void pre_process()
+    {
+        ;
+    }
+    virtual void process_idle();
+    virtual void process_move();
+    virtual void process_wait()
+    {
+        ;
+    }
+    virtual int process_attack();
+    virtual int process_die();
+    void process_turn();
+    virtual void process_extra_move()
+    {
+        ;
+    } // for ship only
 
-  void set_dir(int curX, int curY, int destX, int destY);
-  void set_dir(UCHAR newDir); //	 overloading function
-  static int get_dir(int curX, int curY, int destX, int destY);
-  int is_dir_correct();
-  int match_dir();
+    void set_dir(int curX, int curY, int destX, int destY);
+    void set_dir(UCHAR newDir); //	 overloading function
+    static int get_dir(int curX, int curY, int destX, int destY);
+    int is_dir_correct();
+    int match_dir();
 
-  virtual void set_remain_attack_delay() { ; }
-  virtual void update_abs_pos(SpriteFrame * = 0);
+    virtual void set_remain_attack_delay()
+    {
+        ;
+    }
+    virtual void update_abs_pos(SpriteFrame * = 0);
 
-  UCHAR display_dir();
-  int need_mirror(UCHAR dispDir);
+    UCHAR display_dir();
+    int need_mirror(UCHAR dispDir);
 
-  void set_guard_on();
-  void set_guard_off();
-  int is_guarding() { return guard_count > 0; }
-  bool is_freezed() { return freeze_frame_left > 0; }
-  virtual int is_stealth();
+    void set_guard_on();
+    void set_guard_off();
+    int is_guarding()
+    {
+        return guard_count > 0;
+    }
+    bool is_freezed()
+    {
+        return freeze_frame_left > 0;
+    }
+    virtual int is_stealth();
 
-  virtual int sprite_speed() { return sprite_info->speed; }
+    virtual int sprite_speed()
+    {
+        return sprite_info->speed;
+    }
 
-  //-------------- multiplayer checking codes ---------------//
+    //-------------- multiplayer checking codes ---------------//
 
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 
-private:
-  virtual void cycle_eqv_attack() { ; }
+  private:
+    virtual void cycle_eqv_attack()
+    {
+        ;
+    }
 };
 #pragma pack()
 
 //------- Define class SpriteArray ---------//
 
-class SpriteArray : public DynArrayB {
-public:
-  short restart_recno; // indicate the unit's sprite_recno to process first in
-                       // next process_cycle
+class SpriteArray : public DynArrayB
+{
+  public:
+    short restart_recno; // indicate the unit's sprite_recno to process first in
+                         // next process_cycle
 
-  SpriteArray(int initArraySize);
-  ~SpriteArray();
+    SpriteArray(int initArraySize);
+    ~SpriteArray();
 
-  void init();
-  void deinit();
+    void init();
+    void deinit();
 
-  void add(Sprite *);
-  void add_sorted(Sprite *);
+    void add(Sprite *);
+    void add_sorted(Sprite *);
 
-  virtual void del(int);
-  virtual void die(int spriteRecno) { del(spriteRecno); }
-  virtual void process();
+    virtual void del(int);
+    virtual void die(int spriteRecno)
+    {
+        del(spriteRecno);
+    }
+    virtual void process();
 
 #ifdef DEBUG
-  Sprite *operator[](int recNo);
+    Sprite *operator[](int recNo);
 #else
-  Sprite *operator[](int recNo) { return (Sprite *)get_ptr(recNo); }
+    Sprite *operator[](int recNo)
+    {
+        return (Sprite *)get_ptr(recNo);
+    }
 #endif
 
-  int is_deleted(int recNo) { return get_ptr(recNo) == NULL; }
+    int is_deleted(int recNo)
+    {
+        return get_ptr(recNo) == NULL;
+    }
 };
 
 //------------------------------------------//

@@ -31,18 +31,22 @@
 //----------- Define class Monster -----------//
 
 #pragma pack(1)
-class UnitMonster : public Unit {
-public:
-  const char *unit_name(int withTitle = 1, int firstNameOnly = 0);
+class UnitMonster : public Unit
+{
+  public:
+    const char *unit_name(int withTitle = 1, int firstNameOnly = 0);
 
-  //---------- multiplayer checking codes ---------//
+    //---------- multiplayer checking codes ---------//
 
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 
-  //--------- casting function ----------//
+    //--------- casting function ----------//
 
-  UnitMonster *cast_to_UnitMonster() { return this; }
+    UnitMonster *cast_to_UnitMonster()
+    {
+        return this;
+    }
 };
 #pragma pack()
 

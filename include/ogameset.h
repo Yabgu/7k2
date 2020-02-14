@@ -34,59 +34,85 @@
 
 //-------- Define struct SetRec ---------//
 
-struct SetRec {
-  enum { CODE_LEN = 8, DES_LEN = 60 };
+struct SetRec
+{
+    enum
+    {
+        CODE_LEN = 8,
+        DES_LEN = 60
+    };
 
-  char code[CODE_LEN];
-  char des[DES_LEN];
+    char code[CODE_LEN];
+    char des[DES_LEN];
 };
 
 //-------- Define struct SetInfo ---------//
 
-struct SetInfo {
-  enum { CODE_LEN = 8, DES_LEN = 60 };
+struct SetInfo
+{
+    enum
+    {
+        CODE_LEN = 8,
+        DES_LEN = 60
+    };
 
-  char code[CODE_LEN + 1];
-  char des[DES_LEN + 1];
+    char code[CODE_LEN + 1];
+    char des[DES_LEN + 1];
 };
 
 //-------- Define class GameSet ---------//
 
-class GameSet {
-public:
-  char init_flag;
-  short cur_set_id;
+class GameSet
+{
+  public:
+    char init_flag;
+    short cur_set_id;
 
-  short set_count;
-  SetInfo *set_info_array;
+    short set_count;
+    SetInfo *set_info_array;
 
-  ResourceIdx set_res;
-  Database set_db;
+    ResourceIdx set_res;
+    Database set_db;
 
-  char set_opened_flag;
+    char set_opened_flag;
 
-public:
-  GameSet() { init_flag = 0; }
-  ~GameSet() { deinit(); }
+  public:
+    GameSet()
+    {
+        init_flag = 0;
+    }
+    ~GameSet()
+    {
+        deinit();
+    }
 
-  void init();
-  void deinit();
+    void init();
+    void deinit();
 
-  char *cur_set_code() { return set_info_array[cur_set_id - 1].code; }
+    char *cur_set_code()
+    {
+        return set_info_array[cur_set_id - 1].code;
+    }
 
-  void open_set(int);
-  void close_set();
+    void open_set(int);
+    void close_set();
 
-  Database *open_db(const char *);
-  Database *get_db();
+    Database *open_db(const char *);
+    Database *get_db();
 
-  int find_set(const char *);
+    int find_set(const char *);
 
-  SetInfo *operator()() { return set_info_array + cur_set_id - 1; }
-  SetInfo *operator[](int recNo) { return set_info_array + recNo - 1; }
+    SetInfo *operator()()
+    {
+        return set_info_array + cur_set_id - 1;
+    }
+    SetInfo *operator[](int recNo)
+    {
+        return set_info_array + recNo - 1;
+    }
 
-private:
-  void load_set_header();
+  private:
+    void load_set_header();
 };
 
 //---------------------------------------//

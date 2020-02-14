@@ -36,15 +36,16 @@ ButtonCustom customButton1;
 
 //-------- Begin of function ButtonCustom::ButtonCustom -------//
 //
-ButtonCustom::ButtonCustom() : custom_para(NULL, 0) {
-  init_flag = 0;
-  enable_flag = 0;
-  button_key = 0;
-  help_code[0] = '\0';
-  // ##### begin Gilbert 11/9 ######//
-  visible_flag = 1;
-  painted_flag = 0;
-  // ##### end Gilbert 11/9 ######//
+ButtonCustom::ButtonCustom() : custom_para(NULL, 0)
+{
+    init_flag = 0;
+    enable_flag = 0;
+    button_key = 0;
+    help_code[0] = '\0';
+    // ##### begin Gilbert 11/9 ######//
+    visible_flag = 1;
+    painted_flag = 0;
+    // ##### end Gilbert 11/9 ######//
 }
 //--------- End of function ButtonCustom::ButtonCustom -------//
 
@@ -60,29 +61,29 @@ ButtonCustom::ButtonCustom() : custom_para(NULL, 0) {
 // [char]   defIsPushed = default pushed_flag : 1-Pushed, 0-Non-pushed
 //                       (default : 0)
 //
-void ButtonCustom::create(int pX1, int pY1, int pX2, int pY2,
-                          ButtonCustomFP funcPtr, ButtonCustomPara funcPara,
-                          char elasticFlag, char defIsPushed) {
-  init_flag = 1;
+void ButtonCustom::create(int pX1, int pY1, int pX2, int pY2, ButtonCustomFP funcPtr, ButtonCustomPara funcPara,
+                          char elasticFlag, char defIsPushed)
+{
+    init_flag = 1;
 
-  //--------- set button size --------//
+    //--------- set button size --------//
 
-  x1 = pX1;
-  y1 = pY1;
-  x2 = pX2;
-  y2 = pY2;
+    x1 = pX1;
+    y1 = pY1;
+    x2 = pX2;
+    y2 = pY2;
 
-  //------ set button parameters -----//
+    //------ set button parameters -----//
 
-  body_fp = funcPtr;
-  custom_para = funcPara;
-  elastic_flag = elasticFlag;
-  pushed_flag = defIsPushed;
-  enable_flag = 1;
-  // ##### begin Gilbert 11/9 ######//
-  visible_flag = 1;
-  painted_flag = 0;
-  // ##### end Gilbert 11/9 ######//
+    body_fp = funcPtr;
+    custom_para = funcPara;
+    elastic_flag = elasticFlag;
+    pushed_flag = defIsPushed;
+    enable_flag = 1;
+    // ##### begin Gilbert 11/9 ######//
+    visible_flag = 1;
+    painted_flag = 0;
+    // ##### end Gilbert 11/9 ######//
 }
 //--------- End of function ButtonCustom::create --------//
 
@@ -92,39 +93,41 @@ void ButtonCustom::create(int pX1, int pY1, int pX2, int pY2,
 //                       (default : pushed_flag)
 // [int] repaintBody = parameter passed to body_fp, (default 0)
 //
-void ButtonCustom::paint(int defIsPushed, int repaintBody) {
-  if (!init_flag)
-    return;
+void ButtonCustom::paint(int defIsPushed, int repaintBody)
+{
+    if (!init_flag)
+        return;
 
-  // ####### begin Gilbert 11/9 ######//
-  if (defIsPushed >= 0)
-    pushed_flag = defIsPushed;
+    // ####### begin Gilbert 11/9 ######//
+    if (defIsPushed >= 0)
+        pushed_flag = defIsPushed;
 
-  if (!visible_flag) {
-    painted_flag = 0;
-    return;
-  }
-  // ####### end Gilbert 11/9 ######//
+    if (!visible_flag)
+    {
+        painted_flag = 0;
+        return;
+    }
+    // ####### end Gilbert 11/9 ######//
 
-  if (!vga.use_back_buf)
-    mouse.hide_area(x1, y1, x2, y2);
+    if (!vga.use_back_buf)
+        mouse.hide_area(x1, y1, x2, y2);
 
-  //------ display the button button -------//
+    //------ display the button button -------//
 
-  (*body_fp)(this, repaintBody);
+    (*body_fp)(this, repaintBody);
 
-  //--------------------------------------//
+    //--------------------------------------//
 
-  if (!vga.use_back_buf)
-    mouse.show_area();
+    if (!vga.use_back_buf)
+        mouse.show_area();
 
-  // #### begin Gilbert 11/9 ########//
-  painted_flag = 1;
-  // #### end Gilbert 11/9 ########//
+    // #### begin Gilbert 11/9 ########//
+    painted_flag = 1;
+    // #### end Gilbert 11/9 ########//
 
 #ifndef NO_REAL_TIME_UPDATE
-  if (!vga.use_back_buf)
-    sys.blt_virtual_buf_area(x1, y1, x2, y2);
+    if (!vga.use_back_buf)
+        sys.blt_virtual_buf_area(x1, y1, x2, y2);
 #endif
 }
 //---------- End of function ButtonCustom::paint -----------//
@@ -152,94 +155,98 @@ void ButtonCustom::paint(int defIsPushed, int repaintBody) {
 //          3 - the key is pressed (only when keyCode is specified)
 //          0 - if not
 //
-int ButtonCustom::detect(unsigned keyCode1, unsigned keyCode2, int detectRight,
-                         int suspendPop) {
-  int rc = 0;
+int ButtonCustom::detect(unsigned keyCode1, unsigned keyCode2, int detectRight, int suspendPop)
+{
+    int rc = 0;
 
-  if (!init_flag)
-    return 0;
+    if (!init_flag)
+        return 0;
 
-  // ###### begin Gilbert 11/9 ######//
-  if (!visible_flag || !painted_flag)
-    return 0;
-  // ###### end Gilbert 11/9 ######//
+    // ###### begin Gilbert 11/9 ######//
+    if (!visible_flag || !painted_flag)
+        return 0;
+    // ###### end Gilbert 11/9 ######//
 
-  if (help_code[0])
-    help.set_help(x1, y1, x2, y2, help_code);
+    if (help_code[0])
+        help.set_help(x1, y1, x2, y2, help_code);
 
-  if (!enable_flag)
-    return 0;
+    if (!enable_flag)
+        return 0;
 
-  if (mouse.any_click(x1, y1, x2, y2, LEFT_BUTTON))
-    rc = 1;
+    if (mouse.any_click(x1, y1, x2, y2, LEFT_BUTTON))
+        rc = 1;
 
-  else if (detectRight && mouse.any_click(x1, y1, x2, y2, RIGHT_BUTTON))
-    rc = 2;
+    else if (detectRight && mouse.any_click(x1, y1, x2, y2, RIGHT_BUTTON))
+        rc = 2;
 
-  else if (mouse.key_code) {
-    unsigned mouseKey = mouse.key_code;
+    else if (mouse.key_code)
+    {
+        unsigned mouseKey = mouse.key_code;
 
-    if (mouseKey >= 'a' && mouseKey <= 'z') // non-case sensitive comparsion
-      mouseKey -= 32; // convert from lower case to upper case
+        if (mouseKey >= 'a' && mouseKey <= 'z') // non-case sensitive comparsion
+            mouseKey -= 32;                     // convert from lower case to upper case
 
-    if (mouseKey == keyCode1 || mouseKey == keyCode2 ||
-        mouseKey == button_key) {
-      rc = 3;
+        if (mouseKey == keyCode1 || mouseKey == keyCode2 || mouseKey == button_key)
+        {
+            rc = 3;
+        }
     }
-  }
 
-  if (!rc)
-    return 0;
+    if (!rc)
+        return 0;
 
-    //----- paint the button with pressed shape ------//
+        //----- paint the button with pressed shape ------//
 
 #define PRESSED_TIMEOUT_SECONDS 1 // 1 seconds
-  DWORD timeOutTime = misc.get_time() + PRESSED_TIMEOUT_SECONDS * 1000;
-
-  if (elastic_flag) {
-    if (!pushed_flag)
-      paint(1);
-
-    while ((rc == 1 && mouse.left_press) || (rc == 2 && mouse.right_press)) {
-      sys.yield();
-      mouse.get_event();
-      // when timeout or release the button will press the button
-      if (misc.get_time() >= timeOutTime)
-        break;
-      // leave the rectangle, cancel press
-      if (mouse.cur_x < x1 || mouse.cur_x > x2 || mouse.cur_y < y1 ||
-          mouse.cur_y > y2) {
-        rc = 0;
-        break;
-      }
-    }
+    DWORD timeOutTime = misc.get_time() + PRESSED_TIMEOUT_SECONDS * 1000;
 
     if (elastic_flag)
-      paint(0);
-  } else // inelastic_flag button
-  {
-    if (suspendPop)
-      pushed_flag = 1;
-    else
-      pushed_flag = !pushed_flag;
+    {
+        if (!pushed_flag)
+            paint(1);
 
-    paint(pushed_flag);
+        while ((rc == 1 && mouse.left_press) || (rc == 2 && mouse.right_press))
+        {
+            sys.yield();
+            mouse.get_event();
+            // when timeout or release the button will press the button
+            if (misc.get_time() >= timeOutTime)
+                break;
+            // leave the rectangle, cancel press
+            if (mouse.cur_x < x1 || mouse.cur_x > x2 || mouse.cur_y < y1 || mouse.cur_y > y2)
+            {
+                rc = 0;
+                break;
+            }
+        }
 
-    while ((rc == 1 && mouse.left_press) || (rc == 2 && mouse.right_press)) {
-      sys.yield();
-      mouse.get_event();
-
-      if (misc.get_time() >= timeOutTime)
-        break;
+        if (elastic_flag)
+            paint(0);
     }
-  }
+    else // inelastic_flag button
+    {
+        if (suspendPop)
+            pushed_flag = 1;
+        else
+            pushed_flag = !pushed_flag;
 
-  if (game.game_mode != GAME_TUTORIAL ||
-      (game.game_mode == GAME_TUTORIAL &&
-       tutor.allow_button_click(x1, y1, x2, y2, help_code, rc)))
-    return rc;
-  else
-    return 0;
+        paint(pushed_flag);
+
+        while ((rc == 1 && mouse.left_press) || (rc == 2 && mouse.right_press))
+        {
+            sys.yield();
+            mouse.get_event();
+
+            if (misc.get_time() >= timeOutTime)
+                break;
+        }
+    }
+
+    if (game.game_mode != GAME_TUTORIAL ||
+        (game.game_mode == GAME_TUTORIAL && tutor.allow_button_click(x1, y1, x2, y2, help_code, rc)))
+        return rc;
+    else
+        return 0;
 }
 //----------- End of function ButtonCustom::detect -------------//
 
@@ -247,17 +254,18 @@ int ButtonCustom::detect(unsigned keyCode1, unsigned keyCode2, int detectRight,
 //
 // Disable and hide the button.
 //
-void ButtonCustom::hide() {
-  if (!init_flag)
-    return;
+void ButtonCustom::hide()
+{
+    if (!init_flag)
+        return;
 
-  vga_util.blt_buf(x1, y1, x2, y2, 0);
+    vga_util.blt_buf(x1, y1, x2, y2, 0);
 
-  // #### begin Gilbert 11/9 ######//
-  // enable_flag = 0;
-  visible_flag = 0;
-  painted_flag = 0;
-  // #### end Gilbert 11/9 ######//
+    // #### begin Gilbert 11/9 ######//
+    // enable_flag = 0;
+    visible_flag = 0;
+    painted_flag = 0;
+    // #### end Gilbert 11/9 ######//
 }
 //----------- End of function ButtonCustom::hide -------------//
 
@@ -265,23 +273,25 @@ void ButtonCustom::hide() {
 //
 // unhide and show the button.
 //
-void ButtonCustom::unhide() {
-  if (!init_flag)
-    return;
+void ButtonCustom::unhide()
+{
+    if (!init_flag)
+        return;
 
-  visible_flag = 1;
-  painted_flag = 0;
+    visible_flag = 1;
+    painted_flag = 0;
 
-  paint();
+    paint();
 }
 //----------- End of function ButtonCustom::hide -------------//
 
 //-------- Begin of function ButtonCustom::set_help_code -------//
 //
-void ButtonCustom::set_help_code(const char *helpCode) {
-  strncpy(help_code, helpCode, HELP_CODE_LEN);
+void ButtonCustom::set_help_code(const char *helpCode)
+{
+    strncpy(help_code, helpCode, HELP_CODE_LEN);
 
-  help_code[HELP_CODE_LEN] = '\0';
+    help_code[HELP_CODE_LEN] = '\0';
 }
 //--------- End of function ButtonCustom::set_help_code --------//
 
@@ -292,26 +302,29 @@ void ButtonCustom::set_help_code(const char *helpCode) {
 //
 // button->custom_para.ptr is the pointer of char
 //
-void ButtonCustom::disp_text_button_func(ButtonCustom *button,
-                                         int repaintBody) {
-  int x1 = button->x1;
-  int y1 = button->y1;
-  int x2 = button->x2;
-  int y2 = button->y2;
+void ButtonCustom::disp_text_button_func(ButtonCustom *button, int repaintBody)
+{
+    int x1 = button->x1;
+    int y1 = button->y1;
+    int x2 = button->x2;
+    int y2 = button->y2;
 
-  // modify x1,y1, x2,y2 to the button body
-  if (button->pushed_flag) {
-    vga_util.d3_panel2_down(x1, y1, x2, y2);
-    x1++;
-    y1++;
-  } else {
-    vga_util.d3_panel2_up(x1, y1, x2, y2);
-    x2--;
-    y2--;
-  }
+    // modify x1,y1, x2,y2 to the button body
+    if (button->pushed_flag)
+    {
+        vga_util.d3_panel2_down(x1, y1, x2, y2);
+        x1++;
+        y1++;
+    }
+    else
+    {
+        vga_util.d3_panel2_up(x1, y1, x2, y2);
+        x2--;
+        y2--;
+    }
 
-  // put name
-  font_bible.center_put(x1, y1, x2, y2, (const char *)button->custom_para.ptr);
+    // put name
+    font_bible.center_put(x1, y1, x2, y2, (const char *)button->custom_para.ptr);
 }
 //----------- End of function ButtonCustom::disp_text_button_func
 //-------------//
@@ -323,28 +336,31 @@ void ButtonCustom::disp_text_button_func(ButtonCustom *button,
 //
 // button->custom_para.ptr is the pointer of char
 //
-void ButtonCustom::disp_text2_button_func(ButtonCustom *button,
-                                          int repaintBody) {
-  int x1 = button->x1;
-  int y1 = button->y1;
-  int x2 = button->x2;
-  int y2 = button->y2;
+void ButtonCustom::disp_text2_button_func(ButtonCustom *button, int repaintBody)
+{
+    int x1 = button->x1;
+    int y1 = button->y1;
+    int x2 = button->x2;
+    int y2 = button->y2;
 
-  // modify x1,y1, x2,y2 to the button body
-  if (button->pushed_flag) {
-    vga_front.blt_buf_bright(&vga_back, x1, y1, x2, y2, -4);
-    vga_front.d3_panel_down(x1, y1, x2, y2, 2, 0);
-    x1++;
-    y1++;
-  } else {
-    vga_front.blt_buf_bright(&vga_back, x1, y1, x2, y2, 4);
-    vga_front.d3_panel_up(x1, y1, x2, y2, 2, 0);
-    x2--;
-    y2--;
-  }
+    // modify x1,y1, x2,y2 to the button body
+    if (button->pushed_flag)
+    {
+        vga_front.blt_buf_bright(&vga_back, x1, y1, x2, y2, -4);
+        vga_front.d3_panel_down(x1, y1, x2, y2, 2, 0);
+        x1++;
+        y1++;
+    }
+    else
+    {
+        vga_front.blt_buf_bright(&vga_back, x1, y1, x2, y2, 4);
+        vga_front.d3_panel_up(x1, y1, x2, y2, 2, 0);
+        x2--;
+        y2--;
+    }
 
-  // put name
-  font_bible.center_put(x1, y1, x2, y2, (const char *)button->custom_para.ptr);
+    // put name
+    font_bible.center_put(x1, y1, x2, y2, (const char *)button->custom_para.ptr);
 }
 //----------- End of function ButtonCustom::disp_text2_button_func
 //-------------//
@@ -353,17 +369,21 @@ void ButtonCustom::disp_text2_button_func(ButtonCustom *button,
 
 //-------- Begin of function ButtonCustomGroup::ButtonCustomGroup -------//
 
-ButtonCustomGroup::ButtonCustomGroup(int buttonNum) {
-  button_pressed = 0;
-  button_num = buttonNum;
-  button_array = new ButtonCustom[buttonNum];
+ButtonCustomGroup::ButtonCustomGroup(int buttonNum)
+{
+    button_pressed = 0;
+    button_num = buttonNum;
+    button_array = new ButtonCustom[buttonNum];
 }
 //---------- End of function ButtonCustomGroup::ButtonCustomGroup -------//
 
 //----------- Begin of function ButtonCustomGroup::~ButtonCustomGroup
 //-----------//
 //
-ButtonCustomGroup::~ButtonCustomGroup() { delete[] button_array; }
+ButtonCustomGroup::~ButtonCustomGroup()
+{
+    delete[] button_array;
+}
 //-------------- End of function ButtonCustomGroup::~ButtonCustomGroup
 //----------//
 
@@ -374,14 +394,15 @@ ButtonCustomGroup::~ButtonCustomGroup() { delete[] button_array; }
 // [int] buttonPressed = the default pressed button
 //                       (default no change to button_pressed)
 //
-void ButtonCustomGroup::paint(int buttonPressed) {
-  int i;
+void ButtonCustomGroup::paint(int buttonPressed)
+{
+    int i;
 
-  if (buttonPressed >= 0)
-    button_pressed = buttonPressed;
+    if (buttonPressed >= 0)
+        button_pressed = buttonPressed;
 
-  for (i = 0; i < button_num; i++)
-    button_array[i].paint(button_pressed == i);
+    for (i = 0; i < button_num; i++)
+        button_array[i].paint(button_pressed == i);
 }
 //----------- End of function ButtonCustomGroup::paint ----------//
 
@@ -395,19 +416,22 @@ void ButtonCustomGroup::paint(int buttonPressed) {
 // Return : <int> -1  - if no button pressed
 //                >=0 - the record no. of the button pressed
 //
-int ButtonCustomGroup::detect() {
-  int i;
+int ButtonCustomGroup::detect()
+{
+    int i;
 
-  for (i = 0; i < button_num; i++) {
-    if (!button_array[i].pushed_flag && button_array[i].detect()) {
-      if (button_pressed >= 0 && button_pressed < button_num)
-        button_array[button_pressed].pop();
-      button_pressed = i;
-      return i;
+    for (i = 0; i < button_num; i++)
+    {
+        if (!button_array[i].pushed_flag && button_array[i].detect())
+        {
+            if (button_pressed >= 0 && button_pressed < button_num)
+                button_array[button_pressed].pop();
+            button_pressed = i;
+            return i;
+        }
     }
-  }
 
-  return -1;
+    return -1;
 }
 //----------- End of function ButtonCustomGroup::detect ----------//
 
@@ -417,26 +441,32 @@ int ButtonCustomGroup::detect() {
 //
 // <int> buttonId = Id. of the button.
 //
-void ButtonCustomGroup::push(int buttonId, int paintFlag) {
-  int i;
+void ButtonCustomGroup::push(int buttonId, int paintFlag)
+{
+    int i;
 
-  button_pressed = buttonId;
+    button_pressed = buttonId;
 
-  if (paintFlag) {
-    for (i = 0; i < button_num; i++) {
-      if (i == buttonId)
-        button_array[i].push();
-      else
-        button_array[i].pop();
+    if (paintFlag)
+    {
+        for (i = 0; i < button_num; i++)
+        {
+            if (i == buttonId)
+                button_array[i].push();
+            else
+                button_array[i].pop();
+        }
     }
-  } else {
-    for (i = 0; i < button_num; i++) {
-      if (i == buttonId)
-        button_array[i].pushed_flag = 1;
-      else
-        button_array[i].pushed_flag = 0;
+    else
+    {
+        for (i = 0; i < button_num; i++)
+        {
+            if (i == buttonId)
+                button_array[i].pushed_flag = 1;
+            else
+                button_array[i].pushed_flag = 0;
+        }
     }
-  }
 }
 //----------- End of function ButtonCustomGroup::push ----------//
 
@@ -444,9 +474,10 @@ void ButtonCustomGroup::push(int buttonId, int paintFlag) {
 //
 // <int> buttonId = Id. of the button, start from 0
 //
-ButtonCustom &ButtonCustomGroup::operator[](int buttonId) {
-  err_when(buttonId < 0 || buttonId >= button_num);
+ButtonCustom &ButtonCustomGroup::operator[](int buttonId)
+{
+    err_when(buttonId < 0 || buttonId >= button_num);
 
-  return button_array[buttonId];
+    return button_array[buttonId];
 }
 //----------- End of function ButtonCustomGroup::operator[] ----------//

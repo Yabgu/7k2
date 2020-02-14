@@ -37,34 +37,44 @@
 
 //--------------------------------------//
 
-class FileTxt : public File {
-public:
-  char *data_ptr;
+class FileTxt : public File
+{
+  public:
+    char *data_ptr;
 
-private:
-  enum { MAX_TOKEN_LEN = 30 };
+  private:
+    enum
+    {
+        MAX_TOKEN_LEN = 30
+    };
 
-  char *data_buf;
-  char token_buf[MAX_TOKEN_LEN];
+    char *data_buf;
+    char token_buf[MAX_TOKEN_LEN];
 
-  long file_length;
+    long file_length;
 
-public:
-  FileTxt(char *fileName);
-  FileTxt(File *filePtr, int dataSize);
-  ~FileTxt();
+  public:
+    FileTxt(char *fileName);
+    FileTxt(File *filePtr, int dataSize);
+    ~FileTxt();
 
-  char *next_line();
-  char *locate_word(char *);
+    char *next_line();
+    char *locate_word(char *);
 
-  char get_char(int = 1);
-  char *get_token(int = 1);
-  double get_num();
-  void read_line(char *, int);
-  int read_paragraph(char *, int);
+    char get_char(int = 1);
+    char *get_token(int = 1);
+    double get_num();
+    void read_line(char *, int);
+    int read_paragraph(char *, int);
 
-  long file_size() { return file_length; }
-  int is_eof() { return *data_ptr == CHAR_EOF; }
+    long file_size()
+    {
+        return file_length;
+    }
+    int is_eof()
+    {
+        return *data_ptr == CHAR_EOF;
+    }
 };
 
 #endif

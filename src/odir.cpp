@@ -41,8 +41,9 @@ static int sort_file_function(const void *a, const void *b);
 
 //------- Begin of function Directory::Directory -------//
 
-Directory::Directory(const boost::filesystem::path &base)
-    : DynArray(sizeof(FileInfo), 20), base(base) {}
+Directory::Directory(const boost::filesystem::path &base) : DynArray(sizeof(FileInfo), 20), base(base)
+{
+}
 
 //-------- End of function Directory::Directory -------//
 
@@ -56,28 +57,30 @@ Directory::Directory(const boost::filesystem::path &base)
 //
 // return : <int> the no. of files matched the file spec.
 //
-int Directory::read(const char *fileSpec, int sortName) {
-  FileInfo fileInfo;
-  MSG("Listing Directory %s sortName=%d\n", fileSpec, sortName);
+int Directory::read(const char *fileSpec, int sortName)
+{
+    FileInfo fileInfo;
+    MSG("Listing Directory %s sortName=%d\n", fileSpec, sortName);
 
-  struct stat file_stat;
-  stat(fileSpec, &file_stat);
+    struct stat file_stat;
+    stat(fileSpec, &file_stat);
 
-  strncpy(fileInfo.name, fileSpec, sizeof(fileInfo.name));
+    strncpy(fileInfo.name, fileSpec, sizeof(fileInfo.name));
 
-  fileInfo.size = file_stat.st_size;
-  fileInfo.time.dwLowDateTime = 0;
-  fileInfo.time.dwHighDateTime = 0;
+    fileInfo.size = file_stat.st_size;
+    fileInfo.time.dwLowDateTime = 0;
+    fileInfo.time.dwHighDateTime = 0;
 
-  linkin(&fileInfo);
+    linkin(&fileInfo);
 
-  return size(); // DynArray::size()
+    return size(); // DynArray::size()
 }
 //-------- End of function Directory::read -------//
 
 //------ Begin of function sort_file_function ------//
 //
-static int sort_file_function(const void *a, const void *b) {
-  return strcmpi(((FileInfo *)a)->name, ((FileInfo *)b)->name);
+static int sort_file_function(const void *a, const void *b)
+{
+    return strcmpi(((FileInfo *)a)->name, ((FileInfo *)b)->name);
 }
 //------- End of function sort_file_function ------//

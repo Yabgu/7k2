@@ -26,12 +26,13 @@
 
 #include <otxtres.h>
 
-class TextResItem : public TextResource {
-public:
-  void init();
+class TextResItem : public TextResource
+{
+  public:
+    void init();
 
-  const char *str_item_name(int itemId);
-  const char *str_item_desc(int itemId);
+    const char *str_item_name(int itemId);
+    const char *str_item_desc(int itemId);
 };
 
 extern TextResItem text_item;

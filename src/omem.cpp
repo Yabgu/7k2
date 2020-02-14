@@ -44,32 +44,33 @@
 // pointers loaded with these values will cause an obvious crash.
 // MALLOCVAL is the value to set malloc'd data to.
 
-#define BAD_VAL                                                                \
-  0xFF // set to this value for freed memory (memory that we no longer occupy)
+#define BAD_VAL 0xFF   // set to this value for freed memory (memory that we no longer occupy)
 #define ALLOC_VAL 0xEE // set to this value for memory just allocated
 
 //---------- define constant and structure --------//
 
 #define SPOOL_MEM 50 // 50 bytes spool memory for mem_add(),
 
-struct MemInfo {
-  void *ptr;     // this pointer directly point to useable buffer
-  unsigned size; // bypassing the PRE_CHK_VAL
+struct MemInfo
+{
+    void *ptr;     // this pointer directly point to useable buffer
+    unsigned size; // bypassing the PRE_CHK_VAL
 
-  const char *file_name;
-  int file_line;
+    const char *file_name;
+    int file_line;
 };
 
 //-------- BEGIN OF FUNCTION Mem::Mem ------------//
 
-Mem::Mem() {
-  info_array = (MemInfo *)malloc(sizeof(MemInfo) * 100);
+Mem::Mem()
+{
+    info_array = (MemInfo *)malloc(sizeof(MemInfo) * 100);
 
-  if (info_array == NULL)
-    err.mem();
+    if (info_array == NULL)
+        err.mem();
 
-  ptr_num = 100;
-  ptr_used = 0;
+    ptr_num = 100;
+    ptr_used = 0;
 }
 //---------- END OF FUNCTION Mem::Mem ------------//
 
@@ -79,57 +80,61 @@ Mem::Mem() {
 // <char*>    fileName = file from which the client function calls
 // <int>      fileLine = line number of the client function in the file
 //
-char *Mem::add(unsigned memSize, const char *fileName, int fileLine) {
-  // ###### begin Gilbert 29/8 ######//
-  // err_when( memSize > 1000000 );		//**BUGHERE, for temporary debugging
-  // only
-  err_when(memSize > 0x1000000);
-  // ###### end Gilbert 29/8 ######//
+char *Mem::add(unsigned memSize, const char *fileName, int fileLine)
+{
+    // ###### begin Gilbert 29/8 ######//
+    // err_when( memSize > 1000000 );		//**BUGHERE, for temporary
+    // debugging only
+    err_when(memSize > 0x1000000);
+    // ###### end Gilbert 29/8 ######//
 
-  //----------- build up memory pointer table ---------//
+    //----------- build up memory pointer table ---------//
 
-  if (ptr_used == ptr_num) {
-    ptr_num += 100;
-    if (ptr_num > 10000)
-      err.run(" Mem::add() - Too many pointers ");
+    if (ptr_used == ptr_num)
+    {
+        ptr_num += 100;
+        if (ptr_num > 10000)
+            err.run(" Mem::add() - Too many pointers ");
 
-    info_array = (MemInfo *)realloc(info_array, sizeof(MemInfo) * ptr_num);
+        info_array = (MemInfo *)realloc(info_array, sizeof(MemInfo) * ptr_num);
 
-    if (info_array == NULL)
-      err.mem();
-  }
+        if (info_array == NULL)
+            err.mem();
+    }
 
-  //----------- actually allocate memory -------------//
+    //----------- actually allocate memory -------------//
 
-  char *allocPtr;
+    char *allocPtr;
 
-  allocPtr = (char *)malloc(
-      sizeof(char) * (memSize + CHK_VAL_SIZE * 2)); // Pre-check & Post-check
+    allocPtr = (char *)malloc(sizeof(char) * (memSize + CHK_VAL_SIZE * 2)); // Pre-check & Post-check
 
-  if (allocPtr == NULL) {
-    err.mem();
-    return NULL;
-  } else {
-    // set check value before and after the allocated block,
-    // so Mem::del() can use these check value to detect
-    // underrun && overrun
+    if (allocPtr == NULL)
+    {
+        err.mem();
+        return NULL;
+    }
+    else
+    {
+        // set check value before and after the allocated block,
+        // so Mem::del() can use these check value to detect
+        // underrun && overrun
 
-    *((int *)allocPtr) = PRE_CHK_VAL;
-    *((int *)(allocPtr + CHK_VAL_SIZE + memSize)) = POST_CHK_VAL;
+        *((int *)allocPtr) = PRE_CHK_VAL;
+        *((int *)(allocPtr + CHK_VAL_SIZE + memSize)) = POST_CHK_VAL;
 
-    // fill the allocated block with a value, which may
-    // have chance to reveal some hiden bugs
+        // fill the allocated block with a value, which may
+        // have chance to reveal some hiden bugs
 
-    memset(allocPtr + CHK_VAL_SIZE, ALLOC_VAL, memSize);
+        memset(allocPtr + CHK_VAL_SIZE, ALLOC_VAL, memSize);
 
-    info_array[ptr_used].ptr = allocPtr + CHK_VAL_SIZE;
-    info_array[ptr_used].size = memSize;
-    info_array[ptr_used].file_name = fileName;
-    info_array[ptr_used].file_line = fileLine;
-    ptr_used++;
+        info_array[ptr_used].ptr = allocPtr + CHK_VAL_SIZE;
+        info_array[ptr_used].size = memSize;
+        info_array[ptr_used].file_name = fileName;
+        info_array[ptr_used].file_line = fileLine;
+        ptr_used++;
 
-    return allocPtr + CHK_VAL_SIZE;
-  }
+        return allocPtr + CHK_VAL_SIZE;
+    }
 }
 //---------- END OF FUNCTION Mem::add ---------------//
 
@@ -141,55 +146,59 @@ char *Mem::add(unsigned memSize, const char *fileName, int fileLine) {
 // <char*>    fileName = file from which the client function calls
 // <int>      fileLine = line number of the client function in the file
 //
-char *Mem::add_clear(unsigned memSize, const char *fileName, int fileLine) {
-  // err_when( memSize > 1000000 );		//**BUGHERE, for temporary debugging
-  // only
-  err_when(memSize > 0x800000);
+char *Mem::add_clear(unsigned memSize, const char *fileName, int fileLine)
+{
+    // err_when( memSize > 1000000 );		//**BUGHERE, for temporary
+    // debugging only
+    err_when(memSize > 0x800000);
 
-  //----------- build up memory pointer table ---------//
+    //----------- build up memory pointer table ---------//
 
-  if (ptr_used == ptr_num) {
-    ptr_num += 100;
-    if (ptr_num > 10000)
-      err.run(" Mem::add_clear() - Too many pointers ");
+    if (ptr_used == ptr_num)
+    {
+        ptr_num += 100;
+        if (ptr_num > 10000)
+            err.run(" Mem::add_clear() - Too many pointers ");
 
-    info_array = (MemInfo *)realloc(info_array, sizeof(MemInfo) * ptr_num);
+        info_array = (MemInfo *)realloc(info_array, sizeof(MemInfo) * ptr_num);
 
-    if (info_array == NULL)
-      err.mem();
-  }
+        if (info_array == NULL)
+            err.mem();
+    }
 
-  //----------- actually allocate memory -------------//
+    //----------- actually allocate memory -------------//
 
-  char *allocPtr;
+    char *allocPtr;
 
-  allocPtr = (char *)malloc(
-      sizeof(char) * (memSize + CHK_VAL_SIZE * 2)); // Pre-check & Post-check
+    allocPtr = (char *)malloc(sizeof(char) * (memSize + CHK_VAL_SIZE * 2)); // Pre-check & Post-check
 
-  if (allocPtr == NULL) {
-    err.mem();
-    return NULL;
-  } else {
-    // set check value before and after the allocated block,
-    // so Mem::del() can use these check value to detect
-    // underrun && overrun
+    if (allocPtr == NULL)
+    {
+        err.mem();
+        return NULL;
+    }
+    else
+    {
+        // set check value before and after the allocated block,
+        // so Mem::del() can use these check value to detect
+        // underrun && overrun
 
-    *((int *)allocPtr) = PRE_CHK_VAL;
-    *((int *)(allocPtr + CHK_VAL_SIZE + memSize)) = POST_CHK_VAL;
+        *((int *)allocPtr) = PRE_CHK_VAL;
+        *((int *)(allocPtr + CHK_VAL_SIZE + memSize)) = POST_CHK_VAL;
 
-    // fill the allocated block with a value, which may
-    // have chance to reveal some hiden bugs
+        // fill the allocated block with a value, which may
+        // have chance to reveal some hiden bugs
 
-    memset(allocPtr + CHK_VAL_SIZE, 0, memSize);
+        memset(allocPtr + CHK_VAL_SIZE, 0, memSize);
 
-    info_array[ptr_used].ptr = allocPtr + CHK_VAL_SIZE;
-    info_array[ptr_used].size = memSize;
-    info_array[ptr_used].file_name = fileName;
-    info_array[ptr_used].file_line = fileLine;
-    ptr_used++;
+        info_array[ptr_used].ptr = allocPtr + CHK_VAL_SIZE;
+        info_array[ptr_used].size = memSize;
+        info_array[ptr_used].file_name = fileName;
+        info_array[ptr_used].file_line = fileLine;
+        ptr_used++;
 
-    return allocPtr + CHK_VAL_SIZE;
-  }
+        return allocPtr + CHK_VAL_SIZE;
+    }
 }
 //---------- END OF FUNCTION Mem::add_clear ---------------//
 
@@ -210,37 +219,37 @@ char *Mem::add_clear(unsigned memSize, const char *fileName, int fileLine) {
 // Returns : NULL    - not enough memory
 //           <char*> - pointer to the allocated memory
 //
-char *Mem::resize_keep_data(void *orgPtr, unsigned orgSize, unsigned newSize,
-                            const char *fileName, int fileLine) {
-  if (orgPtr == NULL)
-    return add(newSize, fileName, fileLine);
+char *Mem::resize_keep_data(void *orgPtr, unsigned orgSize, unsigned newSize, const char *fileName, int fileLine)
+{
+    if (orgPtr == NULL)
+        return add(newSize, fileName, fileLine);
 
-  if (newSize <= orgSize)
-    return resize(orgPtr, newSize, fileName, fileLine);
+    if (newSize <= orgSize)
+        return resize(orgPtr, newSize, fileName, fileLine);
 
-  //-------- save the original data first ------//
+    //-------- save the original data first ------//
 
-  char *saveBuf = (char *)malloc(sizeof(char) * (orgSize));
+    char *saveBuf = (char *)malloc(sizeof(char) * (orgSize));
 
-  memcpy(saveBuf, orgPtr, orgSize);
+    memcpy(saveBuf, orgPtr, orgSize);
 
-  //------ reallocate the memory --------//
+    //------ reallocate the memory --------//
 
-  char *newPtr = resize(orgPtr, newSize, fileName, fileLine);
+    char *newPtr = resize(orgPtr, newSize, fileName, fileLine);
 
-  //----- store the original data to the new buf -------//
-  //
-  // if the new pointer is the same as the orginal pointer
-  // the original data should be kept without any change
-  //
-  //----------------------------------------------------//
+    //----- store the original data to the new buf -------//
+    //
+    // if the new pointer is the same as the orginal pointer
+    // the original data should be kept without any change
+    //
+    //----------------------------------------------------//
 
-  if (newPtr != orgPtr)
-    memcpy(newPtr, saveBuf, orgSize);
+    if (newPtr != orgPtr)
+        memcpy(newPtr, saveBuf, orgSize);
 
-  free(saveBuf);
+    free(saveBuf);
 
-  return newPtr;
+    return newPtr;
 }
 //----------- END OF FUNCTION Mem::resize_keep_data ---------------//
 
@@ -258,50 +267,52 @@ char *Mem::resize_keep_data(void *orgPtr, unsigned orgSize, unsigned newSize,
 //        and add(), because some clients want to keep the content on the
 //        existing buffer. (e.g. DynArray)
 //
-char *Mem::resize(void *orgPtr, unsigned memSize, const char *fileName,
-                  int fileLine) {
-  // err_when( memSize > 1000000 );		//**BUGHERE, for temporary debugging
-  // only
-  err_when(memSize > 0x800000);
+char *Mem::resize(void *orgPtr, unsigned memSize, const char *fileName, int fileLine)
+{
+    // err_when( memSize > 1000000 );		//**BUGHERE, for temporary
+    // debugging only
+    err_when(memSize > 0x800000);
 
-  if (orgPtr == NULL)
-    return add(memSize, fileName, fileLine);
+    if (orgPtr == NULL)
+        return add(memSize, fileName, fileLine);
 
-  //-------------------------------------------//
+    //-------------------------------------------//
 
-  char *newPtr;
-  int i;
+    char *newPtr;
+    int i;
 
-  for (i = ptr_used - 1; i >= 0; i--) {
-    if (info_array[i].ptr == orgPtr) {
-      if (info_array[i].size != memSize) {
-        // Remember : MemInfo::ptr points directly to client buffer,
-        //            bypassing the PRE_CHK_VAL
+    for (i = ptr_used - 1; i >= 0; i--)
+    {
+        if (info_array[i].ptr == orgPtr)
+        {
+            if (info_array[i].size != memSize)
+            {
+                // Remember : MemInfo::ptr points directly to client buffer,
+                //            bypassing the PRE_CHK_VAL
 
-        newPtr = (char *)realloc((char *)orgPtr - CHK_VAL_SIZE,
-                                 memSize + CHK_VAL_SIZE * 2);
+                newPtr = (char *)realloc((char *)orgPtr - CHK_VAL_SIZE, memSize + CHK_VAL_SIZE * 2);
 
-        if (newPtr == NULL)
-          err.mem();
+                if (newPtr == NULL)
+                    err.mem();
 
-        // set the POST_CHK_VAL again as the size of it has changed
+                // set the POST_CHK_VAL again as the size of it has changed
 
-        *((int *)newPtr) = PRE_CHK_VAL;
-        *((int *)(newPtr + CHK_VAL_SIZE + memSize)) = POST_CHK_VAL;
+                *((int *)newPtr) = PRE_CHK_VAL;
+                *((int *)(newPtr + CHK_VAL_SIZE + memSize)) = POST_CHK_VAL;
 
-        info_array[i].ptr = newPtr + CHK_VAL_SIZE;
-        info_array[i].size = memSize;
-      }
+                info_array[i].ptr = newPtr + CHK_VAL_SIZE;
+                info_array[i].size = memSize;
+            }
 
-      return (char *)info_array[i].ptr;
+            return (char *)info_array[i].ptr;
+        }
     }
-  }
 
-  err.run("Mem::resize - Original memory pointer not found.\n"
-          "File name : %s, line no. : %d \n",
-          fileName, fileLine);
+    err.run("Mem::resize - Original memory pointer not found.\n"
+            "File name : %s, line no. : %d \n",
+            fileName, fileLine);
 
-  return NULL;
+    return NULL;
 }
 //----------- END OF FUNCTION Mem::resize ---------------//
 
@@ -311,46 +322,44 @@ char *Mem::resize(void *orgPtr, unsigned memSize, const char *fileName,
 // <char*>    fileName  = file from which the client function calls
 // <int>      fileLine  = line number of the client function in the file
 //
-void Mem::del(void *freePtr, const char *fileName, int fileLine) {
-  int i;
-  char *truePtr;
+void Mem::del(void *freePtr, const char *fileName, int fileLine)
+{
+    int i;
+    char *truePtr;
 
-  for (i = ptr_used - 1; i >= 0; i--) {
-    if (info_array[i].ptr == freePtr) {
-      // truePtr is the pointer actually point to the start of the allocated
-      // block, including PRE_CHK_VAL
+    for (i = ptr_used - 1; i >= 0; i--)
+    {
+        if (info_array[i].ptr == freePtr)
+        {
+            // truePtr is the pointer actually point to the start of the allocated
+            // block, including PRE_CHK_VAL
 
-      truePtr = (char *)freePtr - CHK_VAL_SIZE;
+            truePtr = (char *)freePtr - CHK_VAL_SIZE;
 
-      //---- Check for Underwrite and Overwrite error ---//
+            //---- Check for Underwrite and Overwrite error ---//
 
-      if (*((int *)truePtr) != PRE_CHK_VAL)
-        err.run("Mem::del - Memory Underwritten, File name:%s, line no.:%d\n",
-                fileName, fileLine);
+            if (*((int *)truePtr) != PRE_CHK_VAL)
+                err.run("Mem::del - Memory Underwritten, File name:%s, line no.:%d\n", fileName, fileLine);
 
-      if (*((int *)(truePtr + CHK_VAL_SIZE + info_array[i].size)) !=
-          POST_CHK_VAL)
-        err.run("Mem::del - Memory Overwritten, File name:%s, line no.:%d\n",
-                fileName, fileLine);
+            if (*((int *)(truePtr + CHK_VAL_SIZE + info_array[i].size)) != POST_CHK_VAL)
+                err.run("Mem::del - Memory Overwritten, File name:%s, line no.:%d\n", fileName, fileLine);
 
-      // fill the to be freed block with a value, which may
-      // have chance to reveal some hiden bugs
+            // fill the to be freed block with a value, which may
+            // have chance to reveal some hiden bugs
 
-      memset(truePtr + CHK_VAL_SIZE, BAD_VAL, info_array[i].size);
+            memset(truePtr + CHK_VAL_SIZE, BAD_VAL, info_array[i].size);
 
-      //--------- free it up --------------//
+            //--------- free it up --------------//
 
-      free(truePtr);
+            free(truePtr);
 
-      memmove(info_array + i, info_array + i + 1,
-              sizeof(MemInfo) * (ptr_used - i - 1));
-      ptr_used--;
-      return;
+            memmove(info_array + i, info_array + i + 1, sizeof(MemInfo) * (ptr_used - i - 1));
+            ptr_used--;
+            return;
+        }
     }
-  }
 
-  err.run("Mem::del - Free value not found, File name:%s, line no.:%d\n",
-          fileName, fileLine);
+    err.run("Mem::del - Free value not found, File name:%s, line no.:%d\n", fileName, fileLine);
 }
 //----------- END OF FUNCTION Mem::del ---------------//
 
@@ -360,31 +369,36 @@ void Mem::del(void *freePtr, const char *fileName, int fileLine) {
 //
 // <void*> memPtr   = the memory data pointer to be freed
 //
-int Mem::get_mem_size(void *memPtr) {
-  for (int i = ptr_used - 1; i >= 0; i--) {
-    if (info_array[i].ptr == memPtr)
-      return info_array[i].size;
-  }
+int Mem::get_mem_size(void *memPtr)
+{
+    for (int i = ptr_used - 1; i >= 0; i--)
+    {
+        if (info_array[i].ptr == memPtr)
+            return info_array[i].size;
+    }
 
-  err.run("Error: Mem::get_mem_size().");
+    err.run("Error: Mem::get_mem_size().");
 
-  return 0;
+    return 0;
 }
 //----------- END OF FUNCTION Mem::get_mem_size ---------------//
 
 //-------- BEGIN OF FUNCTION Mem::~Mem ------------//
 
-Mem::~Mem() {
-  if (ptr_used > 0) {
-    int i;
+Mem::~Mem()
+{
+    if (ptr_used > 0)
+    {
+        int i;
 
-    for (i = 0; i < ptr_used; i++) {
-      err.msg("Memory not freed. File name : %s, line no. : %d \n",
-              info_array[i].file_name, info_array[i].file_line);
+        for (i = 0; i < ptr_used; i++)
+        {
+            err.msg("Memory not freed. File name : %s, line no. : %d \n", info_array[i].file_name,
+                    info_array[i].file_line);
+        }
     }
-  }
 
-  free(info_array);
+    free(info_array);
 }
 
 //---------- END OF FUNCTION Mem::~Mem ------------//
@@ -427,31 +441,32 @@ void operator delete(void *memPtr)
 // Returns : NULL    - not enough memory
 //           <char*> - pointer to the allocated memory
 //
-char *mem_resize_keep_data(void *orgPtr, unsigned orgSize, unsigned newSize) {
-  if (orgPtr == NULL)
-    return (char *)malloc(newSize);
+char *mem_resize_keep_data(void *orgPtr, unsigned orgSize, unsigned newSize)
+{
+    if (orgPtr == NULL)
+        return (char *)malloc(newSize);
 
-  if (newSize <= orgSize)
-    return (char *)realloc(orgPtr, newSize);
+    if (newSize <= orgSize)
+        return (char *)realloc(orgPtr, newSize);
 
-  //-------- save the original data first ------//
+    //-------- save the original data first ------//
 
-  char *saveBuf = (char *)malloc(sizeof(char) * (orgSize));
+    char *saveBuf = (char *)malloc(sizeof(char) * (orgSize));
 
-  memcpy(saveBuf, orgPtr, orgSize);
+    memcpy(saveBuf, orgPtr, orgSize);
 
-  //------ reallocate the memory --------//
+    //------ reallocate the memory --------//
 
-  char *newPtr = (char *)realloc(orgPtr, newSize);
+    char *newPtr = (char *)realloc(orgPtr, newSize);
 
-  //----- store the original data to the new buf -------//
+    //----- store the original data to the new buf -------//
 
-  if (newPtr != orgPtr) // only when the pointer has been changed
-    memcpy(newPtr, saveBuf, orgSize);
+    if (newPtr != orgPtr) // only when the pointer has been changed
+        memcpy(newPtr, saveBuf, orgSize);
 
-  free(saveBuf);
+    free(saveBuf);
 
-  return newPtr;
+    return newPtr;
 }
 //----------- END OF FUNCTION mem_resize_keep_data ---------------//
 

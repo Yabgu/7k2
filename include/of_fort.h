@@ -44,92 +44,96 @@
 //-------- define class FirmFort --------//
 
 #pragma pack(1)
-class FirmFort : public FirmCamp {
-public:
-  // ------ archers variables --------//
+class FirmFort : public FirmCamp
+{
+  public:
+    // ------ archers variables --------//
 
-  char current_archer_count;
-  char target_archer_count;
-  short train_archer_progress;
-  DWORD last_archer_fire_frame[MAX_FORT_ARCHER];
+    char current_archer_count;
+    char target_archer_count;
+    short train_archer_progress;
+    DWORD last_archer_fire_frame[MAX_FORT_ARCHER];
 
-  //---------- AI vars ----------//
+    //---------- AI vars ----------//
 
-  char ai_recruiting_soldier;
+    char ai_recruiting_soldier;
 
-public:
-  FirmFort();
+  public:
+    FirmFort();
 
-  void init_derived();
+    void init_derived();
 
-  // -------- virtual function affecting linked town ------ //
+    // -------- virtual function affecting linked town ------ //
 
-  int resistance_adjustment();
-  int loyalty_adjustment();
+    int resistance_adjustment();
+    int loyalty_adjustment();
 
-  // -------- derived function --------//
+    // -------- derived function --------//
 
-  virtual int obj_can_attack(int offensiveAttackOnly) {
-    return offensiveAttackOnly ? 0 : current_archer_count > 0;
-  }
-  virtual FirmFort *cast_to_FirmFort() { return this; }
+    virtual int obj_can_attack(int offensiveAttackOnly)
+    {
+        return offensiveAttackOnly ? 0 : current_archer_count > 0;
+    }
+    virtual FirmFort *cast_to_FirmFort()
+    {
+        return this;
+    }
 
-  // -------- overloaded interface functions ----------//
+    // -------- overloaded interface functions ----------//
 
-  void disp_camp_info(int dispY1, int refreshFlag);
-  void detect_camp_info();
-  void disp_train_menu(int refreshFlag);
-  void detect_train_menu();
+    void disp_camp_info(int dispY1, int refreshFlag);
+    void detect_camp_info();
+    void disp_train_menu(int refreshFlag);
+    void detect_train_menu();
 
-  // ------- function of processing ------//
+    // ------- function of processing ------//
 
-  void next_day();
-  void pay_expense();
+    void next_day();
+    void pay_expense();
 
-  //----- derived function from BaseObj -----//
+    //----- derived function from BaseObj -----//
 
-  virtual void being_attack_hit(BaseObj *attackerObj, float damagePoint);
+    virtual void being_attack_hit(BaseObj *attackerObj, float damagePoint);
 
-  //---------- recuit soldier functions ----------//
+    //---------- recuit soldier functions ----------//
 
-  void recruit_soldier(int townRecno, bool specialUnit, char remoteAction,
-                       char noCost = 0);
-  int can_set_active_link(int townRecno);
-  void set_active_link(int townRecno, char remoteAction);
-  int can_recruit(int townRecno);
-  void cancel_train_soldier(int soldierId, char remoteAction);
+    void recruit_soldier(int townRecno, bool specialUnit, char remoteAction, char noCost = 0);
+    int can_set_active_link(int townRecno);
+    void set_active_link(int townRecno, char remoteAction);
+    int can_recruit(int townRecno);
+    void cancel_train_soldier(int soldierId, char remoteAction);
 
-  // -------- function on archer -------//
+    // -------- function on archer -------//
 
-  void set_target_archer(int newTargetArcher, char remoteAction);
-  void process_train_archer();
-  int return_fire(BaseObj *targetObj);
-  void kill_archer();
+    void set_target_archer(int newTargetArcher, char remoteAction);
+    void process_train_archer();
+    int return_fire(BaseObj *targetObj);
+    void kill_archer();
 
-  // ------- function returns to Bullet::init --------//
+    // ------- function returns to Bullet::init --------//
 
-  float bullet_damage();
-  short bullet_radius();
-  char bullet_fire();
-  short bullet_id();
-  short bullet_speed();
-  short bullet_init_z();
+    float bullet_damage();
+    short bullet_radius();
+    char bullet_fire();
+    short bullet_id();
+    short bullet_speed();
+    short bullet_init_z();
 
-  //----------- AI functions ----------//
+    //----------- AI functions ----------//
 
-  void process_ai();
+    void process_ai();
 
-  //------- multiplayer checking codes -------//
+    //------- multiplayer checking codes -------//
 
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 
-private:
-  //-------------- AI functions --------------//
+  private:
+    //-------------- AI functions --------------//
 
-  virtual int ai_recruit(int recruitCount);
+    virtual int ai_recruit(int recruitCount);
 
-  int think_train_archer();
+    int think_train_archer();
 };
 #pragma pack()
 

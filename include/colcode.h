@@ -28,10 +28,10 @@
 // write two bytes, MANY_TRANSPARENT_CODE and repeated_times
 
 #define TRANSPARENT_CODE 255
-#define UNIQUE_REPEAT_CODE_NUM                                                 \
-  7 // total no. of bytes used by transparent pixels and compressed transparent
-    // pixels is 7+1 (the last 1 is the first byte of the 2 bytes compression
-    // code)
+#define UNIQUE_REPEAT_CODE_NUM                                                                                         \
+    7 // total no. of bytes used by transparent pixels and compressed transparent \
+      // pixels is 7+1 (the last 1 is the first byte of the 2 bytes compression   \
+      // code)
 #define FEW_TRANSPARENT_CODE(n) (0xFF - n + 1)
 #define MANY_TRANSPARENT_CODE 0xf8
 #define MIN_TRANSPARENT_CODE 0xf8

@@ -39,88 +39,99 @@
 //------- Define struct Worker -------//
 
 #pragma pack(1)
-struct Worker {
-  short town_recno;
+struct Worker
+{
+    short town_recno;
 };
 #pragma pack()
 
 //------- Define class FirmWork -------//
 
 #pragma pack(1)
-class FirmWork : public Firm {
-public:
-  //-------- worker vars ----------//
+class FirmWork : public Firm
+{
+  public:
+    //-------- worker vars ----------//
 
-  Worker worker_array[MAX_WORKER];
-  char worker_count;        // number of workers currently working in the firm
-  char needed_worker_count; // number of workers we needed
-  char selected_worker_id;
+    Worker worker_array[MAX_WORKER];
+    char worker_count;        // number of workers currently working in the firm
+    char needed_worker_count; // number of workers we needed
+    char selected_worker_id;
 
-  short productivity;
+    short productivity;
 
-  int available_workforce();
-  int is_operating() { return productivity > 0; }
+    int available_workforce();
+    int is_operating()
+    {
+        return productivity > 0;
+    }
 
-public:
-  FirmWork();
+  public:
+    FirmWork();
 
-  void deinit_derived();
-  void free_all_people();
+    void deinit_derived();
+    void free_all_people();
 
-  //------- process function ---------//
+    //------- process function ---------//
 
-  void next_day();
-  void pay_expense();
+    void next_day();
+    void pay_expense();
 
-  virtual void process_ai();
+    virtual void process_ai();
 
-  //------- worker function ----------//
+    //------- worker function ----------//
 
-  void set_needed_worker_count(int neededWorkerCount, char remoteAction);
+    void set_needed_worker_count(int neededWorkerCount, char remoteAction);
 
-  void recruit_worker();
-  void resign_all_worker();
-  void resign_worker(int workerId);
-  void kill_all_worker();
+    void recruit_worker();
+    void resign_all_worker();
+    void resign_worker(int workerId);
+    void kill_all_worker();
 
-  FirmWork *cast_to_FirmWork() { return this; }
+    FirmWork *cast_to_FirmWork()
+    {
+        return this;
+    }
 
-  //-------- interface functions ----------//
+    //-------- interface functions ----------//
 
-  void put_info(int refreshFlag);
-  void detect_info();
+    void put_info(int refreshFlag);
+    void detect_info();
 
-  void disp_edit_mode(int &refreshFlag, int &dispY1, int dispBG = 1);
-  int detect_edit_mode();
+    void disp_edit_mode(int &refreshFlag, int &dispY1, int dispBG = 1);
+    int detect_edit_mode();
 
-  //------- multiplayer checking codes -------//
+    //------- multiplayer checking codes -------//
 
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 
-protected:
-  void calc_productivity();
-  void process_independent_town_worker();
+  protected:
+    void calc_productivity();
+    void process_independent_town_worker();
 
-  //------- protected interface functions -------//
+    //------- protected interface functions -------//
 
-  virtual void disp_firm_info(int dispY1, int refreshFlag);
-  virtual void detect_firm_info();
-  void disp_worker_list(int dispY1, int refreshFlag);
-  void detect_worker_list();
-  void disp_worker_info(int dispY1, int refreshFlag);
-  void detect_worker_info();
+    virtual void disp_firm_info(int dispY1, int refreshFlag);
+    virtual void detect_firm_info();
+    void disp_worker_list(int dispY1, int refreshFlag);
+    void detect_worker_list();
+    void disp_worker_info(int dispY1, int refreshFlag);
+    void detect_worker_info();
 
-  //------- AI functions --------//
+    //------- AI functions --------//
 
-  virtual int think_adjust_workforce() { return 0; }
+    virtual int think_adjust_workforce()
+    {
+        return 0;
+    }
 
-  int think_inc_worker_supply();
-  int ai_build_neighbor_town(int builderUnitRecno = 0);
-  int most_jobless_race();
-  int race_jobless_pop(int raceId, int excludedTownRecno);
-  int most_jobless_town(int raceId, int excludedTownRecno);
-  int is_worker_already_coming();
+    int think_inc_worker_supply();
+    int ai_build_neighbor_town(int builderUnitRecno = 0);
+    int most_jobless_race();
+    int race_jobless_pop(int raceId, int excludedTownRecno);
+    int most_jobless_town(int raceId, int excludedTownRecno);
+    int is_worker_already_coming();
 };
 #pragma pack()
 

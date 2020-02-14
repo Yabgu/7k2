@@ -33,56 +33,65 @@ struct RockInfo;
 struct RockBitmapInfo;
 
 #pragma pack(1)
-class Rock {
-public:
-  short rock_recno;
-  char cur_frame;
-  char delay_remain;
-  short loc_x;
-  short loc_y;
+class Rock
+{
+  public:
+    short rock_recno;
+    char cur_frame;
+    char delay_remain;
+    short loc_x;
+    short loc_y;
 
-private:
-  unsigned seed;
+  private:
+    unsigned seed;
 
-public:
-  Rock(short rockRecno, short xLoc, short yLoc);
-  void init(short rockRecno, short xLoc,
-            short yLoc); // cur_frame init to 1, and initDelay is random
-  void process();
-  void draw();
-  void draw_block(short xLoc, short yLoc);
+  public:
+    Rock(short rockRecno, short xLoc, short yLoc);
+    void init(short rockRecno, short xLoc,
+              short yLoc); // cur_frame init to 1, and initDelay is random
+    void process();
+    void draw();
+    void draw_block(short xLoc, short yLoc);
 
-  // ##### begin Gilbert 5/11 ######//
-  short loc_x2();
-  short loc_y2();
-  RockInfo *rock_info();
-  RockBitmapInfo *rock_bitmap_info();
-  // ##### end Gilbert 5/11 ######//
+    // ##### begin Gilbert 5/11 ######//
+    short loc_x2();
+    short loc_y2();
+    RockInfo *rock_info();
+    RockBitmapInfo *rock_bitmap_info();
+    // ##### end Gilbert 5/11 ######//
 
-  int is_stealth();
+    int is_stealth();
 
-private:
-  unsigned random(unsigned);
+  private:
+    unsigned random(unsigned);
 };
 #pragma pack()
 
 // --------- define class RockArray -----------//
 
-class RockArray : public DynArrayB {
-public:
-  RockArray(int initArraySize = DEF_DYNARRAY_BLOCK_SIZE);
-  void init();
-  void deinit();
-  //	void	draw_dot();
-  void process();
-  int add(Rock *r) {
-    linkin(r);
-    return recno();
-  }
-  void del(int i) { linkout(i); }
+class RockArray : public DynArrayB
+{
+  public:
+    RockArray(int initArraySize = DEF_DYNARRAY_BLOCK_SIZE);
+    void init();
+    void deinit();
+    //	void	draw_dot();
+    void process();
+    int add(Rock *r)
+    {
+        linkin(r);
+        return recno();
+    }
+    void del(int i)
+    {
+        linkout(i);
+    }
 
-  int is_deleted(int n);
-  Rock *operator[](int n) { return (Rock *)get(n); }
+    int is_deleted(int n);
+    Rock *operator[](int n)
+    {
+        return (Rock *)get(n);
+    }
 };
 
 extern RockArray rock_array;

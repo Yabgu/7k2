@@ -31,95 +31,108 @@ static struct __dbglog_channel dbglog_settings[DEBUG_LOG_MAX_CHANNELS];
 
 static int debug_log_initialized = 0;
 
-int dbglog_init() {
-  const char *debug_env_var;
-  int i, j, len;
+int dbglog_init()
+{
+    const char *debug_env_var;
+    int i, j, len;
 
-  if (debug_log_initialized)
+    if (debug_log_initialized)
+        return 1;
+
+    debug_env_var = getenv("SKDEBUG");
+    if (debug_env_var)
+        len = strlen(debug_env_var);
+    else
+        len = 0;
+
+    for (i = 0, j = 0; i < DEBUG_LOG_MAX_CHANNELS; i++)
+    {
+        int copied = 0;
+
+        while (j < len && copied < 30)
+        {
+            if (debug_env_var[j] == '\0' || debug_env_var[j] == ',')
+            {
+                j++;
+                break;
+            }
+            dbglog_settings[i].name[copied] = debug_env_var[j];
+            j++;
+            copied++;
+        }
+
+        dbglog_settings[i].name[copied] = '\0';
+
+        if (copied > 0)
+        {
+            dbglog_settings[i].flags = DBGLOG_ERR_ON | DBGLOG_MSG_ON;
+        }
+        else
+        {
+            dbglog_settings[i].flags = DBGLOG_NEED_INIT;
+        }
+    }
+
+    debug_log_initialized = 1;
+
     return 1;
-
-  debug_env_var = getenv("SKDEBUG");
-  if (debug_env_var)
-    len = strlen(debug_env_var);
-  else
-    len = 0;
-
-  for (i = 0, j = 0; i < DEBUG_LOG_MAX_CHANNELS; i++) {
-    int copied = 0;
-
-    while (j < len && copied < 30) {
-      if (debug_env_var[j] == '\0' || debug_env_var[j] == ',') {
-        j++;
-        break;
-      }
-      dbglog_settings[i].name[copied] = debug_env_var[j];
-      j++;
-      copied++;
-    }
-
-    dbglog_settings[i].name[copied] = '\0';
-
-    if (copied > 0) {
-      dbglog_settings[i].flags = DBGLOG_ERR_ON | DBGLOG_MSG_ON;
-    } else {
-      dbglog_settings[i].flags = DBGLOG_NEED_INIT;
-    }
-  }
-
-  debug_log_initialized = 1;
-
-  return 1;
 }
 
-unsigned char dbglog_get_flags(char *name) {
-  int i;
+unsigned char dbglog_get_flags(char *name)
+{
+    int i;
 
-  if (!debug_log_initialized && !dbglog_init())
+    if (!debug_log_initialized && !dbglog_init())
+        return DBGLOG_NEED_INIT;
+
+    for (i = 0; i < DEBUG_LOG_MAX_CHANNELS; i++)
+    {
+        if (strncmp(name, dbglog_settings[i].name, 32) == 0)
+        {
+            return dbglog_settings[i].flags;
+        }
+        if (dbglog_settings[i].flags == DBGLOG_NEED_INIT)
+        {
+            strncpy(dbglog_settings[i].name, name, 32);
+            dbglog_settings[i].flags = DBGLOG_ERR_ON;
+            return dbglog_settings[i].flags;
+        }
+    }
     return DBGLOG_NEED_INIT;
-
-  for (i = 0; i < DEBUG_LOG_MAX_CHANNELS; i++) {
-    if (strncmp(name, dbglog_settings[i].name, 32) == 0) {
-      return dbglog_settings[i].flags;
-    }
-    if (dbglog_settings[i].flags == DBGLOG_NEED_INIT) {
-      strncpy(dbglog_settings[i].name, name, 32);
-      dbglog_settings[i].flags = DBGLOG_ERR_ON;
-      return dbglog_settings[i].flags;
-    }
-  }
-  return DBGLOG_NEED_INIT;
 }
 
-void dbglog_printf(enum __dbglog_class msg_class, struct __dbglog_channel *c,
-                   const char *format, ...) {
-  va_list valist;
+void dbglog_printf(enum __dbglog_class msg_class, struct __dbglog_channel *c, const char *format, ...)
+{
+    va_list valist;
 
-  if (c->flags == DBGLOG_NEED_INIT) {
-    c->flags = dbglog_get_flags(c->name);
     if (c->flags == DBGLOG_NEED_INIT)
-      return;
-  }
+    {
+        c->flags = dbglog_get_flags(c->name);
+        if (c->flags == DBGLOG_NEED_INIT)
+            return;
+    }
 
-  // Get HH:MM:SS in local time
-  time_t rawTime;
-  time(&rawTime);
-  tm *curTime = localtime(&rawTime);
-  char curTimeStr[256];
-  if (strftime(curTimeStr, sizeof(curTimeStr) / sizeof(curTimeStr[0]),
-               "%H:%M:%S", curTime) == 0)
-    strcpy(curTimeStr, "??:??:??");
+    // Get HH:MM:SS in local time
+    time_t rawTime;
+    time(&rawTime);
+    tm *curTime = localtime(&rawTime);
+    char curTimeStr[256];
+    if (strftime(curTimeStr, sizeof(curTimeStr) / sizeof(curTimeStr[0]), "%H:%M:%S", curTime) == 0)
+        strcpy(curTimeStr, "??:??:??");
 
-  if (c->flags & DBGLOG_ERR_ON && msg_class == __DBGLOG_ERR) {
-    printf("%s: err:%s: ", curTimeStr, c->name);
-    va_start(valist, format);
-    vprintf(format, valist);
-    va_end(valist);
-  }
+    if (c->flags & DBGLOG_ERR_ON && msg_class == __DBGLOG_ERR)
+    {
+        printf("%s: err:%s: ", curTimeStr, c->name);
+        va_start(valist, format);
+        vprintf(format, valist);
+        va_end(valist);
+    }
 
-  if (c->flags & DBGLOG_MSG_ON && msg_class == __DBGLOG_MSG) {
-    printf("%s: msg:%s: ", curTimeStr, c->name);
-    va_start(valist, format);
-    vprintf(format, valist);
-    va_end(valist);
-  }
+    if (c->flags & DBGLOG_MSG_ON && msg_class == __DBGLOG_MSG)
+    {
+        printf("%s: msg:%s: ", curTimeStr, c->name);
+        va_start(valist, format);
+        vprintf(format, valist);
+        va_end(valist);
+    }
 }

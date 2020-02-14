@@ -35,150 +35,171 @@ static char file_opened_flag = 0;
 static long match_seed;
 
 //-------- Begin of function Sys::sp_create_seed_file --------//
-void Sys::sp_create_seed_file(const char *filename) {
-  seedCompareFile.file_create(filename);
-  // debug_seed_status_flag = 2; // 1 for saving, 2 for comparing
-  // random_seed_backup_pos = 0;
-  random_seed_writen_pos = 0;
+void Sys::sp_create_seed_file(const char *filename)
+{
+    seedCompareFile.file_create(filename);
+    // debug_seed_status_flag = 2; // 1 for saving, 2 for comparing
+    // random_seed_backup_pos = 0;
+    random_seed_writen_pos = 0;
 
-  file_opened_flag = 1;
+    file_opened_flag = 1;
 }
 //--------- End of function Sys::sp_create_seed_file ---------//
 
 //-------- Begin of function Sys::sp_close_seed_file --------//
-void Sys::sp_close_seed_file() {
-  seedCompareFile.file_close();
-  // debug_seed_status_flag = NO_DEBUG_SYN;
-  // random_seed_backup_pos = 0;
+void Sys::sp_close_seed_file()
+{
+    seedCompareFile.file_close();
+    // debug_seed_status_flag = NO_DEBUG_SYN;
+    // random_seed_backup_pos = 0;
 
-  file_opened_flag = 0;
-  sp_seed_pos_reset();
+    file_opened_flag = 0;
+    sp_seed_pos_reset();
 }
 //--------- End of function Sys::sp_close_seed_file ---------//
 
 //-------- Begin of function Sys::sp_load_seed_file --------//
-void Sys::sp_load_seed_file() {
-  // debug_seed_status_flag = NO_DEBUG_SYN;
+void Sys::sp_load_seed_file()
+{
+    // debug_seed_status_flag = NO_DEBUG_SYN;
 
-  File headerFile;
-  headerFile.file_open("nhead.rs");
+    File headerFile;
+    headerFile.file_open("nhead.rs");
 
-  long firstSeed;
-  if (headerFile.file_size() >= sizeof(long) * 2) {
-    firstSeed = headerFile.file_get_long();
-    if (match_seed) // internal loading
+    long firstSeed;
+    if (headerFile.file_size() >= sizeof(long) * 2)
     {
-      // do nothing
-      int debug = 0;
-    } else // load from user action
-    {
-      if (misc.get_random_seed() != firstSeed)
-        return; // seed file don't match the save game
+        firstSeed = headerFile.file_get_long();
+        if (match_seed) // internal loading
+        {
+            // do nothing
+            int debug = 0;
+        }
+        else // load from user action
+        {
+            if (misc.get_random_seed() != firstSeed)
+                return; // seed file don't match the save game
+        }
     }
-  } else
-    return; // seed file don't match the save game
+    else
+        return; // seed file don't match the save game
 
-  if (!seedCompareFile.file_open("nseed.rs"))
-    return;
+    if (!seedCompareFile.file_open("nseed.rs"))
+        return;
 
-  random_seed_backup_pos = 0;
-  // debug_seed_status_flag = DEBUG_SYN_AUTO_LOAD;
+    random_seed_backup_pos = 0;
+    // debug_seed_status_flag = DEBUG_SYN_AUTO_LOAD;
 
-  random_seed_backup_table_data_size =
-      headerFile.file_get_long(); // read the table size
-  headerFile.file_close();
+    random_seed_backup_table_data_size = headerFile.file_get_long(); // read the table size
+    headerFile.file_close();
 
-  //------------ read the table content ------------//
-  for (int i = 0; i < random_seed_backup_table_data_size; i++)
-    random_seed_backup_table[i] = seedCompareFile.file_get_long();
+    //------------ read the table content ------------//
+    for (int i = 0; i < random_seed_backup_table_data_size; i++)
+        random_seed_backup_table[i] = seedCompareFile.file_get_long();
 
-  file_opened_flag = 1;
+    file_opened_flag = 1;
 }
 //--------- End of function Sys::sp_load_seed_file ---------//
 
 //-------- Begin of function Sys::sp_record_match_seed --------//
-void Sys::sp_record_match_seed() { match_seed = misc.get_random_seed(); }
+void Sys::sp_record_match_seed()
+{
+    match_seed = misc.get_random_seed();
+}
 //--------- End of function Sys::sp_record_match_seed ---------//
 
 //-------- Begin of function Sys::sp_record_seed --------//
-void Sys::sp_record_seed() {
-  random_seed_backup_table[random_seed_backup_pos] = misc.get_random_seed();
-  random_seed_backup_pos++;
+void Sys::sp_record_seed()
+{
+    random_seed_backup_table[random_seed_backup_pos] = misc.get_random_seed();
+    random_seed_backup_pos++;
 }
 //--------- End of function Sys::sp_record_seed ---------//
 
 //-------- Begin of function Sys::sp_write_seed --------//
-void Sys::sp_write_seed() {
-  if (random_seed_backup_pos == 0)
-    return;
+void Sys::sp_write_seed()
+{
+    if (random_seed_backup_pos == 0)
+        return;
 
-  if (file_opened_flag == 0)
-    return;
+    if (file_opened_flag == 0)
+        return;
 
-  /*
-  seedCompareFile.file_put_long(match_seed);
-  seedCompareFile.file_put_long(random_seed_backup_pos);
+    /*
+    seedCompareFile.file_put_long(match_seed);
+    seedCompareFile.file_put_long(random_seed_backup_pos);
 
-  for(int i=0; i<random_seed_backup_pos; i++)
-          seedCompareFile.file_put_long(random_seed_backup_table[i]);
-  */
+    for(int i=0; i<random_seed_backup_pos; i++)
+            seedCompareFile.file_put_long(random_seed_backup_table[i]);
+    */
 
-  File headerFile;
-  headerFile.file_create("nhead.rs");
-  headerFile.file_put_long(match_seed);
-  headerFile.file_put_long(random_seed_writen_pos + random_seed_backup_pos);
-  headerFile.file_close();
+    File headerFile;
+    headerFile.file_create("nhead.rs");
+    headerFile.file_put_long(match_seed);
+    headerFile.file_put_long(random_seed_writen_pos + random_seed_backup_pos);
+    headerFile.file_close();
 
-  if (random_seed_writen_pos == 0) {
-    for (int i = 0; i < random_seed_backup_pos; i++)
-      seedCompareFile.file_put_long(random_seed_backup_table[i]);
-  } else {
-    seedCompareFile.file_seek(0L, SEEK_END);
-    for (int i = 0; i < random_seed_backup_pos; i++)
-      seedCompareFile.file_put_long(random_seed_backup_table[i]);
-  }
+    if (random_seed_writen_pos == 0)
+    {
+        for (int i = 0; i < random_seed_backup_pos; i++)
+            seedCompareFile.file_put_long(random_seed_backup_table[i]);
+    }
+    else
+    {
+        seedCompareFile.file_seek(0L, SEEK_END);
+        for (int i = 0; i < random_seed_backup_pos; i++)
+            seedCompareFile.file_put_long(random_seed_backup_table[i]);
+    }
 
-  random_seed_writen_pos += random_seed_backup_pos;
-  random_seed_backup_pos = 0;
+    random_seed_writen_pos += random_seed_backup_pos;
+    random_seed_backup_pos = 0;
 }
 //--------- End of function Sys::sp_write_seed ---------//
 
 //-------- Begin of function Sys::sp_compare_seed --------//
-void Sys::sp_compare_seed() {
-  if (file_opened_flag == 0)
-    return;
+void Sys::sp_compare_seed()
+{
+    if (file_opened_flag == 0)
+        return;
 
-  long gameSeed, saveSeed;
+    long gameSeed, saveSeed;
 
-  gameSeed = misc.get_random_seed();
-  saveSeed = random_seed_backup_table[random_seed_backup_pos];
+    gameSeed = misc.get_random_seed();
+    saveSeed = random_seed_backup_table[random_seed_backup_pos];
 
-  if (random_seed_backup_pos > 130)
-    int debug = 0;
+    if (random_seed_backup_pos > 130)
+        int debug = 0;
 
-  if (gameSeed != saveSeed)
-    err.run("Error: random seeds not sync.");
+    if (gameSeed != saveSeed)
+        err.run("Error: random seeds not sync.");
 
-  random_seed_backup_pos++;
+    random_seed_backup_pos++;
 
-  if (random_seed_backup_pos >= random_seed_backup_table_data_size) {
-    sp_close_seed_file();
-    // debug_seed_status_flag = 0;
-    if (debug_seed_status_flag == DEBUG_SYN_AUTO_LOAD)
-      // debug_seed_status_flag = DENUG_SYN_AUTO_SAVE;
-      // DIK_LBRACKET = 0x1A
-      mouse.add_key_event(0x1A, misc.get_time()); // save seed for comparison
-    else
-      debug_seed_status_flag = NO_DEBUG_SYN;
-  }
+    if (random_seed_backup_pos >= random_seed_backup_table_data_size)
+    {
+        sp_close_seed_file();
+        // debug_seed_status_flag = 0;
+        if (debug_seed_status_flag == DEBUG_SYN_AUTO_LOAD)
+            // debug_seed_status_flag = DENUG_SYN_AUTO_SAVE;
+            // DIK_LBRACKET = 0x1A
+            mouse.add_key_event(0x1A, misc.get_time()); // save seed for comparison
+        else
+            debug_seed_status_flag = NO_DEBUG_SYN;
+    }
 }
 //--------- End of function Sys::sp_compare_seed ---------//
 
 //-------- Begin of function Sys::sp_seed_pos_reset --------//
-void Sys::sp_seed_pos_reset() { random_seed_backup_pos = 0; }
+void Sys::sp_seed_pos_reset()
+{
+    random_seed_backup_pos = 0;
+}
 //--------- End of function Sys::sp_seed_pos_reset ---------//
 
 //-------- Begin of function Sys::sp_seed_pos_set --------//
-void Sys::sp_seed_pos_set(int pos) { random_seed_backup_pos = pos; }
+void Sys::sp_seed_pos_set(int pos)
+{
+    random_seed_backup_pos = pos;
+}
 //--------- End of function Sys::sp_seed_pos_set ---------//
 #endif

@@ -112,7 +112,10 @@
 #define TOWER_DES2 0x61
 #define TOWER_DES3 0x62
 
-inline int is_wall_rubble(int w) { return (w >= 0x51 && w <= 0x62); }
+inline int is_wall_rubble(int w)
+{
+    return (w >= 0x51 && w <= 0x62);
+}
 
 // Gate tiles
 

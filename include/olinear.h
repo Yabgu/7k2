@@ -24,25 +24,26 @@
 #ifndef __OLINEAR_H
 #define __OLINEAR_H
 
-class LinearCounter {
-public:
-  int dx;
-  int dy;
-  int x_dest;
+class LinearCounter
+{
+  public:
+    int dx;
+    int dy;
+    int x_dest;
 
-  int x;
-  int y;
-  int d;
-  int q;
-  int r;
+    int x;
+    int y;
+    int d;
+    int q;
+    int r;
 
-public:
-  LinearCounter();
-  LinearCounter(int x0, int y0, int x1, int y1);
+  public:
+    LinearCounter();
+    LinearCounter(int x0, int y0, int x1, int y1);
 
-  void init(int x0, int y0, int x1, int y1);
-  int is_end();
-  void inc();
+    void init(int x0, int y0, int x1, int y1);
+    int is_end();
+    void inc();
 };
 
 #endif

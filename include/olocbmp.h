@@ -28,38 +28,39 @@
 
 class Blob2DW;
 
-class LocationBitmap {
-public:
-  int init_flag;
-  int top_x_loc;
-  int top_y_loc;
-  int column_count;
-  int row_count;
+class LocationBitmap
+{
+  public:
+    int init_flag;
+    int top_x_loc;
+    int top_y_loc;
+    int column_count;
+    int row_count;
 
-  int adj_col;
-  int adj_row;
+    int adj_col;
+    int adj_row;
 
-  Blob2DW **bitmap_array;
-  Blob2DW **sec_bitmap_array;
+    Blob2DW **bitmap_array;
+    Blob2DW **sec_bitmap_array;
 
-public:
-  LocationBitmap();
-  ~LocationBitmap();
+  public:
+    LocationBitmap();
+    ~LocationBitmap();
 
-  void init(int cachedColumn, int cachedRow, int viewColumn, int viewRow);
-  void deinit();
+    void init(int cachedColumn, int cachedRow, int viewColumn, int viewRow);
+    void deinit();
 
-  void set_top_loc(int xLoc, int yLoc);
-  int is_loc_cached(int xLoc, int yLoc);
-  Blob2DW *get_bitmap(int xLoc, int yLoc);
-  Blob2DW *get_new_bitmap(int xLoc, int yLoc);
-  void scroll_to(int xLoc, int yLoc);
+    void set_top_loc(int xLoc, int yLoc);
+    int is_loc_cached(int xLoc, int yLoc);
+    Blob2DW *get_bitmap(int xLoc, int yLoc);
+    Blob2DW *get_new_bitmap(int xLoc, int yLoc);
+    void scroll_to(int xLoc, int yLoc);
 
-private:
-  int get_row(int xLoc, int yLoc);
-  int get_column(int xLoc, int yLoc);
-  int get_x_loc(int column, int row);
-  int get_y_loc(int row, int column);
+  private:
+    int get_row(int xLoc, int yLoc);
+    int get_column(int xLoc, int yLoc);
+    int get_x_loc(int column, int row);
+    int get_y_loc(int row, int column);
 };
 
 extern LocationBitmap loc_bitmap_cache;

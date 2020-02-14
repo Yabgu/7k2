@@ -26,26 +26,26 @@
 #define DBGLOG_MSG_ON 0x02
 #define DBGLOG_NEED_INIT 0xff
 
-enum __dbglog_class { __DBGLOG_MSG, __DBGLOG_ERR };
-
-struct __dbglog_channel {
-  unsigned char flags;
-  char name[32];
+enum __dbglog_class
+{
+    __DBGLOG_MSG,
+    __DBGLOG_ERR
 };
 
-extern void dbglog_printf(enum __dbglog_class msg_class,
-                          struct __dbglog_channel *c, const char *format, ...);
+struct __dbglog_channel
+{
+    unsigned char flags;
+    char name[32];
+};
+
+extern void dbglog_printf(enum __dbglog_class msg_class, struct __dbglog_channel *c, const char *format, ...);
 
 #ifdef DEBUG
 
-#define MSG(format, ...)                                                       \
-  dbglog_printf(__DBGLOG_MSG, &__dbglog_default_channel, format, ##__VA_ARGS__)
-#define ERR(format, ...)                                                       \
-  dbglog_printf(__DBGLOG_ERR, &__dbglog_default_channel, format, ##__VA_ARGS__)
+#define MSG(format, ...) dbglog_printf(__DBGLOG_MSG, &__dbglog_default_channel, format, ##__VA_ARGS__)
+#define ERR(format, ...) dbglog_printf(__DBGLOG_ERR, &__dbglog_default_channel, format, ##__VA_ARGS__)
 
-#define DBGLOG_DEFAULT_CHANNEL(s)                                              \
-  static struct __dbglog_channel __dbglog_default_channel = {DBGLOG_NEED_INIT, \
-                                                             #s}
+#define DBGLOG_DEFAULT_CHANNEL(s) static struct __dbglog_channel __dbglog_default_channel = {DBGLOG_NEED_INIT, #s}
 
 #else /* !DEBUG */
 

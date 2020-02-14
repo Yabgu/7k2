@@ -19,63 +19,75 @@
  */
 #include <file_writer.h>
 
-FileWriter::FileWriter() {
-  this->file = NULL;
-  this->ok = true;
+FileWriter::FileWriter()
+{
+    this->file = NULL;
+    this->ok = true;
 }
 
-FileWriter::~FileWriter() { this->deinit(); }
-
-bool FileWriter::init(File *file) {
-  this->deinit();
-
-  if (!this->os.open(file))
-    return false;
-
-  this->file = file;
-  this->ok = true;
-  this->original_type = this->file->file_type;
-
-  /* We need raw file access */
-  if (this->file->file_type != File::FLAT)
-    this->file->file_type = File::FLAT;
-
-  return true;
+FileWriter::~FileWriter()
+{
+    this->deinit();
 }
 
-void FileWriter::deinit() {
-  if (this->file == NULL)
-    return;
+bool FileWriter::init(File *file)
+{
+    this->deinit();
 
-  this->file->file_type = this->original_type;
-  this->os.close();
-  this->file = NULL;
-}
+    if (!this->os.open(file))
+        return false;
 
-bool FileWriter::good() const { return this->ok; }
+    this->file = file;
+    this->ok = true;
+    this->original_type = this->file->file_type;
 
-bool FileWriter::skip(size_t len) {
-  const char *chars = "\xc0\xde\xba\xbe";
+    /* We need raw file access */
+    if (this->file->file_type != File::FLAT)
+        this->file->file_type = File::FLAT;
 
-  if (!this->ok)
-    return false;
-
-  for (size_t n = 0; n < len; n++) {
-    if (!this->write<int8_t>(chars[n & 3]))
-      break;
-  }
-
-  return this->ok;
-}
-
-bool FileWriter::write_record_size(uint16_t size) {
-  if (!this->ok)
-    return false;
-
-  if (this->original_type != File::STRUCTURED)
     return true;
+}
 
-  return this->write<uint16_t>(size);
+void FileWriter::deinit()
+{
+    if (this->file == NULL)
+        return;
+
+    this->file->file_type = this->original_type;
+    this->os.close();
+    this->file = NULL;
+}
+
+bool FileWriter::good() const
+{
+    return this->ok;
+}
+
+bool FileWriter::skip(size_t len)
+{
+    const char *chars = "\xc0\xde\xba\xbe";
+
+    if (!this->ok)
+        return false;
+
+    for (size_t n = 0; n < len; n++)
+    {
+        if (!this->write<int8_t>(chars[n & 3]))
+            break;
+    }
+
+    return this->ok;
+}
+
+bool FileWriter::write_record_size(uint16_t size)
+{
+    if (!this->ok)
+        return false;
+
+    if (this->original_type != File::STRUCTURED)
+        return true;
+
+    return this->write<uint16_t>(size);
 }
 
 /* vim: set ts=8 sw=3: */

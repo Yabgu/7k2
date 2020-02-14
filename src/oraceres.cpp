@@ -36,54 +36,61 @@
 
 //------- Begin of function RaceRes::RaceRes -----------//
 
-RaceRes::RaceRes() { init_flag = 0; }
+RaceRes::RaceRes()
+{
+    init_flag = 0;
+}
 //--------- End of function RaceRes::RaceRes -----------//
 
 //---------- Begin of function RaceRes::init -----------//
 //
 // This function must be called after a map is generated.
 //
-void RaceRes::init() {
-  deinit();
+void RaceRes::init()
+{
+    deinit();
 
-  //----- open unit bitmap resource file -------//
+    //----- open unit bitmap resource file -------//
 
-  String str;
+    String str;
 
-  str = DIR_RES;
-  str += "I_RACE.RES";
+    str = DIR_RES;
+    str += "I_RACE.RES";
 
-  res_bitmap.init_imported(str, 1); // 1-don't read all into buffer
+    res_bitmap.init_imported(str, 1); // 1-don't read all into buffer
 
-  //------- load database information --------//
+    //------- load database information --------//
 
-  load_race_info();
-  load_name();
+    load_race_info();
+    load_name();
 
-  init_flag = 1;
+    init_flag = 1;
 }
 //---------- End of function RaceRes::init -----------//
 
 //---------- Begin of function RaceRes::deinit -----------//
 
-void RaceRes::deinit() {
-  if (init_flag) {
-    mem_del(race_info_array);
-    mem_del(name_array);
-    mem_del(name_used_array);
+void RaceRes::deinit()
+{
+    if (init_flag)
+    {
+        mem_del(race_info_array);
+        mem_del(name_array);
+        mem_del(name_used_array);
 
-    init_flag = 0;
-  }
+        init_flag = 0;
+    }
 }
 //---------- End of function RaceRes::deinit -----------//
 
 //---------- Begin of function RaceRes::second_init -----------//
 
-void RaceRes::second_init() {
-  // ##### begin Gilbert 19/3 #########//
-  // memset( name_used_array, 0, sizeof(name_used_array) );
-  memset(name_used_array, 0, sizeof(name_used_array[0]) * name_count);
-  // ##### end Gilbert 19/3 #########//
+void RaceRes::second_init()
+{
+    // ##### begin Gilbert 19/3 #########//
+    // memset( name_used_array, 0, sizeof(name_used_array) );
+    memset(name_used_array, 0, sizeof(name_used_array[0]) * name_count);
+    // ##### end Gilbert 19/3 #########//
 }
 //---------- End of function RaceRes::second_init -----------//
 
@@ -91,64 +98,69 @@ void RaceRes::second_init() {
 //
 // Read in information of RACE.DBF into memory array
 //
-void RaceRes::load_race_info() {
-  RaceRec *raceRec;
-  RaceInfo *raceInfo;
-  int i, unitId;
-  uint32_t bitmapOffset;
-  Database *dbRace = game_set.open_db(RACE_DB);
+void RaceRes::load_race_info()
+{
+    RaceRec *raceRec;
+    RaceInfo *raceInfo;
+    int i, unitId;
+    uint32_t bitmapOffset;
+    Database *dbRace = game_set.open_db(RACE_DB);
 
-  race_count = (short)dbRace->rec_count();
-  race_info_array = (RaceInfo *)mem_add(sizeof(RaceInfo) * race_count);
+    race_count = (short)dbRace->rec_count();
+    race_info_array = (RaceInfo *)mem_add(sizeof(RaceInfo) * race_count);
 
-  //------ read in race information array -------//
+    //------ read in race information array -------//
 
-  memset(race_info_array, 0, sizeof(RaceInfo) * race_count);
+    memset(race_info_array, 0, sizeof(RaceInfo) * race_count);
 
-  for (i = 0; i < race_count; i++) {
-    raceRec = (RaceRec *)dbRace->read(i + 1);
-    raceInfo = race_info_array + i;
+    for (i = 0; i < race_count; i++)
+    {
+        raceRec = (RaceRec *)dbRace->read(i + 1);
+        raceInfo = race_info_array + i;
 
-    raceInfo->race_id = i + 1;
+        raceInfo->race_id = i + 1;
 
-    misc.rtrim_fld(raceInfo->code, raceRec->code, raceRec->CODE_LEN);
-    misc.rtrim_fld(raceInfo->name, raceRec->name, raceRec->NAME_LEN);
-    misc.rtrim_fld(raceInfo->adjective, raceRec->adjective,
-                   raceRec->ADJECTIVE_LEN);
-    translate.multi_to_win(raceInfo->name, raceInfo->NAME_LEN);
-    translate.multi_to_win(raceInfo->adjective, raceInfo->ADJECTIVE_LEN);
+        misc.rtrim_fld(raceInfo->code, raceRec->code, raceRec->CODE_LEN);
+        misc.rtrim_fld(raceInfo->name, raceRec->name, raceRec->NAME_LEN);
+        misc.rtrim_fld(raceInfo->adjective, raceRec->adjective, raceRec->ADJECTIVE_LEN);
+        translate.multi_to_win(raceInfo->name, raceInfo->NAME_LEN);
+        translate.multi_to_win(raceInfo->adjective, raceInfo->ADJECTIVE_LEN);
 
-    memcpy(&bitmapOffset, raceRec->icon_bitmap_ptr, sizeof(uint32_t));
+        memcpy(&bitmapOffset, raceRec->icon_bitmap_ptr, sizeof(uint32_t));
 
-    raceInfo->icon_bitmap_ptr = res_bitmap.read_imported(bitmapOffset);
+        raceInfo->icon_bitmap_ptr = res_bitmap.read_imported(bitmapOffset);
 
-    err_when(!raceInfo->icon_bitmap_ptr);
+        err_when(!raceInfo->icon_bitmap_ptr);
 
-    err_when(!unit_res.init_flag); // unit_res.init() before race_res.init()
+        err_when(!unit_res.init_flag); // unit_res.init() before race_res.init()
 
-    raceInfo->civilian_unit_id = 0;
-    raceInfo->infantry_unit_id = 0;
-    raceInfo->special_unit_id = 0;
+        raceInfo->civilian_unit_id = 0;
+        raceInfo->infantry_unit_id = 0;
+        raceInfo->special_unit_id = 0;
 
-    for (unitId = 1; unitId <= MAX_UNIT_TYPE; unitId++) {
-      if (unit_res[unitId]->race_id == i + 1) {
-        if (!raceInfo->civilian_unit_id) // assume first unit of that race is
-                                         // civilian
+        for (unitId = 1; unitId <= MAX_UNIT_TYPE; unitId++)
         {
-          raceInfo->civilian_unit_id = unitId;
-          unit_res[unitId]->is_civilian = 1;
-        } else if (!raceInfo->infantry_unit_id) // assume second unit of that
-                                                // race is infantry
-        {
-          raceInfo->infantry_unit_id = unitId;
-        } else if (!raceInfo->special_unit_id) // assume first unit of that race
-                                               // is cavalry
-        {
-          raceInfo->special_unit_id = unitId;
+            if (unit_res[unitId]->race_id == i + 1)
+            {
+                if (!raceInfo->civilian_unit_id) // assume first unit of that race is
+                                                 // civilian
+                {
+                    raceInfo->civilian_unit_id = unitId;
+                    unit_res[unitId]->is_civilian = 1;
+                }
+                else if (!raceInfo->infantry_unit_id) // assume second unit of that
+                                                      // race is infantry
+                {
+                    raceInfo->infantry_unit_id = unitId;
+                }
+                else if (!raceInfo->special_unit_id) // assume first unit of that race
+                                                     // is cavalry
+                {
+                    raceInfo->special_unit_id = unitId;
+                }
+            }
         }
-      }
     }
-  }
 }
 //--------- End of function RaceRes::load_race_info ---------//
 
@@ -158,91 +170,90 @@ void RaceRes::load_race_info() {
 //
 // Note: race_res must be initialized before calling this function.
 //
-void RaceRes::load_name() {
-#define MAX_SINGLE_RACE_NAME                                                   \
-  255 // cannot be more than 255 in each name group, as Unit::name_id is an
-      // <int> and half of it is for the first name and another half of it is
+void RaceRes::load_name()
+{
+#define MAX_SINGLE_RACE_NAME                                                                                           \
+    255 // cannot be more than 255 in each name group, as Unit::name_id is an   \
+      // <int> and half of it is for the first name and another half of it is \
       // for the last name
 
-  RaceNameRec *raceNameRec;
-  RaceName *raceName;
-  int i, j;
-  Database *dbRaceName = game_set.open_db(RACE_NAME_DB);
+    RaceNameRec *raceNameRec;
+    RaceName *raceName;
+    int i, j;
+    Database *dbRaceName = game_set.open_db(RACE_NAME_DB);
 
-  name_count = (short)dbRaceName->rec_count();
-  name_array = (RaceName *)mem_add(sizeof(RaceName) * name_count);
-  name_used_array = (char *)mem_add(sizeof(name_used_array[0]) * name_count);
+    name_count = (short)dbRaceName->rec_count();
+    name_array = (RaceName *)mem_add(sizeof(RaceName) * name_count);
+    name_used_array = (char *)mem_add(sizeof(name_used_array[0]) * name_count);
 
-  memset(name_used_array, 0, sizeof(name_used_array[0]) * name_count);
+    memset(name_used_array, 0, sizeof(name_used_array[0]) * name_count);
 
-  //------ read in RaceName info array -------//
+    //------ read in RaceName info array -------//
 
-  int raceId = 0, isFirstName;
+    int raceId = 0, isFirstName;
 
-  for (i = 1; i <= name_count; i++) {
-    raceNameRec = (RaceNameRec *)dbRaceName->read(i);
-    raceName = name_array + i - 1;
+    for (i = 1; i <= name_count; i++)
+    {
+        raceNameRec = (RaceNameRec *)dbRaceName->read(i);
+        raceName = name_array + i - 1;
 
-    misc.rtrim_fld(raceName->name, raceNameRec->name, raceNameRec->NAME_LEN);
-    // ####### begin Gilbert 16/1 #######//
-    // don't translate
-    // translate.multi_to_win(raceName->name, raceName->NAME_LEN);
-    // ####### end Gilbert 16/1 #######//
+        misc.rtrim_fld(raceName->name, raceNameRec->name, raceNameRec->NAME_LEN);
+        // ####### begin Gilbert 16/1 #######//
+        // don't translate
+        // translate.multi_to_win(raceName->name, raceName->NAME_LEN);
+        // ####### end Gilbert 16/1 #######//
 
-    if (raceName->name[0] == '@') {
-      if (raceId) {
+        if (raceName->name[0] == '@')
+        {
+            if (raceId)
+            {
+                if (isFirstName)
+                    race_res[raceId]->first_name_count = i - race_res[raceId]->first_first_name_id;
+                else
+                    race_res[raceId]->last_name_count = i - race_res[raceId]->first_last_name_id;
+
+                err_when(race_res[raceId]->first_name_count > MAX_SINGLE_RACE_NAME);
+                err_when(race_res[raceId]->last_name_count > MAX_SINGLE_RACE_NAME);
+            }
+
+            //----- get the race id. of the following names -----//
+
+            for (j = 1; j <= MAX_RACE; j++)
+            {
+                if (strcmp(race_res[j]->code, misc.nullify(raceName->name + 2, RaceInfo::CODE_LEN)) == 0)
+                {
+                    raceId = j;
+                    break;
+                }
+            }
+
+            err_when(j > MAX_RACE);
+
+            //----------------------------------------------//
+
+            isFirstName = raceName->name[1] == '1'; // whether the following names are first names
+
+            if (isFirstName)
+                race_res[raceId]->first_first_name_id =
+                    i + 1; // next record following the "@RACECODE" is the first name record
+            else
+                race_res[raceId]->first_last_name_id =
+                    i + 1; // next record following the "@RACECODE" is the first name record
+        }
+    }
+
+    //------- finish up the last race in the list ------//
+
+    if (raceId)
+    {
         if (isFirstName)
-          race_res[raceId]->first_name_count =
-              i - race_res[raceId]->first_first_name_id;
+            race_res[raceId]->first_name_count = i - race_res[raceId]->first_first_name_id;
         else
-          race_res[raceId]->last_name_count =
-              i - race_res[raceId]->first_last_name_id;
+            race_res[raceId]->last_name_count = i - race_res[raceId]->first_last_name_id;
 
         err_when(race_res[raceId]->first_name_count > MAX_SINGLE_RACE_NAME);
         err_when(race_res[raceId]->last_name_count > MAX_SINGLE_RACE_NAME);
-      }
-
-      //----- get the race id. of the following names -----//
-
-      for (j = 1; j <= MAX_RACE; j++) {
-        if (strcmp(race_res[j]->code,
-                   misc.nullify(raceName->name + 2, RaceInfo::CODE_LEN)) == 0) {
-          raceId = j;
-          break;
-        }
-      }
-
-      err_when(j > MAX_RACE);
-
-      //----------------------------------------------//
-
-      isFirstName = raceName->name[1] ==
-                    '1'; // whether the following names are first names
-
-      if (isFirstName)
-        race_res[raceId]->first_first_name_id =
-            i +
-            1; // next record following the "@RACECODE" is the first name record
-      else
-        race_res[raceId]->first_last_name_id =
-            i +
-            1; // next record following the "@RACECODE" is the first name record
     }
-  }
-
-  //------- finish up the last race in the list ------//
-
-  if (raceId) {
-    if (isFirstName)
-      race_res[raceId]->first_name_count =
-          i - race_res[raceId]->first_first_name_id;
-    else
-      race_res[raceId]->last_name_count =
-          i - race_res[raceId]->first_last_name_id;
-
-    err_when(race_res[raceId]->first_name_count > MAX_SINGLE_RACE_NAME);
-    err_when(race_res[raceId]->last_name_count > MAX_SINGLE_RACE_NAME);
-  }
 }
 //--------- End of function RaceRes::load_name ---------//
 
@@ -254,8 +265,9 @@ void RaceRes::load_name() {
 // because it is easier to research all lines that compare races
 // by keyword searching is_same_race().
 //
-int RaceRes::is_same_race(int raceId1, int raceId2) {
-  return raceId1 == raceId2;
+int RaceRes::is_same_race(int raceId1, int raceId2)
+{
+    return raceId1 == raceId2;
 }
 //---------- End of function RaceRes::is_same_race -----------//
 
@@ -264,69 +276,71 @@ int RaceRes::is_same_race(int raceId1, int raceId2) {
 // Return an unused name id. and set the used_count of the
 // first and first name to 1.
 //
-WORD RaceInfo::get_new_name_id() {
-  //---------- get the first name ----------//
+WORD RaceInfo::get_new_name_id()
+{
+    //---------- get the first name ----------//
 
-  int i;
-  int firstNameId = misc.random(first_name_count) + 1;
+    int i;
+    int firstNameId = misc.random(first_name_count) + 1;
 
-  for (i = 1; i <= first_name_count; i++) {
-    if (++firstNameId > first_name_count)
-      firstNameId = 1;
+    for (i = 1; i <= first_name_count; i++)
+    {
+        if (++firstNameId > first_name_count)
+            firstNameId = 1;
 
-    //--- try to get an unused first name -----//
-    //--- if all names have been used (when i>first_name_count), use the first
-    //selected random name id. --//
+        //--- try to get an unused first name -----//
+        //--- if all names have been used (when i>first_name_count), use the first
+        // selected random name id. --//
 
-    if (!race_res.name_used_array[first_first_name_id + firstNameId - 2])
-      break;
-  }
-
-  int nameRecno = first_first_name_id + firstNameId - 1;
-
-  err_when(nameRecno < 1 || nameRecno > race_res.name_count);
-
-  race_res.name_used_array[nameRecno - 1]++;
-
-  //---------- get the last name ----------//
-
-  int lastNameId;
-
-  if (last_name_count == 0) // if there is no last name for this race, add Roman
-                            // letter as the last name
-  {
-    lastNameId =
-        race_res.name_used_array[first_first_name_id + firstNameId - 2];
-  } else // this race has last names
-  {
-    lastNameId = misc.random(last_name_count) + 1;
-
-    for (i = 1; i <= last_name_count; i++) {
-      if (++lastNameId > last_name_count)
-        lastNameId = 1;
-
-      //--- try to get an unused last name -----//
-      //--- if all names have been used, use the first selected random name id.
-      //--//
-
-      if (!race_res.name_used_array[first_last_name_id + lastNameId - 2])
-        break;
+        if (!race_res.name_used_array[first_first_name_id + firstNameId - 2])
+            break;
     }
 
-    nameRecno = first_last_name_id + lastNameId - 1;
+    int nameRecno = first_first_name_id + firstNameId - 1;
 
     err_when(nameRecno < 1 || nameRecno > race_res.name_count);
 
     race_res.name_used_array[nameRecno - 1]++;
-  }
 
-  //--- nameId is a combination of first & last name id. ----//
+    //---------- get the last name ----------//
 
-  err_when(firstNameId < 1 || firstNameId > first_name_count);
-  err_when(last_name_count > 0 &&
-           (lastNameId < 1 || lastNameId > last_name_count));
+    int lastNameId;
 
-  return (firstNameId << 8) + lastNameId;
+    if (last_name_count == 0) // if there is no last name for this race, add Roman
+                              // letter as the last name
+    {
+        lastNameId = race_res.name_used_array[first_first_name_id + firstNameId - 2];
+    }
+    else // this race has last names
+    {
+        lastNameId = misc.random(last_name_count) + 1;
+
+        for (i = 1; i <= last_name_count; i++)
+        {
+            if (++lastNameId > last_name_count)
+                lastNameId = 1;
+
+            //--- try to get an unused last name -----//
+            //--- if all names have been used, use the first selected random name id.
+            //--//
+
+            if (!race_res.name_used_array[first_last_name_id + lastNameId - 2])
+                break;
+        }
+
+        nameRecno = first_last_name_id + lastNameId - 1;
+
+        err_when(nameRecno < 1 || nameRecno > race_res.name_count);
+
+        race_res.name_used_array[nameRecno - 1]++;
+    }
+
+    //--- nameId is a combination of first & last name id. ----//
+
+    err_when(firstNameId < 1 || firstNameId > first_name_count);
+    err_when(last_name_count > 0 && (lastNameId < 1 || lastNameId > last_name_count));
+
+    return (firstNameId << 8) + lastNameId;
 }
 //------ End of function RaceInfo::get_new_name_id -------//
 
@@ -337,31 +351,32 @@ WORD RaceInfo::get_new_name_id() {
 // Unit names are freed when they settle into a town.
 // But unit names are not freed when they are killed.
 //
-void RaceInfo::free_name_id(WORD nameId) {
-  err_when(!nameId);
+void RaceInfo::free_name_id(WORD nameId)
+{
+    err_when(!nameId);
 
-  int firstNameId = (nameId >> 8);
-  int nameRecno = first_first_name_id + firstNameId - 1;
+    int firstNameId = (nameId >> 8);
+    int nameRecno = first_first_name_id + firstNameId - 1;
 
-  err_when(firstNameId < 1 || firstNameId > first_name_count);
-  err_when(nameRecno < 1 || nameRecno > race_res.name_count);
-
-  race_res.name_used_array[nameRecno - 1]--;
-
-  err_when(race_res.name_used_array[nameRecno - 1] < 0);
-
-  if (last_name_count > 0) // some races do not have last names
-  {
-    int lastNameId = (nameId & 0xFF);
-    int nameRecno = first_last_name_id + lastNameId - 1;
-
-    err_when(lastNameId < 1 || lastNameId > last_name_count);
+    err_when(firstNameId < 1 || firstNameId > first_name_count);
     err_when(nameRecno < 1 || nameRecno > race_res.name_count);
 
     race_res.name_used_array[nameRecno - 1]--;
 
     err_when(race_res.name_used_array[nameRecno - 1] < 0);
-  }
+
+    if (last_name_count > 0) // some races do not have last names
+    {
+        int lastNameId = (nameId & 0xFF);
+        int nameRecno = first_last_name_id + lastNameId - 1;
+
+        err_when(lastNameId < 1 || lastNameId > last_name_count);
+        err_when(nameRecno < 1 || nameRecno > race_res.name_count);
+
+        race_res.name_used_array[nameRecno - 1]--;
+
+        err_when(race_res.name_used_array[nameRecno - 1] < 0);
+    }
 }
 //------ End of function RaceInfo::free_name_id -------//
 
@@ -369,25 +384,26 @@ void RaceInfo::free_name_id(WORD nameId) {
 //
 // Claim the use a specific name id.
 //
-void RaceInfo::use_name_id(WORD nameId) {
-  int firstNameId = (nameId >> 8);
-  int nameRecno = first_first_name_id + firstNameId - 1;
+void RaceInfo::use_name_id(WORD nameId)
+{
+    int firstNameId = (nameId >> 8);
+    int nameRecno = first_first_name_id + firstNameId - 1;
 
-  err_when(firstNameId < 1 || firstNameId > first_name_count);
-  err_when(nameRecno < 1 || nameRecno > race_res.name_count);
-
-  race_res.name_used_array[nameRecno - 1]++;
-
-  if (last_name_count > 0) // some races do not have last names
-  {
-    int lastNameId = (nameId & 0xFF);
-    int nameRecno = first_last_name_id + lastNameId - 1;
-
-    err_when(lastNameId < 1 || lastNameId > last_name_count);
+    err_when(firstNameId < 1 || firstNameId > first_name_count);
     err_when(nameRecno < 1 || nameRecno > race_res.name_count);
 
     race_res.name_used_array[nameRecno - 1]++;
-  }
+
+    if (last_name_count > 0) // some races do not have last names
+    {
+        int lastNameId = (nameId & 0xFF);
+        int nameRecno = first_last_name_id + lastNameId - 1;
+
+        err_when(lastNameId < 1 || lastNameId > last_name_count);
+        err_when(nameRecno < 1 || nameRecno > race_res.name_count);
+
+        race_res.name_used_array[nameRecno - 1]++;
+    }
 }
 //------ End of function RaceInfo::use_name_id -------//
 
@@ -396,62 +412,69 @@ void RaceInfo::use_name_id(WORD nameId) {
 // <WORD> nameId - higher byte - first name id, lower byte - last name id.
 // [int]  nameType - 0-full name, 1-first name only, 2-last name only
 //
-const char *RaceInfo::get_name(WORD nameId, int nameType) {
-  static String str;
+const char *RaceInfo::get_name(WORD nameId, int nameType)
+{
+    static String str;
 
-  if (nameId == 0) {
-    return "";
-  } else {
-    if (nameType != 2) // 2-is for last name only
+    if (nameId == 0)
     {
-      int firstNameId = (nameId >> 8);
-
-      err_when(firstNameId > first_name_count);
-
-      int nameRecno = first_first_name_id + firstNameId - 1;
-
-      err_when(nameRecno < 1 || nameRecno > race_res.name_count);
-
-      str = race_res.name_array[nameRecno - 1].name;
-
-      if (nameType == 1) // first name only
-        return str;
-    } else {
-      if (last_name_count == 0) // if this race does not have last name
         return "";
-
-      str = "";
     }
-
-    //--------- last name ----------//
-
-    int lastNameId = (nameId & 0xFF);
-
-    if (last_name_count == 0) // if there is no last name for this race
+    else
     {
-      if (lastNameId >
-          1) // no need to display roman letter "I" for the first one
-      {
-        if (str.len() > 0)
-          str += " ";
+        if (nameType != 2) // 2-is for last name only
+        {
+            int firstNameId = (nameId >> 8);
 
-        str += misc.roman_number(lastNameId);
-      }
-    } else {
-      err_when(lastNameId > last_name_count);
+            err_when(firstNameId > first_name_count);
 
-      int nameRecno = first_last_name_id + lastNameId - 1;
+            int nameRecno = first_first_name_id + firstNameId - 1;
 
-      err_when(nameRecno < 1 || nameRecno > race_res.name_count);
+            err_when(nameRecno < 1 || nameRecno > race_res.name_count);
 
-      if (str.len() > 0)
-        str += " ";
+            str = race_res.name_array[nameRecno - 1].name;
 
-      str += race_res.name_array[nameRecno - 1].name;
+            if (nameType == 1) // first name only
+                return str;
+        }
+        else
+        {
+            if (last_name_count == 0) // if this race does not have last name
+                return "";
+
+            str = "";
+        }
+
+        //--------- last name ----------//
+
+        int lastNameId = (nameId & 0xFF);
+
+        if (last_name_count == 0) // if there is no last name for this race
+        {
+            if (lastNameId > 1) // no need to display roman letter "I" for the first one
+            {
+                if (str.len() > 0)
+                    str += " ";
+
+                str += misc.roman_number(lastNameId);
+            }
+        }
+        else
+        {
+            err_when(lastNameId > last_name_count);
+
+            int nameRecno = first_last_name_id + lastNameId - 1;
+
+            err_when(nameRecno < 1 || nameRecno > race_res.name_count);
+
+            if (str.len() > 0)
+                str += " ";
+
+            str += race_res.name_array[nameRecno - 1].name;
+        }
+
+        return str;
     }
-
-    return str;
-  }
 }
 //--------- End of function RaceInfo::get_name ---------------//
 
@@ -462,48 +485,53 @@ const char *RaceInfo::get_name(WORD nameId, int nameType) {
 //
 // <WORD> nameId - higher byte - first name id, lower byte - last name id.
 //
-const char *RaceInfo::get_single_name(WORD nameId) {
-  switch (race_id) {
-    // ###### begin Gilbert 5/10 #######//
-  case RACE_NORMAN:
-  case RACE_VIKING:
-    return get_name(nameId, 1); // 1-first name only
+const char *RaceInfo::get_single_name(WORD nameId)
+{
+    switch (race_id)
+    {
+        // ###### begin Gilbert 5/10 #######//
+    case RACE_NORMAN:
+    case RACE_VIKING:
+        return get_name(nameId, 1); // 1-first name only
 
-  case RACE_CHINESE:
-  case RACE_JAPANESE:
-  case RACE_ROMAN:
-    return get_name(nameId, 2); // 2-last name only
-    // ###### end Gilbert 5/10 #######//
+    case RACE_CHINESE:
+    case RACE_JAPANESE:
+    case RACE_ROMAN:
+        return get_name(nameId, 2); // 2-last name only
+                                    // ###### end Gilbert 5/10 #######//
 
-  default:
-    return get_name(nameId); // the whole name
-  }
+    default:
+        return get_name(nameId); // the whole name
+    }
 }
 //--------- End of function RaceInfo::get_single_name ---------------//
 
 //---------- Begin of function RaceRes::operator[] -----------//
 
-RaceInfo *RaceRes::operator[](int raceId) {
-  err_if(raceId < 0 || raceId > race_count) err_now("RaceRes::operator[]");
+RaceInfo *RaceRes::operator[](int raceId)
+{
+    err_if(raceId < 0 || raceId > race_count) err_now("RaceRes::operator[]");
 
-  return race_info_array + raceId - 1;
+    return race_info_array + raceId - 1;
 }
 
 //------------ End of function RaceRes::operator[] -----------//
 
 // ----------- begin of function RaceRes::sum_name_used ------//
 // for sum of name_used_array, checking
-long RaceRes::sum_name_used() {
-  long sum = 0;
-  for (int i = 0; i < name_count; ++i) {
-    if (name_used_array[i] < 0) // skip negative value
+long RaceRes::sum_name_used()
+{
+    long sum = 0;
+    for (int i = 0; i < name_count; ++i)
     {
-      err_here();
-      continue;
+        if (name_used_array[i] < 0) // skip negative value
+        {
+            err_here();
+            continue;
+        }
+        sum += name_used_array[i];
     }
-    sum += name_used_array[i];
-  }
 
-  return sum;
+    return sum;
 }
 // ----------- end of function RaceRes::sum_name_used ------//

@@ -20,40 +20,53 @@
 #include <file_output_stream.h>
 #include <file_util.h>
 
-FileOutputStream::FileOutputStream() { this->file = NULL; }
-
-FileOutputStream::~FileOutputStream() { this->close(); }
-
-long FileOutputStream::write(const void *data, long length) {
-  if (this->file == NULL)
-    return 0;
-
-  if (!this->file->file_write(const_cast<void *>(data), length))
-    return 0;
-
-  return length;
+FileOutputStream::FileOutputStream()
+{
+    this->file = NULL;
 }
 
-bool FileOutputStream::seek(long offset, int whence) {
-  if (this->file == NULL)
-    return false;
-
-  return ::seek(this->file, offset, whence);
+FileOutputStream::~FileOutputStream()
+{
+    this->close();
 }
 
-long FileOutputStream::tell() {
-  if (this->file == NULL)
-    return -1;
+long FileOutputStream::write(const void *data, long length)
+{
+    if (this->file == NULL)
+        return 0;
 
-  return this->file->file_pos();
+    if (!this->file->file_write(const_cast<void *>(data), length))
+        return 0;
+
+    return length;
 }
 
-bool FileOutputStream::open(File *file) {
-  this->close();
-  this->file = file;
-  return (file != NULL);
+bool FileOutputStream::seek(long offset, int whence)
+{
+    if (this->file == NULL)
+        return false;
+
+    return ::seek(this->file, offset, whence);
 }
 
-void FileOutputStream::close() { this->file = NULL; }
+long FileOutputStream::tell()
+{
+    if (this->file == NULL)
+        return -1;
+
+    return this->file->file_pos();
+}
+
+bool FileOutputStream::open(File *file)
+{
+    this->close();
+    this->file = file;
+    return (file != NULL);
+}
+
+void FileOutputStream::close()
+{
+    this->file = NULL;
+}
 
 /* vim: set ts=8 sw=3: */

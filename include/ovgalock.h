@@ -25,25 +25,28 @@
 #ifndef __OVGALOCK_H
 #define __OVGALOCK_H
 
-class VgaFrontLock {
-public:
-  VgaFrontLock();
-  ~VgaFrontLock();
+class VgaFrontLock
+{
+  public:
+    VgaFrontLock();
+    ~VgaFrontLock();
 };
 
-class VgaFrontReLock {
-public:
-  VgaFrontReLock();
-  ~VgaFrontReLock();
+class VgaFrontReLock
+{
+  public:
+    VgaFrontReLock();
+    ~VgaFrontReLock();
 };
 
-class MouseDispCount {
-private:
-  void *cursor_handle;
+class MouseDispCount
+{
+  private:
+    void *cursor_handle;
 
-public:
-  MouseDispCount();
-  ~MouseDispCount();
+  public:
+    MouseDispCount();
+    ~MouseDispCount();
 };
 
 #endif

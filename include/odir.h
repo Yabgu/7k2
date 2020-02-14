@@ -30,23 +30,28 @@
 
 //---------- Define struct FileInfo ----------//
 
-struct FileInfo {
-  char name[MAX_PATH + 1];
-  unsigned long size;
-  FILETIME time;
+struct FileInfo
+{
+    char name[MAX_PATH + 1];
+    unsigned long size;
+    FILETIME time;
 };
 
 //---------- Define class Directory ----------//
 
-class Directory : public DynArray {
-private:
-  boost::filesystem::path base;
+class Directory : public DynArray
+{
+  private:
+    boost::filesystem::path base;
 
-public:
-  Directory(const boost::filesystem::path &base = ".");
+  public:
+    Directory(const boost::filesystem::path &base = ".");
 
-  int read(const char *, int = 0);
-  FileInfo *operator[](int recNo) { return (FileInfo *)get(recNo); }
+    int read(const char *, int = 0);
+    FileInfo *operator[](int recNo)
+    {
+        return (FileInfo *)get(recNo);
+    }
 };
 
 //--------------------------------------------//

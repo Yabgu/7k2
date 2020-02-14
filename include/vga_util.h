@@ -27,25 +27,22 @@
 
 //-------- Define class VgaUtil ----------------//
 
-class VgaUtil {
-public:
-  VgaUtil();
-  ~VgaUtil();
+class VgaUtil
+{
+  public:
+    VgaUtil();
+    ~VgaUtil();
 
-  void d3_panel_up(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0,
-                   int drawBorderOnly = 0);
-  void d3_panel_down(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0,
-                     int drawBorderOnly = 0);
-  void d3_panel2_up(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0,
-                    int drawBorderOnly = 0);
-  void d3_panel2_down(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0,
-                      int drawBorderOnly = 0);
-  void separator(int x1, int y1, int x2, int y2);
+    void d3_panel_up(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0, int drawBorderOnly = 0);
+    void d3_panel_down(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0, int drawBorderOnly = 0);
+    void d3_panel2_up(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0, int drawBorderOnly = 0);
+    void d3_panel2_down(int x1, int y1, int x2, int y2, int vgaFrontOnly = 0, int drawBorderOnly = 0);
+    void separator(int x1, int y1, int x2, int y2);
 
-  void blt_buf(int x1, int y1, int x2, int y2, int putMouseCursor = 1);
+    void blt_buf(int x1, int y1, int x2, int y2, int putMouseCursor = 1);
 
-  void disp_image_file(const char *fileName, int x1 = 0, int y1 = 0);
-  void finish_disp_image_file();
+    void disp_image_file(const char *fileName, int x1 = 0, int y1 = 0);
+    void finish_disp_image_file();
 };
 
 extern VgaUtil vga_util;

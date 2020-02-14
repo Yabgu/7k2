@@ -49,8 +49,7 @@
 #define V_YELLOW VGA_YELLOW
 #define V_BROWN VGA_BROWN + 2
 
-#define V_BACKGROUND                                                           \
-  0xFF // background color, pixels of this color are not put in VGAputIcon
+#define V_BACKGROUND 0xFF // background color, pixels of this color are not put in VGAputIcon
 
 //---------- Define Game Colors --------------//
 

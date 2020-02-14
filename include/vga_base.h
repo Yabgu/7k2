@@ -41,38 +41,41 @@
 
 //-------- Define class VgaBase ----------------//
 
-class VgaBase {
-public:
-  static VgaBuf *active_buf;
-  static char use_back_buf;
-  static char opaque_flag;
+class VgaBase
+{
+  public:
+    static VgaBuf *active_buf;
+    static char use_back_buf;
+    static char opaque_flag;
 
-public:
-  VgaBase(){};
-  ~VgaBase(){};
+  public:
+    VgaBase(){};
+    ~VgaBase(){};
 
-  virtual int init() = 0;
-  virtual void deinit() = 0;
+    virtual int init() = 0;
+    virtual void deinit() = 0;
 
-  virtual bool is_inited() = 0;
+    virtual bool is_inited() = 0;
 
-  void use_front() {
-    use_back_buf = 0;
-    active_buf = &vga_front;
-  }
-  void use_back() {
-    use_back_buf = 1;
-    active_buf = &vga_back;
-  }
+    void use_front()
+    {
+        use_back_buf = 0;
+        active_buf = &vga_front;
+    }
+    void use_back()
+    {
+        use_back_buf = 1;
+        active_buf = &vga_back;
+    }
 
-  virtual void handle_messages() = 0;
-  virtual void flag_redraw() = 0;
-  virtual bool is_full_screen() const = 0;
-  virtual int is_input_grabbed() = 0;
-  virtual void set_full_screen_mode(int mode) = 0;
-  virtual void set_window_grab(int mode) = 0;
-  virtual void flip() = 0;
-  virtual int change_resolution(int width, int height) = 0;
+    virtual void handle_messages() = 0;
+    virtual void flag_redraw() = 0;
+    virtual bool is_full_screen() const = 0;
+    virtual int is_input_grabbed() = 0;
+    virtual void set_full_screen_mode(int mode) = 0;
+    virtual void set_window_grab(int mode) = 0;
+    virtual void flip() = 0;
+    virtual int change_resolution(int width, int height) = 0;
 };
 
 //--------------------------------------------//

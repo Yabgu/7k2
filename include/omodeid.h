@@ -32,97 +32,97 @@
 
 // -------- define struct DisplayModeInfo --------------//
 
-struct DisplayModeInfo {
-  int mode_id;
+struct DisplayModeInfo
+{
+    int mode_id;
 
-  // vga class constant
+    // vga class constant
 
-  int screen_width;
-  int screen_height;
-  int screen_bpp; // bit per plane
+    int screen_width;
+    int screen_height;
+    int screen_bpp; // bit per plane
 
-  // world.zoom_matrix constant
+    // world.zoom_matrix constant
 
-  int zoom_matrix_x1;
-  int zoom_matrix_y1;
-  int zoom_matrix_x2;
-  int zoom_matrix_y2;
-  int zoom_matrix_width;
-  int zoom_matrix_height;
+    int zoom_matrix_x1;
+    int zoom_matrix_y1;
+    int zoom_matrix_x2;
+    int zoom_matrix_y2;
+    int zoom_matrix_width;
+    int zoom_matrix_height;
 
-  // world.map_matrix constant
+    // world.map_matrix constant
 
-  int map_matrix_x1;
-  int map_matrix_y1;
-  int map_matrix_x2;
-  int map_matrix_y2;
-  int map_matrix_width;
-  int map_matrix_height;
+    int map_matrix_x1;
+    int map_matrix_y1;
+    int map_matrix_x2;
+    int map_matrix_y2;
+    int map_matrix_width;
+    int map_matrix_height;
 
-  // class Info constant
+    // class Info constant
 
-  int top_menu_x1;
-  int top_menu_y1;
-  int top_menu_x2;
-  int top_menu_y2;
+    int top_menu_x1;
+    int top_menu_y1;
+    int top_menu_x2;
+    int top_menu_y2;
 
-  int info_x1;
-  int info_y1;
-  int info_x2;
-  int info_y2;
+    int info_x1;
+    int info_y1;
+    int info_x2;
+    int info_y2;
 
-  int info_msg_x1;
-  int info_msg_y1;
-  int info_msg_x2;
-  int info_msg_y2;
+    int info_msg_x1;
+    int info_msg_y1;
+    int info_msg_x2;
+    int info_msg_y2;
 
-  // reserved for expansion
+    // reserved for expansion
 
-  int map_mode_button_x1;
-  int map_mode_button_y1;
-  int map_mode_button_width;
-  int map_mode_button_height;
+    int map_mode_button_x1;
+    int map_mode_button_y1;
+    int map_mode_button_width;
+    int map_mode_button_height;
 
-  int menu_button_x1;
-  int menu_button_y1;
+    int menu_button_x1;
+    int menu_button_y1;
 
-  int repu_button_x1;
-  int repu_button_y1;
+    int repu_button_x1;
+    int repu_button_y1;
 
-  int date_x1;
-  int date_y1;
-  int date_length;
+    int date_x1;
+    int date_y1;
+    int date_length;
 
-  int food_x1;
-  int food_y1;
-  int food_length;
+    int food_x1;
+    int food_y1;
+    int food_length;
 
-  int cash_x1;
-  int cash_y1;
-  int cash_length;
+    int cash_x1;
+    int cash_y1;
+    int cash_length;
 
-  int scroll_menu_x1;
-  int scroll_menu_y1;
-  int scroll_menu_x2;
-  int scroll_menu_y2;
+    int scroll_menu_x1;
+    int scroll_menu_y1;
+    int scroll_menu_x2;
+    int scroll_menu_y2;
 
-  int help_short_x1;
-  int help_short_y1;
-  int help_short_x2;
-  int help_short_y2;
+    int help_short_x1;
+    int help_short_y1;
+    int help_short_x2;
+    int help_short_y2;
 
-  int mouse_x1;
-  int mouse_y1;
-  int mouse_x2;
-  int mouse_y2;
+    int mouse_x1;
+    int mouse_y1;
+    int mouse_x2;
+    int mouse_y2;
 
-  // ------------------------------ //
+    // ------------------------------ //
 
-  void init(int modeId = MODE_ID_DEFAULT);
+    void init(int modeId = MODE_ID_DEFAULT);
 
-  static DisplayModeInfo *
-  get_display_info(int modeId); // return NULL for non-existing display mode
-  static void set_current_display_mode(int modeId);
+    static DisplayModeInfo *get_display_info(int modeId); // return NULL for non-existing display mode
+    static void set_current_display_mode(int modeId);
 };
 
 extern DisplayModeInfo current_display_mode;

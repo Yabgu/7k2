@@ -46,218 +46,220 @@ static ResourceIdx res_credit;
 
 //------ Begin of function Game::view_credits ------//
 
-void Game::view_credits() {
-  //----- display the first page ------//
-  vga_util.disp_image_file("credits1");
+void Game::view_credits()
+{
+    //----- display the first page ------//
+    vga_util.disp_image_file("credits1");
 
-  String str;
-  str = DIR_RES;
-  str += "CREDIT.RES";
-  res_credit.init(str, 0);
+    String str;
+    str = DIR_RES;
+    str += "CREDIT.RES";
+    res_credit.init(str, 0);
 
-  int dataSize;
-  char *credit_buf = NULL;
-  int credit_buf_size = 0;
+    int dataSize;
+    char *credit_buf = NULL;
+    int credit_buf_size = 0;
 
-  File *filePtr = res_credit.get_file("CREDIT1", dataSize);
-  if (!filePtr) // if error getting the tutor resource
-    err_here();
+    File *filePtr = res_credit.get_file("CREDIT1", dataSize);
+    if (!filePtr) // if error getting the tutor resource
+        err_here();
 
-  //------ Open the file and allocate buffer -----//
-  FileTxt fileTxt(filePtr,
-                  dataSize); // initialize fileTxt with an existing file stream
-  if (dataSize > credit_buf_size) {
-    credit_buf =
-        mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
-                                          // need for the largest size possible
-    credit_buf_size = dataSize;
-  }
-  char *textPtr = credit_buf;
-  fileTxt.read_paragraph(textPtr, credit_buf_size);
-  //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
-  //0, 0 );
-  font_mid.put_paragraph(50, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
+    //------ Open the file and allocate buffer -----//
+    FileTxt fileTxt(filePtr,
+                    dataSize); // initialize fileTxt with an existing file stream
+    if (dataSize > credit_buf_size)
+    {
+        credit_buf = mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
+                                                       // need for the largest size possible
+        credit_buf_size = dataSize;
+    }
+    char *textPtr = credit_buf;
+    fileTxt.read_paragraph(textPtr, credit_buf_size);
+    //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
+    // 0, 0 );
+    font_mid.put_paragraph(50, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
 
-  if (credit_buf) {
-    mem_del(credit_buf);
+    if (credit_buf)
+    {
+        mem_del(credit_buf);
+        credit_buf = NULL;
+    }
+
+    if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
+    {
+        res_credit.deinit();
+        vga_util.finish_disp_image_file();
+        return; // 60 seconds to time out
+    }
+
+    //----- display the 2nd page ------//
+    vga_util.disp_image_file("credits1");
+
     credit_buf = NULL;
-  }
+    credit_buf_size = 0;
 
-  if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
-  {
-    res_credit.deinit();
-    vga_util.finish_disp_image_file();
-    return; // 60 seconds to time out
-  }
+    filePtr = res_credit.get_file("CREDIT2", dataSize);
+    if (!filePtr) // if error getting the tutor resource
+        err_here();
 
-  //----- display the 2nd page ------//
-  vga_util.disp_image_file("credits1");
+    //------ Open the file and allocate buffer -----//
+    FileTxt fileTxt2(filePtr, dataSize); // initialize fileTxt2 with an existing file stream
+    if (dataSize > credit_buf_size)
+    {
+        credit_buf = mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
+                                                       // need for the largest size possible
+        credit_buf_size = dataSize;
+    }
+    textPtr = credit_buf;
+    fileTxt2.read_paragraph(textPtr, credit_buf_size);
+    //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
+    // 0, 0 );
+    font_mid.put_paragraph(250, 200, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
 
-  credit_buf = NULL;
-  credit_buf_size = 0;
+    if (credit_buf)
+    {
+        mem_del(credit_buf);
+        credit_buf = NULL;
+    }
 
-  filePtr = res_credit.get_file("CREDIT2", dataSize);
-  if (!filePtr) // if error getting the tutor resource
-    err_here();
+    if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
+    {
+        res_credit.deinit();
+        vga_util.finish_disp_image_file();
+        return; // 60 seconds to time out
+    }
 
-  //------ Open the file and allocate buffer -----//
-  FileTxt fileTxt2(
-      filePtr, dataSize); // initialize fileTxt2 with an existing file stream
-  if (dataSize > credit_buf_size) {
-    credit_buf =
-        mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
-                                          // need for the largest size possible
-    credit_buf_size = dataSize;
-  }
-  textPtr = credit_buf;
-  fileTxt2.read_paragraph(textPtr, credit_buf_size);
-  //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
-  //0, 0 );
-  font_mid.put_paragraph(250, 200, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
+    //----- display the 3nd page ------//
+    vga_util.disp_image_file("CREDITS1");
 
-  if (credit_buf) {
-    mem_del(credit_buf);
     credit_buf = NULL;
-  }
+    credit_buf_size = 0;
 
-  if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
-  {
-    res_credit.deinit();
-    vga_util.finish_disp_image_file();
-    return; // 60 seconds to time out
-  }
+    filePtr = res_credit.get_file("CREDIT3", dataSize);
+    if (!filePtr) // if error getting the tutor resource
+        err_here();
 
-  //----- display the 3nd page ------//
-  vga_util.disp_image_file("CREDITS1");
+    //------ Open the file and allocate buffer -----//
+    FileTxt fileTxt3(filePtr, dataSize); // initialize fileTxt2 with an existing file stream
+    if (dataSize > credit_buf_size)
+    {
+        credit_buf = mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
+                                                       // need for the largest size possible
+        credit_buf_size = dataSize;
+    }
+    textPtr = credit_buf;
+    fileTxt3.read_paragraph(textPtr, credit_buf_size);
+    //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
+    // 0, 0 );
+    font_mid.put_paragraph(250, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
 
-  credit_buf = NULL;
-  credit_buf_size = 0;
+    if (credit_buf)
+    {
+        mem_del(credit_buf);
+        credit_buf = NULL;
+    }
 
-  filePtr = res_credit.get_file("CREDIT3", dataSize);
-  if (!filePtr) // if error getting the tutor resource
-    err_here();
+    if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
+    {
+        res_credit.deinit();
+        vga_util.finish_disp_image_file();
+        return; // 60 seconds to time out
+    }
 
-  //------ Open the file and allocate buffer -----//
-  FileTxt fileTxt3(
-      filePtr, dataSize); // initialize fileTxt2 with an existing file stream
-  if (dataSize > credit_buf_size) {
-    credit_buf =
-        mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
-                                          // need for the largest size possible
-    credit_buf_size = dataSize;
-  }
-  textPtr = credit_buf;
-  fileTxt3.read_paragraph(textPtr, credit_buf_size);
-  //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
-  //0, 0 );
-  font_mid.put_paragraph(250, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
+    //----- display the 4th page ------//
+    vga_util.disp_image_file("CREDITS1");
 
-  if (credit_buf) {
-    mem_del(credit_buf);
     credit_buf = NULL;
-  }
+    credit_buf_size = 0;
 
-  if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
-  {
-    res_credit.deinit();
-    vga_util.finish_disp_image_file();
-    return; // 60 seconds to time out
-  }
+    filePtr = res_credit.get_file("CREDIT4", dataSize);
+    if (!filePtr) // if error getting the tutor resource
+        err_here();
 
-  //----- display the 4th page ------//
-  vga_util.disp_image_file("CREDITS1");
+    //------ Open the file and allocate buffer -----//
+    FileTxt fileTxt4(filePtr, dataSize); // initialize fileTxt2 with an existing file stream
+    if (dataSize > credit_buf_size)
+    {
+        credit_buf = mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
+                                                       // need for the largest size possible
+        credit_buf_size = dataSize;
+    }
+    textPtr = credit_buf;
+    fileTxt4.read_paragraph(textPtr, credit_buf_size);
+    //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
+    // 0, 0 );
+    font_mid.put_paragraph(250, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
 
-  credit_buf = NULL;
-  credit_buf_size = 0;
+    if (credit_buf)
+    {
+        mem_del(credit_buf);
+        credit_buf = NULL;
+    }
 
-  filePtr = res_credit.get_file("CREDIT4", dataSize);
-  if (!filePtr) // if error getting the tutor resource
-    err_here();
-
-  //------ Open the file and allocate buffer -----//
-  FileTxt fileTxt4(
-      filePtr, dataSize); // initialize fileTxt2 with an existing file stream
-  if (dataSize > credit_buf_size) {
-    credit_buf =
-        mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
-                                          // need for the largest size possible
-    credit_buf_size = dataSize;
-  }
-  textPtr = credit_buf;
-  fileTxt4.read_paragraph(textPtr, credit_buf_size);
-  //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
-  //0, 0 );
-  font_mid.put_paragraph(250, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
-
-  if (credit_buf) {
-    mem_del(credit_buf);
-    credit_buf = NULL;
-  }
-
-  if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
-  {
-    res_credit.deinit();
-    vga_util.finish_disp_image_file();
-    return; // 60 seconds to time out
-  }
+    if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
+    {
+        res_credit.deinit();
+        vga_util.finish_disp_image_file();
+        return; // 60 seconds to time out
+    }
 
 #if (defined(CHINESE))
-  // SXM:Credits
-  //----- display the 5th page ------//
-  vga_util.disp_image_file("CREDITS1");
+    // SXM:Credits
+    //----- display the 5th page ------//
+    vga_util.disp_image_file("CREDITS1");
 
-  credit_buf = NULL;
-  credit_buf_size = 0;
-
-  filePtr = res_credit.get_file("CREDIT5", dataSize);
-  if (!filePtr) // if error getting the tutor resource
-    err_here();
-
-  //------ Open the file and allocate buffer -----//
-  FileTxt fileTxt5(
-      filePtr, dataSize); // initialize fileTxt2 with an existing file stream
-  if (dataSize > credit_buf_size) {
-    credit_buf =
-        mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
-                                          // need for the largest size possible
-    credit_buf_size = dataSize;
-  }
-  textPtr = credit_buf;
-  fileTxt5.read_paragraph(textPtr, credit_buf_size);
-  //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
-  //0, 0 );
-  font_mid.put_paragraph(250, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
-
-  if (credit_buf) {
-    mem_del(credit_buf);
     credit_buf = NULL;
-  }
+    credit_buf_size = 0;
 
-  if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
-  {
-    res_credit.deinit();
-    vga_util.finish_disp_image_file();
-    return; // 60 seconds to time out
-  }
-  // SXM
+    filePtr = res_credit.get_file("CREDIT5", dataSize);
+    if (!filePtr) // if error getting the tutor resource
+        err_here();
+
+    //------ Open the file and allocate buffer -----//
+    FileTxt fileTxt5(filePtr, dataSize); // initialize fileTxt2 with an existing file stream
+    if (dataSize > credit_buf_size)
+    {
+        credit_buf = mem_resize(credit_buf, dataSize); // allocate a buffer larger than we
+                                                       // need for the largest size possible
+        credit_buf_size = dataSize;
+    }
+    textPtr = credit_buf;
+    fileTxt5.read_paragraph(textPtr, credit_buf_size);
+    //	font_mid.center_put_paragraph( 0, 0, VGA_WIDTH, VGA_HEIGHT, textPtr, 2,
+    // 0, 0 );
+    font_mid.put_paragraph(250, 150, VGA_WIDTH - 1, VGA_HEIGHT - 1, textPtr);
+
+    if (credit_buf)
+    {
+        mem_del(credit_buf);
+        credit_buf = NULL;
+    }
+
+    if (mouse.wait_press(60) == 2) // return 2 if pressed ESC or right mouse click
+    {
+        res_credit.deinit();
+        vga_util.finish_disp_image_file();
+        return; // 60 seconds to time out
+    }
+    // SXM
 #endif // defined(CHINESE)
-       /*
-       #if(defined(FRENCH))
-               //------ display the 5th page -----//
-     
-               vga_util.disp_image_file("CREDITS5");
-     
-               if( mouse.wait_press(60)==2 )		// return 2 if pressed ESC or
-       right mouse click
-               {
-                       vga_util.finish_disp_image_file();
-                       return;								// 60
-       seconds to time out
-               }
-       #endif*/
+    /*
+    #if(defined(FRENCH))
+            //------ display the 5th page -----//
 
-  vga_util.finish_disp_image_file();
-  res_credit.deinit();
+            vga_util.disp_image_file("CREDITS5");
+
+            if( mouse.wait_press(60)==2 )		// return 2 if pressed ESC or
+    right mouse click
+            {
+                    vga_util.finish_disp_image_file();
+                    return;								//
+    60 seconds to time out
+            }
+    #endif*/
+
+    vga_util.finish_disp_image_file();
+    res_credit.deinit();
 }
 //------ End of function Game::view_credits ------//
 

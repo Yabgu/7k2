@@ -43,62 +43,66 @@
 //------- Define class FirmBase --------//
 
 #pragma pack(1)
-class FirmBase : public FirmWork {
-public:
-  short god_id;
-  short god_unit_recno; // unit recno of the summoned god
+class FirmBase : public FirmWork
+{
+  public:
+    short god_id;
+    short god_unit_recno; // unit recno of the summoned god
 
-  float pray_points;
+    float pray_points;
 
-  short invoked_effect_id;
-  short invoked_effect_para;
-  short invoked_effect_last;
+    short invoked_effect_id;
+    short invoked_effect_para;
+    short invoked_effect_last;
 
-  static char invoked_effect_text[200];
+    static char invoked_effect_text[200];
 
-public:
-  FirmBase();
-  ~FirmBase();
+  public:
+    FirmBase();
+    ~FirmBase();
 
-  void init_derived();
+    void init_derived();
 
-  void change_nation(int newNationRecno);
+    void change_nation(int newNationRecno);
 
-  void put_info(int refreshFlag);
-  void detect_info();
-  void disp_edit_mode(int &refreshFlag, int &dispY1, int dispBG = 1);
-  int detect_edit_mode();
+    void put_info(int refreshFlag);
+    void detect_info();
+    void disp_edit_mode(int &refreshFlag, int &dispY1, int dispBG = 1);
+    int detect_edit_mode();
 
-  void next_day();
-  void process_ai();
+    void next_day();
+    void process_ai();
 
-  int can_invoke();
-  void invoke_god();
+    int can_invoke();
+    void invoke_god();
 
-  int can_make_wish();
-  void invoke_random_effect(int effectId, char remoteAction);
+    int can_make_wish();
+    void invoke_random_effect(int effectId, char remoteAction);
 
-  virtual FirmBase *cast_to_FirmBase() { return this; };
+    virtual FirmBase *cast_to_FirmBase()
+    {
+        return this;
+    };
 
-  //-------- multiplayer checking codes --------//
+    //-------- multiplayer checking codes --------//
 
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 
-protected:
-  // -------- protected interface function -------//
+  protected:
+    // -------- protected interface function -------//
 
-  void disp_firm_info(int dispY1, int refreshFlag);
-  void detect_firm_info();
+    void disp_firm_info(int dispY1, int refreshFlag);
+    void detect_firm_info();
 
-private:
-  void disp_base_info(int dispY1, int refreshFlag);
-  void disp_god_info(int dispY1, int refreshFlag);
+  private:
+    void disp_base_info(int dispY1, int refreshFlag);
+    void disp_god_info(int dispY1, int refreshFlag);
 
-  //------------- AI actions --------------//
+    //------------- AI actions --------------//
 
-  void think_invoke_god();
-  int think_adjust_workforce();
+    void think_invoke_god();
+    int think_adjust_workforce();
 };
 #pragma pack()
 

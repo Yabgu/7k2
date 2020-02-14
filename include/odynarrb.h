@@ -39,51 +39,61 @@ typedef char *(*CreateEleFP)();
 //--------- Define struct EmptyRoom -----------//
 
 #pragma pack(1)
-struct EmptyRoom {
-  short recno;
-  int deleted_game_date;
+struct EmptyRoom
+{
+    short recno;
+    int deleted_game_date;
 };
 #pragma pack()
 
 //---------- Define class DynArrayB -----------//
 
 #pragma pack(1)
-class DynArrayB : public DynArray {
-public:
-  EmptyRoom *empty_room_array;
-  short empty_room_num;   // rooms allocated
-  short empty_room_count; // rooms used
-  short reuse_interval_days;
-  char reuse_interval_disabled; // default: 0, for function
-                                // enable_reuse_interval() and
-                                // disable_reuse_interval()
+class DynArrayB : public DynArray
+{
+  public:
+    EmptyRoom *empty_room_array;
+    short empty_room_num;   // rooms allocated
+    short empty_room_count; // rooms used
+    short reuse_interval_days;
+    char reuse_interval_disabled; // default: 0, for function
+                                  // enable_reuse_interval() and
+                                  // disable_reuse_interval()
 
-public:
-  DynArrayB(int, int = DEF_DYNARRAY_BLOCK_SIZE, int reuseIntervalDays = 0);
-  ~DynArrayB();
+  public:
+    DynArrayB(int, int = DEF_DYNARRAY_BLOCK_SIZE, int reuseIntervalDays = 0);
+    ~DynArrayB();
 
-  // packed_size()  is the size when the array is packed (deleted record are
-  // actually removed) packed_recno() is the recno when the array is packed
+    // packed_size()  is the size when the array is packed (deleted record are
+    // actually removed) packed_recno() is the recno when the array is packed
 
-  int packed_size() const { return size() - empty_room_count; }
-  int packed_recno(
-      int) const; // Given the recno unpacked, it returns the recno packed.
+    int packed_size() const
+    {
+        return size() - empty_room_count;
+    }
+    int packed_recno(int) const; // Given the recno unpacked, it returns the recno packed.
 
-  void linkin(void *);
-  void linkout(int = -1);
-  void zap();
+    void linkin(void *);
+    void linkout(int = -1);
+    void zap();
 
-  void enable_reuse_interval() { reuse_interval_disabled = 0; }
-  void disable_reuse_interval() { reuse_interval_disabled = 1; }
+    void enable_reuse_interval()
+    {
+        reuse_interval_disabled = 0;
+    }
+    void disable_reuse_interval()
+    {
+        reuse_interval_disabled = 1;
+    }
 
-  int write_file(File *); // Write current dynamic array to file
-  int read_file(File *);  // Read dynamic array from file
+    int write_file(File *); // Write current dynamic array to file
+    int read_file(File *);  // Read dynamic array from file
 
-  int write_empty_room(File *); // Write current dynamic array to file
-  int read_empty_room(File *);  // Read dynamic array from file
+    int write_empty_room(File *); // Write current dynamic array to file
+    int read_empty_room(File *);  // Read dynamic array from file
 
-  int write_ptr_array(File *, int);
-  int read_ptr_array(File *, int, CreateEleFP);
+    int write_ptr_array(File *, int);
+    int read_ptr_array(File *, int, CreateEleFP);
 };
 #pragma pack()
 

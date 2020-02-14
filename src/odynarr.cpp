@@ -35,24 +35,28 @@ using namespace FileIOVisitor;
 // [int] blockNum = number of entity of each block of element
 //                       increased ( default : 30 )
 
-DynArray::DynArray(int eleSize, int blockNum) {
-  ele_size = eleSize;
-  block_num = blockNum;
+DynArray::DynArray(int eleSize, int blockNum)
+{
+    ele_size = eleSize;
+    block_num = blockNum;
 
-  body_buf = mem_add(ele_size * block_num);
+    body_buf = mem_add(ele_size * block_num);
 
-  cur_pos = 0;
-  last_ele = 0;
-  ele_num = block_num;
+    cur_pos = 0;
+    last_ele = 0;
+    ele_num = block_num;
 
-  sort_offset = -1;
+    sort_offset = -1;
 }
 
 //----------- END OF FUNCTION DynArray Constructor -----//
 
 //--------- BEGIN OF FUNCTION DynArray Destructor ------//
 
-DynArray::~DynArray() { mem_del(body_buf); }
+DynArray::~DynArray()
+{
+    mem_del(body_buf);
+}
 
 //---------- END OF FUNCTION DynArray Destructor --------//
 
@@ -60,23 +64,22 @@ DynArray::~DynArray() { mem_del(body_buf); }
 //
 // change the size of the storage block - this will always be an increase
 //
-void DynArray::resize(int newNum) {
-  //-------------------------------------------------------//
-  //
-  // The Mem::resize() and realloc() may not function properly in
-  // some case when the memory block has a considerable size.
-  //
-  // Calling function resize_keep_data will do additional effort
-  // to preserve the original data.
-  //
-  //-------------------------------------------------------//
+void DynArray::resize(int newNum)
+{
+    //-------------------------------------------------------//
+    //
+    // The Mem::resize() and realloc() may not function properly in
+    // some case when the memory block has a considerable size.
+    //
+    // Calling function resize_keep_data will do additional effort
+    // to preserve the original data.
+    //
+    //-------------------------------------------------------//
 
-  body_buf = mem_resize(
-      body_buf,
-      newNum *
-          ele_size); // give both the original data size and the new data size
+    body_buf = mem_resize(body_buf,
+                          newNum * ele_size); // give both the original data size and the new data size
 
-  ele_num = newNum;
+    ele_num = newNum;
 }
 
 //--------- END OF FUNCTION DynArray::resize -----------//
@@ -87,20 +90,22 @@ void DynArray::resize(int newNum) {
 //
 // [int] resizeFlag - whether resize the array to its initial size
 //							 or keep its current
-//size. 							 (default:1)
+// size. 							 (default:1)
 //
-void DynArray::zap(int resizeFlag) {
-  if (resizeFlag) {
-    if (ele_num != block_num) // if the current record no. is already block_num,
-                              // no resizing needed
+void DynArray::zap(int resizeFlag)
+{
+    if (resizeFlag)
     {
-      ele_num = block_num;
-      body_buf = mem_resize(body_buf, ele_size * ele_num);
+        if (ele_num != block_num) // if the current record no. is already block_num,
+                                  // no resizing needed
+        {
+            ele_num = block_num;
+            body_buf = mem_resize(body_buf, ele_size * ele_num);
+        }
     }
-  }
 
-  cur_pos = 0;
-  last_ele = 0;
+    cur_pos = 0;
+    last_ele = 0;
 }
 //--------- END OF FUNCTION DynArray::zap -----------//
 
@@ -111,18 +116,18 @@ void DynArray::zap(int resizeFlag) {
 // WARNING : After calling linkin() all pointers to the linklist body
 //           should be updated, because mem_resize() will move the body memory
 //
-void DynArray::linkin(void *ent) {
-  last_ele++;
-  cur_pos = last_ele;
+void DynArray::linkin(void *ent)
+{
+    last_ele++;
+    cur_pos = last_ele;
 
-  if (last_ele >
-      ele_num) // not enough empty element left to hold the new entity
-    resize(ele_num + block_num);
+    if (last_ele > ele_num) // not enough empty element left to hold the new entity
+        resize(ele_num + block_num);
 
-  if (ent)
-    memcpy(body_buf + (cur_pos - 1) * ele_size, ent, ele_size);
-  else
-    *(body_buf + (cur_pos - 1) * ele_size) = '\0';
+    if (ent)
+        memcpy(body_buf + (cur_pos - 1) * ele_size, ent, ele_size);
+    else
+        *(body_buf + (cur_pos - 1) * ele_size) = '\0';
 }
 
 //---------- END OF FUNCTION DynArray::linkin ------------//
@@ -131,15 +136,17 @@ void DynArray::linkin(void *ent) {
 //
 // Linkin - unique mode. If duplicated, don't link into the array.
 //
-void DynArray::linkin_unique(void *ent) {
-  int i;
+void DynArray::linkin_unique(void *ent)
+{
+    int i;
 
-  for (i = 0; i < last_ele; i++) {
-    if (memcmp(body_buf + i * ele_size, ent, ele_size) == 0)
-      return;
-  }
+    for (i = 0; i < last_ele; i++)
+    {
+        if (memcmp(body_buf + i * ele_size, ent, ele_size) == 0)
+            return;
+    }
 
-  linkin(ent);
+    linkin(ent);
 }
 //---------- END OF FUNCTION DynArray::linkin_unique ------------//
 
@@ -149,25 +156,25 @@ void DynArray::linkin_unique(void *ent) {
 //
 // Warning : DynArrayB (version B) can't use this function
 //
-void DynArray::insert(void *ent) {
-  if (size() == 0) {
-    linkin(ent);
-    return;
-  }
+void DynArray::insert(void *ent)
+{
+    if (size() == 0)
+    {
+        linkin(ent);
+        return;
+    }
 
-  last_ele++;
+    last_ele++;
 
-  if (last_ele >
-      ele_num) // not enough empty element left to hold the new entity
-    resize(ele_num + block_num);
+    if (last_ele > ele_num) // not enough empty element left to hold the new entity
+        resize(ele_num + block_num);
 
-  memmove(body_buf + cur_pos * ele_size, body_buf + (cur_pos - 1) * ele_size,
-          (last_ele - cur_pos) * ele_size);
+    memmove(body_buf + cur_pos * ele_size, body_buf + (cur_pos - 1) * ele_size, (last_ele - cur_pos) * ele_size);
 
-  if (ent)
-    memcpy(body_buf + (cur_pos - 1) * ele_size, ent, ele_size);
-  else
-    *(body_buf + (cur_pos - 1) * ele_size) = '\0';
+    if (ent)
+        memcpy(body_buf + (cur_pos - 1) * ele_size, ent, ele_size);
+    else
+        *(body_buf + (cur_pos - 1) * ele_size) = '\0';
 }
 
 //---------- END OF FUNCTION DynArray::insert ------------//
@@ -182,28 +189,27 @@ void DynArray::insert(void *ent) {
 // <void*> ent		   - pointer to the record entity. If NULL, blank
 // record.
 //
-void DynArray::insert_at(int insertPos, void *ent) {
-  if (size() == 0 || insertPos > last_ele) {
-    linkin(ent);
-    return;
-  }
+void DynArray::insert_at(int insertPos, void *ent)
+{
+    if (size() == 0 || insertPos > last_ele)
+    {
+        linkin(ent);
+        return;
+    }
 
-  err_when(insertPos < 1 || insertPos > last_ele);
+    err_when(insertPos < 1 || insertPos > last_ele);
 
-  last_ele++;
+    last_ele++;
 
-  if (last_ele >
-      ele_num) // not enough empty element left to hold the new entity
-    resize(ele_num + block_num);
+    if (last_ele > ele_num) // not enough empty element left to hold the new entity
+        resize(ele_num + block_num);
 
-  memmove(body_buf + insertPos * ele_size,
-          body_buf + (insertPos - 1) * ele_size,
-          (last_ele - insertPos) * ele_size);
+    memmove(body_buf + insertPos * ele_size, body_buf + (insertPos - 1) * ele_size, (last_ele - insertPos) * ele_size);
 
-  if (ent)
-    memcpy(body_buf + (insertPos - 1) * ele_size, ent, ele_size);
-  else
-    *(body_buf + (insertPos - 1) * ele_size) = '\0';
+    if (ent)
+        memcpy(body_buf + (insertPos - 1) * ele_size, ent, ele_size);
+    else
+        *(body_buf + (insertPos - 1) * ele_size) = '\0';
 }
 
 //---------- END OF FUNCTION DynArray::insert_at ------------//
@@ -215,26 +221,24 @@ void DynArray::insert_at(int insertPos, void *ent) {
 // [int] delPos = the position (recno) of the item to be deleted
 //                ( default : recno() current record no. )
 //
-void DynArray::linkout(int delPos) {
-  if (delPos < 0)
-    delPos = cur_pos;
+void DynArray::linkout(int delPos)
+{
+    if (delPos < 0)
+        delPos = cur_pos;
 
-  if (delPos == 0 || delPos > last_ele)
-    return;
+    if (delPos == 0 || delPos > last_ele)
+        return;
 
-  if (delPos != last_ele)
-    memmove(body_buf + (delPos - 1) * ele_size, body_buf + delPos * ele_size,
-            (last_ele - delPos) * ele_size);
+    if (delPos != last_ele)
+        memmove(body_buf + (delPos - 1) * ele_size, body_buf + delPos * ele_size, (last_ele - delPos) * ele_size);
 
-  last_ele--;
+    last_ele--;
 
-  if (cur_pos > last_ele)
-    cur_pos = last_ele;
+    if (cur_pos > last_ele)
+        cur_pos = last_ele;
 
-  if (last_ele <
-      ele_num - block_num *
-                    2) // shrink the size if two empty block of element are left
-    resize(ele_num - block_num);
+    if (last_ele < ele_num - block_num * 2) // shrink the size if two empty block of element are left
+        resize(ele_num - block_num);
 }
 
 //------------ END OF FUNCTION DynArray::linkout ----------//
@@ -245,17 +249,18 @@ void DynArray::linkout(int delPos) {
 // [int]   recNo   = no. of the record to be updated
 //                   ( default : current record no. )
 //
-void DynArray::update(void *bodyPtr, int recNo) {
-  if (recNo < 0)
-    recNo = cur_pos;
+void DynArray::update(void *bodyPtr, int recNo)
+{
+    if (recNo < 0)
+        recNo = cur_pos;
 
-  if (recNo <= 0)
-    return;
+    if (recNo <= 0)
+        return;
 
-  if (bodyPtr)
-    memcpy(body_buf + (recNo - 1) * ele_size, bodyPtr, ele_size);
-  else
-    *(body_buf + (recNo - 1) * ele_size) = '\0';
+    if (bodyPtr)
+        memcpy(body_buf + (recNo - 1) * ele_size, bodyPtr, ele_size);
+    else
+        *(body_buf + (recNo - 1) * ele_size) = '\0';
 }
 //----------- END OF FUNCTION DynArray::update ---------//
 
@@ -265,15 +270,15 @@ void DynArray::update(void *bodyPtr, int recNo) {
 //
 // <int> blankNum = no. of blank records
 //
-void DynArray::add_blank(int blankNum) {
-  cur_pos = last_ele + 1;
-  last_ele += blankNum;
+void DynArray::add_blank(int blankNum)
+{
+    cur_pos = last_ele + 1;
+    last_ele += blankNum;
 
-  if (last_ele >
-      ele_num) // not enough empty element left to hold the new entity
-    resize(last_ele + block_num);
+    if (last_ele > ele_num) // not enough empty element left to hold the new entity
+        resize(last_ele + block_num);
 
-  memset(body_buf + (cur_pos - 1) * ele_size, 0, blankNum * ele_size);
+    memset(body_buf + (cur_pos - 1) * ele_size, 0, blankNum * ele_size);
 }
 
 //---------- END OF FUNCTION DynArray::add_blank ------------//
@@ -290,13 +295,15 @@ void DynArray::add_blank(int blankNum) {
 // Return : 0 if not found
 //          if found, return the position found
 //
-int DynArray::scan_whole(void *structPtr) {
-  for (cur_pos = 1; cur_pos <= last_ele; cur_pos++) {
-    if (memcmp(structPtr, get(), ele_size) == 0)
-      return cur_pos;
-  }
+int DynArray::scan_whole(void *structPtr)
+{
+    for (cur_pos = 1; cur_pos <= last_ele; cur_pos++)
+    {
+        if (memcmp(structPtr, get(), ele_size) == 0)
+            return cur_pos;
+    }
 
-  return 0;
+    return 0;
 }
 //-------- END OF FUNCTION DynArray::scan_whole ----------//
 
@@ -320,21 +327,24 @@ int DynArray::scan_whole(void *structPtr) {
 // Return : 0 if not found
 //          if found, return the position found
 //
-int DynArray::scan(void *varChar, int varOff, char varType, int restPos) {
-  int oldPos, ret;
+int DynArray::scan(void *varChar, int varOff, char varType, int restPos)
+{
+    int oldPos, ret;
 
-  oldPos = cur_pos;
+    oldPos = cur_pos;
 
-  for (cur_pos = 1; cur_pos <= last_ele; cur_pos++) {
-    if (compare(varChar, varOff, varType)) {
-      ret = cur_pos;
-      if (restPos)
-        cur_pos = oldPos;
-      return ret;
+    for (cur_pos = 1; cur_pos <= last_ele; cur_pos++)
+    {
+        if (compare(varChar, varOff, varType))
+        {
+            ret = cur_pos;
+            if (restPos)
+                cur_pos = oldPos;
+            return ret;
+        }
     }
-  }
 
-  return 0;
+    return 0;
 }
 //-------- END OF FUNCTION DynArray::scan ----------//
 
@@ -349,36 +359,38 @@ int DynArray::scan(void *varChar, int varOff, char varType, int restPos) {
 //           'i' = integer
 //           'c' = char
 
-int DynArray::compare(void *varChar, int varOff, char varType) {
-  char *bodyPtr, *bodyStr;
+int DynArray::compare(void *varChar, int varOff, char varType)
+{
+    char *bodyPtr, *bodyStr;
 
-  bodyPtr = (char *)get();
+    bodyPtr = (char *)get();
 
-  switch (varType) {
-  case 'C':
-  case 'P':
-    if (varType == 'C')
-      bodyStr = bodyPtr + varOff;
-    else
-      bodyStr = *((char **)(bodyPtr + varOff));
+    switch (varType)
+    {
+    case 'C':
+    case 'P':
+        if (varType == 'C')
+            bodyStr = bodyPtr + varOff;
+        else
+            bodyStr = *((char **)(bodyPtr + varOff));
 
-    if (bodyStr == (char *)varChar) // the pointer is the same
-      return 1;
-    else
-      return misc.str_cmp(bodyStr,
-                          (char *)varChar); // m1strcmp with exact set off
+        if (bodyStr == (char *)varChar) // the pointer is the same
+            return 1;
+        else
+            return misc.str_cmp(bodyStr,
+                                (char *)varChar); // m1strcmp with exact set off
 
-  case 'c':
-    return *(bodyPtr + varOff) == *((char *)varChar);
+    case 'c':
+        return *(bodyPtr + varOff) == *((char *)varChar);
 
-  case 'i':
-    return *((int *)(bodyPtr + varOff)) == *((int *)varChar);
+    case 'i':
+        return *((int *)(bodyPtr + varOff)) == *((int *)varChar);
 
-  case 'd':
-    return *((double *)(bodyPtr + varOff)) == *((double *)varChar);
-  }
+    case 'd':
+        return *((double *)(bodyPtr + varOff)) == *((double *)varChar);
+    }
 
-  return 0;
+    return 0;
 }
 
 //-------- END OF FUNCTION DynArray::compare ----------//
@@ -392,39 +404,42 @@ int DynArray::compare(void *varChar, int varOff, char varType) {
 // <int[]> = the array of offset of the char*
 //
 
-void DynArray::clean_up(int *stringOffset) {
-  if (stringOffset) {
-    int i;
+void DynArray::clean_up(int *stringOffset)
+{
+    if (stringOffset)
+    {
+        int i;
 
-    for (i = 0; i < last_ele; i++)
-      free_ptr(body_buf + i * ele_size, stringOffset);
-  }
+        for (i = 0; i < last_ele; i++)
+            free_ptr(body_buf + i * ele_size, stringOffset);
+    }
 
-  last_ele = 0;
-  cur_pos = 0;
+    last_ele = 0;
+    cur_pos = 0;
 
-  resize(block_num);
+    resize(block_num);
 }
 
 //---------- END OF FUNCTION DynArray::clean_up ---------//
 
 //------- BEGIN OF FUNCTION DynArray::free_ptr ----------//
 
-void DynArray::free_ptr(void *freebody, int *stringOffset) {
-  int i, stringNum;
-  char **ptrPtr;
-  char *charPtr;
+void DynArray::free_ptr(void *freebody, int *stringOffset)
+{
+    int i, stringNum;
+    char **ptrPtr;
+    char *charPtr;
 
-  stringNum = stringOffset[0];
+    stringNum = stringOffset[0];
 
-  for (i = 1; i <= stringNum; i++) // write char* allocated string
-  {
-    ptrPtr = (char **)((char *)freebody + stringOffset[i]);
-    charPtr = (char *)*ptrPtr;
+    for (i = 1; i <= stringNum; i++) // write char* allocated string
+    {
+        ptrPtr = (char **)((char *)freebody + stringOffset[i]);
+        charPtr = (char *)*ptrPtr;
 
-    if (charPtr)
-      mem_del(charPtr);
-  }
+        if (charPtr)
+            mem_del(charPtr);
+    }
 }
 //----------- END OF FUNCTION DynArray::free_ptr -------------//
 
@@ -435,24 +450,28 @@ void DynArray::free_ptr(void *freebody, int *stringOffset) {
 // int(*fcmp)(const void*, const void*) cmpFun = the pointer to the comparsion
 // function
 //
-void DynArray::quick_sort(int (*cmpFun)(const void *, const void *)) {
-  qsort(body_buf, last_ele, ele_size, cmpFun);
+void DynArray::quick_sort(int (*cmpFun)(const void *, const void *))
+{
+    qsort(body_buf, last_ele, ele_size, cmpFun);
 }
 //------------- End of function DynArray::quick_sort --------------//
 
-template <typename Visitor>
-static void visit_dyn_array(Visitor *v, DynArray *da) {
-  visit<int32_t>(v, &da->ele_num);
-  visit<int32_t>(v, &da->block_num);
-  visit<int32_t>(v, &da->cur_pos);
-  visit<int32_t>(v, &da->last_ele);
-  visit<int32_t>(v, &da->ele_size);
-  visit<int32_t>(v, &da->sort_offset);
-  visit<int8_t>(v, &da->sort_type);
-  v->skip(4); /* da->body_buf */
+template <typename Visitor> static void visit_dyn_array(Visitor *v, DynArray *da)
+{
+    visit<int32_t>(v, &da->ele_num);
+    visit<int32_t>(v, &da->block_num);
+    visit<int32_t>(v, &da->cur_pos);
+    visit<int32_t>(v, &da->last_ele);
+    visit<int32_t>(v, &da->ele_size);
+    visit<int32_t>(v, &da->sort_offset);
+    visit<int8_t>(v, &da->sort_type);
+    v->skip(4); /* da->body_buf */
 }
 
-enum { DYN_ARRAY_RECORD_SIZE = 29 };
+enum
+{
+    DYN_ARRAY_RECORD_SIZE = 29
+};
 
 //---------- Begin of function DynArray::write_file -------------//
 //
@@ -464,18 +483,18 @@ enum { DYN_ARRAY_RECORD_SIZE = 29 };
 // Return : 1 - write successfully
 //          0 - writing error
 //
-int DynArray::write_file(File *filePtr) {
-  if (!write_with_record_size(filePtr, this,
-                              &visit_dyn_array<FileWriterVisitor>,
-                              DYN_ARRAY_RECORD_SIZE))
-    return 0;
+int DynArray::write_file(File *filePtr)
+{
+    if (!write_with_record_size(filePtr, this, &visit_dyn_array<FileWriterVisitor>, DYN_ARRAY_RECORD_SIZE))
+        return 0;
 
-  if (last_ele > 0) {
-    if (!filePtr->file_write(body_buf, ele_size * last_ele))
-      return 0;
-  }
+    if (last_ele > 0)
+    {
+        if (!filePtr->file_write(body_buf, ele_size * last_ele))
+            return 0;
+    }
 
-  return 1;
+    return 1;
 }
 //------------- End of function DynArray::write_file --------------//
 
@@ -488,23 +507,24 @@ int DynArray::write_file(File *filePtr) {
 // Return : 1 - read successfully
 //          0 - writing error
 //
-int DynArray::read_file(File *filePtr) {
-  char *bodyBuf = body_buf; // preserve body_buf which has been allocated
+int DynArray::read_file(File *filePtr)
+{
+    char *bodyBuf = body_buf; // preserve body_buf which has been allocated
 
-  if (!read_with_record_size(filePtr, this, &visit_dyn_array<FileReaderVisitor>,
-                             DYN_ARRAY_RECORD_SIZE))
-    return 0;
+    if (!read_with_record_size(filePtr, this, &visit_dyn_array<FileReaderVisitor>, DYN_ARRAY_RECORD_SIZE))
+        return 0;
 
-  body_buf = mem_resize(bodyBuf, ele_num * ele_size);
+    body_buf = mem_resize(bodyBuf, ele_num * ele_size);
 
-  if (last_ele > 0) {
-    if (!filePtr->file_read(body_buf, ele_size * last_ele))
-      return 0;
-  }
+    if (last_ele > 0)
+    {
+        if (!filePtr->file_read(body_buf, ele_size * last_ele))
+            return 0;
+    }
 
-  start(); // go top
+    start(); // go top
 
-  return 1;
+    return 1;
 }
 //------------- End of function DynArray::read_file --------------//
 
@@ -517,11 +537,13 @@ int DynArray::read_file(File *filePtr) {
 //                     SORT_CHAR_STR = <char[]>
 //                     SORT_INT		 = <int>
 //							  SORT_SHORT    =
-//<short> 							  SORT_CHAR     = <char>
+//<short> 							  SORT_CHAR     =
+//<char>
 //
-void DynArray::init_sort(int sortOffset, char sortType) {
-  sort_offset = sortOffset;
-  sort_type = sortType;
+void DynArray::init_sort(int sortOffset, char sortType)
+{
+    sort_offset = sortOffset;
+    sort_type = sortType;
 }
 //----------- End of function DynArray::init_sort ---------//
 
@@ -542,59 +564,60 @@ void DynArray::init_sort(int sortOffset, char sortType) {
 // WARNING : After calling linkin() all pointers to the linklist body
 //           should be updated, because mem_resize() will move the body memory
 //
-void DynArray::linkin_sort_scan_from_bottom(void *varPtr) {
-  err_when(sort_offset < 0);
+void DynArray::linkin_sort_scan_from_bottom(void *varPtr)
+{
+    err_when(sort_offset < 0);
 
-  int cmpRet;
-  char *varData, *bodyChar;
+    int cmpRet;
+    char *varData, *bodyChar;
 
-  for (int recNo = last_ele; recNo > 0; recNo--) {
-    //-------- comparsion ---------//
+    for (int recNo = last_ele; recNo > 0; recNo--)
+    {
+        //-------- comparsion ---------//
 
-    switch (sort_type) {
-    case SORT_INT: // <int>
-      cmpRet = *((int *)((char *)varPtr + sort_offset)) >
-               *((int *)((char *)get() + sort_offset));
-      break;
+        switch (sort_type)
+        {
+        case SORT_INT: // <int>
+            cmpRet = *((int *)((char *)varPtr + sort_offset)) > *((int *)((char *)get() + sort_offset));
+            break;
 
-    case SORT_SHORT: // <short>
-      cmpRet = *((short *)((char *)varPtr + sort_offset)) >
-               *((short *)((char *)get() + sort_offset));
-      break;
+        case SORT_SHORT: // <short>
+            cmpRet = *((short *)((char *)varPtr + sort_offset)) > *((short *)((char *)get() + sort_offset));
+            break;
 
-    case SORT_CHAR: // <char>
-      cmpRet = *((char *)((char *)varPtr + sort_offset)) >
-               *((char *)((char *)get() + sort_offset));
-      break;
+        case SORT_CHAR: // <char>
+            cmpRet = *((char *)((char *)varPtr + sort_offset)) > *((char *)((char *)get() + sort_offset));
+            break;
 
-    case SORT_CHAR_PTR: // <char*>
-      varData = *((char **)((char *)varPtr + sort_offset));
-      bodyChar = *((char **)((char *)get() + sort_offset));
+        case SORT_CHAR_PTR: // <char*>
+            varData = *((char **)((char *)varPtr + sort_offset));
+            bodyChar = *((char **)((char *)get() + sort_offset));
 
-      err_when(!varData || !bodyChar);
+            err_when(!varData || !bodyChar);
 
-      cmpRet = strcmp(varData, bodyChar);
-      break;
+            cmpRet = strcmp(varData, bodyChar);
+            break;
 
-    case SORT_CHAR_STR: // <char[]>
-      varData = (char *)varPtr + sort_offset;
-      bodyChar = (char *)get() + sort_offset;
+        case SORT_CHAR_STR: // <char[]>
+            varData = (char *)varPtr + sort_offset;
+            bodyChar = (char *)get() + sort_offset;
 
-      err_when(!varData || !bodyChar);
+            err_when(!varData || !bodyChar);
 
-      cmpRet = strcmp(varData, bodyChar);
-      break;
+            cmpRet = strcmp(varData, bodyChar);
+            break;
+        }
+
+        //---- if equal then linkin -----------//
+
+        if (cmpRet >= 0)
+        {
+            insert_at(last_ele + 1, varPtr);
+            return;
+        }
     }
 
-    //---- if equal then linkin -----------//
-
-    if (cmpRet >= 0) {
-      insert_at(last_ele + 1, varPtr);
-      return;
-    }
-  }
-
-  insert_at(1, varPtr); // insert at the top
+    insert_at(1, varPtr); // insert at the top
 }
 //--------- END OF FUNCTION DynArray::linkin_sort_scan_from_bottom ---------//
 

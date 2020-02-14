@@ -26,32 +26,36 @@
 
 //-------- Define struct DefenseAttribute -------//
 
-struct DefenseAttribute {
-  char sturdiness;
-  char is_wood;
+struct DefenseAttribute
+{
+    char sturdiness;
+    char is_wood;
 
-  void init(char s, char w) {
-    sturdiness = s;
-    is_wood = w;
-  }
+    void init(char s, char w)
+    {
+        sturdiness = s;
+        is_wood = w;
+    }
 };
 
 //-------- Define struct AttackAttribute -------//
 
-struct AttackAttribute {
-  char sturdiness;
-  char explosiveness;
-  char heat;
-  char wood_favour;
+struct AttackAttribute
+{
+    char sturdiness;
+    char explosiveness;
+    char heat;
+    char wood_favour;
 
-  void init(char s, char e, char h, char w) {
-    sturdiness = s;
-    explosiveness = e;
-    heat = h;
-    wood_favour = w;
-  }
+    void init(char s, char e, char h, char w)
+    {
+        sturdiness = s;
+        explosiveness = e;
+        heat = h;
+        wood_favour = w;
+    }
 
-  float effectiveness(DefenseAttribute &);
+    float effectiveness(DefenseAttribute &);
 };
 
 #endif

@@ -29,6 +29,7 @@
 typedef unsigned char CRC_TYPE;
 const unsigned int CRC_LEN = sizeof(CRC_TYPE);
 
-CRC_TYPE crc8(unsigned char *, int);
+CRC_TYPE
+crc8(unsigned char *, int);
 
 #endif

@@ -34,109 +34,131 @@
 
 //------- Define constant ---------//
 
-enum { MAX_MONSTER_TRAINEE = 8 };
-enum { MAX_MONSTER_TRAIN_TYPE = 5 };
+enum
+{
+    MAX_MONSTER_TRAINEE = 8
+};
+enum
+{
+    MAX_MONSTER_TRAIN_TYPE = 5
+};
 
-enum {
-  FIRM_MONS_TRAIN_MENU_MAIN,
+enum
+{
+    FIRM_MONS_TRAIN_MENU_MAIN,
 };
 
 //------- Define struct MonsterTrainee ----/
 
 #pragma pack(1)
-struct MonsterTrainee {
-public:
-  char unit_id;
-  char loyalty;
-  Skill skill;
+struct MonsterTrainee
+{
+  public:
+    char unit_id;
+    char loyalty;
+    Skill skill;
 
-public:
-  int is_under_training() {
-    return skill.actual_combat_level() < BASIC_COMBAT_TRAIN;
-  }
+  public:
+    int is_under_training()
+    {
+        return skill.actual_combat_level() < BASIC_COMBAT_TRAIN;
+    }
 
-  int combat_level() { return skill.actual_combat_level(); }
-  int skill_level() { return skill.actual_skill_level(); }
-  int max_hit_points() { return skill.actual_max_hit_points(); }
+    int combat_level()
+    {
+        return skill.actual_combat_level();
+    }
+    int skill_level()
+    {
+        return skill.actual_skill_level();
+    }
+    int max_hit_points()
+    {
+        return skill.actual_max_hit_points();
+    }
 };
 #pragma pack()
 
 //------- Define class FirmMonsterTrain -------//
 
 #pragma pack(1)
-class FirmMonsterTrain : public Firm {
-public:
-  char train_type_count;
-  char train_unit_id[MAX_MONSTER_TRAIN_TYPE];
+class FirmMonsterTrain : public Firm
+{
+  public:
+    char train_type_count;
+    char train_unit_id[MAX_MONSTER_TRAIN_TYPE];
 
-  MonsterTrainee trainee_array[MAX_MONSTER_TRAINEE];
-  short trainee_count;
-  short selected_trainee_id;
+    MonsterTrainee trainee_array[MAX_MONSTER_TRAINEE];
+    short trainee_count;
+    short selected_trainee_id;
 
-  static char firm_menu_mode;
+    static char firm_menu_mode;
 
-public:
-  FirmMonsterTrain(int trainUnitId);
-  FirmMonsterTrain(char *trainUnitIdArray);
+  public:
+    FirmMonsterTrain(int trainUnitId);
+    FirmMonsterTrain(char *trainUnitIdArray);
 
-  void next_day();
+    void next_day();
 
-  //---- recruit and training functions -----//
+    //---- recruit and training functions -----//
 
-  void recruit_trainee(int trainUnitId, char remoteAction);
-  int can_recruit(int trainUnitId);
-  virtual int represent_attribute(int traineeId);
-  int mobilize_trainee(int traineeId, char remoteAction);
-  void kill_trainee(int traineeId);
-  void cancel_train_trainee(int trainUnitId, char remoteAction);
+    void recruit_trainee(int trainUnitId, char remoteAction);
+    int can_recruit(int trainUnitId);
+    virtual int represent_attribute(int traineeId);
+    int mobilize_trainee(int traineeId, char remoteAction);
+    void kill_trainee(int traineeId);
+    void cancel_train_trainee(int trainUnitId, char remoteAction);
 
-  //------- AI functions -------//
+    //------- AI functions -------//
 
-  void process_ai();
+    void process_ai();
 
-  //------- type casting function --------//
+    //------- type casting function --------//
 
-  virtual FirmMonsterTrain *cast_to_FirmMonsterTrain() { return this; }
+    virtual FirmMonsterTrain *cast_to_FirmMonsterTrain()
+    {
+        return this;
+    }
 
-  //-------- interface functions ----------//
+    //-------- interface functions ----------//
 
-  void put_info(int refreshFlag);
-  void detect_info();
-  void disp_edit_mode(int &refreshFlag, int &dispY1, int dispBG = 1);
-  int detect_edit_mode();
+    void put_info(int refreshFlag);
+    void detect_info();
+    void disp_edit_mode(int &refreshFlag, int &dispY1, int dispBG = 1);
+    int detect_edit_mode();
 
-  //---------------------------------------//
+    //---------------------------------------//
 
-  virtual void change_nation(int newNationRecno);
-  void free_all_people();
+    virtual void change_nation(int newNationRecno);
+    void free_all_people();
 
-  // -------- rally point ----------//
+    // -------- rally point ----------//
 
-  int can_set_rally_point(int destBaseObjRecno = 0);
+    int can_set_rally_point(int destBaseObjRecno = 0);
 
-  //------- multiplayer checking codes -------//
+    //------- multiplayer checking codes -------//
 
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 
-protected:
-  int create_trainee_unit(MonsterTrainee &thisTrainee);
-  void basic_train();
+  protected:
+    int create_trainee_unit(MonsterTrainee &thisTrainee);
+    void basic_train();
 
-  //------- interface functions ------//
+    //------- interface functions ------//
 
-  void disp_firm_info(int dispY1, int refreshFlag);
-  void detect_firm_info();
-  void disp_trainee_list(int dispY1, int refreshFlag);
-  int detect_trainee_list();
-  void disp_trainee_info(int dispY1, int refreshFlag);
-  void detect_trainee_info();
+    void disp_firm_info(int dispY1, int refreshFlag);
+    void detect_firm_info();
+    void disp_trainee_list(int dispY1, int refreshFlag);
+    int detect_trainee_list();
+    void disp_trainee_info(int dispY1, int refreshFlag);
+    void detect_trainee_info();
 
-  //-------- AI actions ---------//
+    //-------- AI actions ---------//
 
-  void think_train_new();
-  int think_del();
-  int think_transfer_unit();
+    void think_train_new();
+    int think_del();
+    int think_transfer_unit();
 };
 #pragma pack()
 

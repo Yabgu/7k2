@@ -51,39 +51,46 @@ fend off the invading force
 
 //---- Begin of function CampaignEastWest::plot_d1_create_game ----//
 
-void CampaignEastWest::plot_d1_create_game() {
-  // reduce cash
+void CampaignEastWest::plot_d1_create_game()
+{
+    // reduce cash
 
-  (~nation_array)->cash = (~nation_array)->cash / 4;
+    (~nation_array)->cash = (~nation_array)->cash / 4;
 
-  // reduce mineral if the mine is owned by the player
+    // reduce mineral if the mine is owned by the player
 
-  for (int i = 1; i <= site_array.size(); ++i) {
-    if (site_array.is_deleted(i))
-      continue;
+    for (int i = 1; i <= site_array.size(); ++i)
+    {
+        if (site_array.is_deleted(i))
+            continue;
 
-    Site *sitePtr = site_array[i];
-    if (sitePtr->site_type == SITE_RAW && sitePtr->has_mine) {
-      Location *locPtr = world.get_loc(sitePtr->map_x_loc, sitePtr->map_y_loc);
-      err_when(!locPtr->is_firm());
-      Firm *firmPtr = firm_array[locPtr->firm_recno()];
-      if (firmPtr->is_own()) {
-        sitePtr->reserve_qty = sitePtr->reserve_qty / 10;
+        Site *sitePtr = site_array[i];
+        if (sitePtr->site_type == SITE_RAW && sitePtr->has_mine)
+        {
+            Location *locPtr = world.get_loc(sitePtr->map_x_loc, sitePtr->map_y_loc);
+            err_when(!locPtr->is_firm());
+            Firm *firmPtr = firm_array[locPtr->firm_recno()];
+            if (firmPtr->is_own())
+            {
+                sitePtr->reserve_qty = sitePtr->reserve_qty / 10;
 
-        if (firmPtr->cast_to_FirmMine()) {
-          firmPtr->cast_to_FirmMine()->reserve_qty =
-              (float)sitePtr->reserve_qty;
-        } else if (firmPtr->cast_to_FirmMonsterAlchemy()) {
-          firmPtr->cast_to_FirmMonsterAlchemy()->reserve_qty =
-              (float)sitePtr->reserve_qty;
+                if (firmPtr->cast_to_FirmMine())
+                {
+                    firmPtr->cast_to_FirmMine()->reserve_qty = (float)sitePtr->reserve_qty;
+                }
+                else if (firmPtr->cast_to_FirmMonsterAlchemy())
+                {
+                    firmPtr->cast_to_FirmMonsterAlchemy()->reserve_qty = (float)sitePtr->reserve_qty;
+                }
+            }
         }
-      }
     }
-  }
 }
 //---- End of function CampaignEastWest::plot_d1_create_game ----//
 
 //---- Begin of function CampaignEastWest::plot_d1_next_day ----//
 //
-void CampaignEastWest::plot_d1_next_day() {}
+void CampaignEastWest::plot_d1_next_day()
+{
+}
 //---- End of function CampaignEastWest::plot_d1_next_day ----//

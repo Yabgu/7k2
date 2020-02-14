@@ -29,64 +29,95 @@
 #include <cstddef>
 #include <win32_compat.h>
 
-class SurfaceSDL {
-private:
-  SDL_Surface *surface;
-  void *save_buf;
-  long cur_pitch;
+class SurfaceSDL
+{
+  private:
+    SDL_Surface *surface;
+    void *save_buf;
+    long cur_pitch;
 
-public:
-  SurfaceSDL(SDL_Surface *s);
-  ~SurfaceSDL();
+  public:
+    SurfaceSDL(SDL_Surface *s);
+    ~SurfaceSDL();
 
-  bool is_inited() { return surface != NULL; }
-
-  short *buf_ptr() { return (short *)surface->pixels; }
-  short *buf_ptr(int x, int y) {
-    return (short *)((char *)surface->pixels + cur_pitch * y) + x;
-  }
-
-  // pitch in pixel
-  int buf_pitch() { return cur_pitch >> 1; } // in no. of pixel
-
-  // pitch in byte
-  int buf_true_pitch() { return cur_pitch; }
-
-  int buf_size() { return surface->w * surface->h * sizeof(short); }
-  int buf_width() { return surface->w; }
-  int buf_height() { return surface->h; }
-
-  BOOL is_buf_lost();
-  BOOL restore_buf();
-
-  int lock_buf();
-  int unlock_buf();
-
-  void set_buf_ptr(short *bufPtr, long pitch) {
-    if (!save_buf) {
-      save_buf = surface->pixels;
-      surface->pixels = bufPtr;
-      cur_pitch = pitch;
+    bool is_inited()
+    {
+        return surface != NULL;
     }
-  }
-  void set_default_buf_ptr() {
-    if (save_buf) {
-      surface->pixels = save_buf;
-      save_buf = NULL;
-      cur_pitch = surface->pitch;
+
+    short *buf_ptr()
+    {
+        return (short *)surface->pixels;
     }
-  }
+    short *buf_ptr(int x, int y)
+    {
+        return (short *)((char *)surface->pixels + cur_pitch * y) + x;
+    }
 
-  int write_bmp_file(char *fileName);
+    // pitch in pixel
+    int buf_pitch()
+    {
+        return cur_pitch >> 1;
+    } // in no. of pixel
 
-  void blt_buf_area(SurfaceSDL *srcBuf, int x1, int y1, int x2, int y2);
-  void blt_virtual_buf(SurfaceSDL *srcBuf);
-  void blt_virtual_buf_area(SurfaceSDL *srcBuf, int x1, int y1, int x2, int y2);
-  SDL_Surface *get_surface();
-  SDL_Surface *&get_surface_sdl() { return surface; }
-  void flip(SurfaceSDL *srcBuf) {
-    std::swap(surface, srcBuf->get_surface_sdl());
-  }
+    // pitch in byte
+    int buf_true_pitch()
+    {
+        return cur_pitch;
+    }
+
+    int buf_size()
+    {
+        return surface->w * surface->h * sizeof(short);
+    }
+    int buf_width()
+    {
+        return surface->w;
+    }
+    int buf_height()
+    {
+        return surface->h;
+    }
+
+    BOOL is_buf_lost();
+    BOOL restore_buf();
+
+    int lock_buf();
+    int unlock_buf();
+
+    void set_buf_ptr(short *bufPtr, long pitch)
+    {
+        if (!save_buf)
+        {
+            save_buf = surface->pixels;
+            surface->pixels = bufPtr;
+            cur_pitch = pitch;
+        }
+    }
+    void set_default_buf_ptr()
+    {
+        if (save_buf)
+        {
+            surface->pixels = save_buf;
+            save_buf = NULL;
+            cur_pitch = surface->pitch;
+        }
+    }
+
+    int write_bmp_file(char *fileName);
+
+    void blt_buf_area(SurfaceSDL *srcBuf, int x1, int y1, int x2, int y2);
+    void blt_virtual_buf(SurfaceSDL *srcBuf);
+    void blt_virtual_buf_area(SurfaceSDL *srcBuf, int x1, int y1, int x2, int y2);
+    SDL_Surface *get_surface();
+    SDL_Surface *&get_surface_sdl()
+    {
+        return surface;
+    }
+    void flip(SurfaceSDL *srcBuf)
+    {
+        std::swap(surface, srcBuf->get_surface_sdl());
+    }
 };
 
 typedef SurfaceSDL Surface;

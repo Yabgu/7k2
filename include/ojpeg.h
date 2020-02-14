@@ -31,17 +31,18 @@ class VgaBuf;
 struct jpeg_error_mgr;
 struct jpeg_decompress_struct;
 
-class Jpeg {
-private:
-  jpeg_decompress_struct *cinfo;
-  jpeg_error_mgr *jerr;
-  int error_flag;
+class Jpeg
+{
+  private:
+    jpeg_decompress_struct *cinfo;
+    jpeg_error_mgr *jerr;
+    int error_flag;
 
-public:
-  Jpeg();
-  ~Jpeg();
+  public:
+    Jpeg();
+    ~Jpeg();
 
-  int put_to_buf(VgaBuf *vgaBuf, int x, int y, char *filename);
+    int put_to_buf(VgaBuf *vgaBuf, int x, int y, char *filename);
 };
 
 extern Jpeg jpeg;

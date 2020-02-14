@@ -29,19 +29,22 @@
 // cur_action of BulletFlame is SPRITE_STOP before die
 
 #pragma pack(1)
-class BulletFlame : public Bullet {
-public:
-  BulletFlame();
+class BulletFlame : public Bullet
+{
+  public:
+    BulletFlame();
 
-  void init(char parentType, short parentRecno, short targetXLoc,
-            short targetYLoc, char targetMobileType);
-  void process_idle();
-  char display_layer();
-  int reflect(int baseObjRecno) { return 0; }
+    void init(char parentType, short parentRecno, short targetXLoc, short targetYLoc, char targetMobileType);
+    void process_idle();
+    char display_layer();
+    int reflect(int baseObjRecno)
+    {
+        return 0;
+    }
 
-  //-------------- multiplayer checking codes ---------------//
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    //-------------- multiplayer checking codes ---------------//
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 };
 #pragma pack()
 

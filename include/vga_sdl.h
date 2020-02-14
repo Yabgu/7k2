@@ -32,65 +32,65 @@
 struct RGBColor;
 class ColorTable;
 
-class VgaSDL : public VgaBase {
-private:
-  SDL_Window *window;
-  SDL_Renderer *renderer;
-  SDL_Surface *screen;
-  SDL_Surface *target;
-  SDL_Texture *texture;
-  SDL_Color game_pal[256];
+class VgaSDL : public VgaBase
+{
+  private:
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    SDL_Surface *screen;
+    SDL_Surface *target;
+    SDL_Texture *texture;
+    SDL_Color game_pal[256];
 
-public:
-  ColorTable *vga_color_table;
-  ColorTable *vga_blend_table;
-  unsigned char gray_remap_table[256];
-  int pixel_format_flag;      // see IMGFUN.H	// new for 16-bit
-  short *default_remap_table; // new for 16-bit
-  short *default_blend_table; // new for 16-bit
+  public:
+    ColorTable *vga_color_table;
+    ColorTable *vga_blend_table;
+    unsigned char gray_remap_table[256];
+    int pixel_format_flag;      // see IMGFUN.H	// new for 16-bit
+    short *default_remap_table; // new for 16-bit
+    short *default_blend_table; // new for 16-bit
 
-public:
-  VgaSDL();
-  ~VgaSDL();
+  public:
+    VgaSDL();
+    ~VgaSDL();
 
-  int init();
-  int set_mode(int width, int height);
-  void deinit();
+    int init();
+    int set_mode(int width, int height);
+    void deinit();
 
-  bool is_inited();
+    bool is_inited();
 
-  void handle_messages();
-  void flag_redraw(){};
-  bool is_full_screen() const;
-  int is_input_grabbed();
-  void set_full_screen_mode(int mode);
-  void set_window_grab(int mode);
-  void flip();
-  int change_resolution(int width, int height);
-  void update_screen();
+    void handle_messages();
+    void flag_redraw(){};
+    bool is_full_screen() const;
+    int is_input_grabbed();
+    void set_full_screen_mode(int mode);
+    void set_window_grab(int mode);
+    void flip();
+    int change_resolution(int width, int height);
+    void update_screen();
 
-  int translate_color(
-      unsigned char c) // calc 8-bit color to 16-bit color // new for 16 bit
-  {
-    return default_remap_table[c];
-  }
+    int translate_color(unsigned char c) // calc 8-bit color to 16-bit color // new for 16 bit
+    {
+        return default_remap_table[c];
+    }
 
-  int make_pixel(Uint8 red, Uint8 green, Uint8 blue);
-  int make_pixel(RGBColor *);
-  void decode_pixel(int, RGBColor *);
+    int make_pixel(Uint8 red, Uint8 green, Uint8 blue);
+    int make_pixel(RGBColor *);
+    void decode_pixel(int, RGBColor *);
 
-private:
-  int init_front(VgaBuf *);
-  int init_back(VgaBuf *, int width = 0, int height = 0);
-  void init_gray_remap_table();
-  void init_color_table();
-  int init_pal(const char *fileName);
-  int create_window();
-  void destroy_window();
-  bool create_surface(SDL_Surface *&surface, int bpp);
-  bool create_texture();
-  void destroy_surface(SDL_Surface *&surface);
-  void destroy_texture();
+  private:
+    int init_front(VgaBuf *);
+    int init_back(VgaBuf *, int width = 0, int height = 0);
+    void init_gray_remap_table();
+    void init_color_table();
+    int init_pal(const char *fileName);
+    int create_window();
+    void destroy_window();
+    bool create_surface(SDL_Surface *&surface, int bpp);
+    bool create_texture();
+    void destroy_surface(SDL_Surface *&surface);
+    void destroy_texture();
 };
 
 typedef VgaSDL Vga;

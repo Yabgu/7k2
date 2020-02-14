@@ -66,13 +66,14 @@ static short move_around_table_size = 0;
 //
 // float wait = the no. of second to wait
 //
-void Misc::delay(float wait) {
-  clock_t stopTime;
+void Misc::delay(float wait)
+{
+    clock_t stopTime;
 
-  stopTime = (long)(clock() + (wait * CLOCKS_PER_SEC));
+    stopTime = (long)(clock() + (wait * CLOCKS_PER_SEC));
 
-  while (clock() < stopTime)
-    ;
+    while (clock() < stopTime)
+        ;
 }
 //--------- End of function Misc::delay ---------------//
 
@@ -85,42 +86,43 @@ void Misc::delay(float wait) {
 // <int>    = max. no. of characters in the dest. string.
 //            ( destStr should be allocated as destStr[destLen+1] )
 //
-void Misc::str_shorten(char *destStr, const char *srcStr, int destLen) {
-  strncpy(destStr, srcStr, destLen);
+void Misc::str_shorten(char *destStr, const char *srcStr, int destLen)
+{
+    strncpy(destStr, srcStr, destLen);
 
-  destStr[destLen] = '\0';
+    destStr[destLen] = '\0';
 
-  //------ no need to cut characters if it fit preciously ----//
-  //
-  // e.g. "One Two Three" ---> "One Two"
-  //      (srcStr)             (destStr, return it as the result)
-  //----------------------------------------------------------//
+    //------ no need to cut characters if it fit preciously ----//
+    //
+    // e.g. "One Two Three" ---> "One Two"
+    //      (srcStr)             (destStr, return it as the result)
+    //----------------------------------------------------------//
 
-  if ((int)strlen(srcStr) < destLen || srcStr[destLen] == ' ')
-    return;
+    if ((int)strlen(srcStr) < destLen || srcStr[destLen] == ' ')
+        return;
 
-  //--- if there is only one word in the string, don't cut it ----//
-  //
-  // e.g. "VeryLongWord" --> "VeryLongWo"
-  //
-  //--------------------------------------------------------------//
+    //--- if there is only one word in the string, don't cut it ----//
+    //
+    // e.g. "VeryLongWord" --> "VeryLongWo"
+    //
+    //--------------------------------------------------------------//
 
-  if (!str_chr(destStr, ' '))
-    return;
+    if (!str_chr(destStr, ' '))
+        return;
 
-  //------ if there is more than one word, cut it ------//
-  //
-  // e.g. "One Two Three" ----> "One Two Thr" ---> "One Two"
-  //      (srcStr)               (destStr before)   (destStr after)
-  //
-  //----------------------------------------------------//
+    //------ if there is more than one word, cut it ------//
+    //
+    // e.g. "One Two Three" ----> "One Two Thr" ---> "One Two"
+    //      (srcStr)               (destStr before)   (destStr after)
+    //
+    //----------------------------------------------------//
 
-  int i;
+    int i;
 
-  for (i = destLen - 1; i > 0 && destStr[i] != ' '; i--)
-    destStr[i] = '\0';
+    for (i = destLen - 1; i > 0 && destStr[i] != ' '; i--)
+        destStr[i] = '\0';
 
-  destStr[i] = '\0'; // trim the space also
+    destStr[i] = '\0'; // trim the space also
 }
 //------------ END OF FUNCTIN Misc::str_shorten -----------------//
 
@@ -137,18 +139,18 @@ void Misc::str_shorten(char *destStr, const char *srcStr, int destLen) {
 // string)
 //
 
-int Misc::str_cut(char *dstr, const char *sstr, int schar, int charnum) {
-  int si, di, forever;
+int Misc::str_cut(char *dstr, const char *sstr, int schar, int charnum)
+{
+    int si, di, forever;
 
-  forever = (charnum < 0);
+    forever = (charnum < 0);
 
-  for (si = schar - 1, di = 0; (di < charnum || forever) && sstr[si];
-       si++, di++)
-    dstr[di] = sstr[si];
+    for (si = schar - 1, di = 0; (di < charnum || forever) && sstr[si]; si++, di++)
+        dstr[di] = sstr[si];
 
-  dstr[di] = '\0'; // terminating NULL sign
+    dstr[di] = '\0'; // terminating NULL sign
 
-  return 1;
+    return 1;
 }
 //------------ END OF FUNCTIN Misc::str_cut -----------------//
 
@@ -168,17 +170,19 @@ int Misc::str_cut(char *dstr, const char *sstr, int schar, int charnum) {
 //          FAIL / NULL if not found
 //
 
-int Misc::str_chr(const char *str, char chr, int spos, int epos) {
-  int i;
+int Misc::str_chr(const char *str, char chr, int spos, int epos)
+{
+    int i;
 
-  epos--;
+    epos--;
 
-  for (i = spos - 1; str[i] && (i <= epos || epos == -2); i++) {
-    if (str[i] == chr)
-      return (i + 1);
-  }
+    for (i = spos - 1; str[i] && (i <= epos || epos == -2); i++)
+    {
+        if (str[i] == chr)
+            return (i + 1);
+    }
 
-  return 0;
+    return 0;
 }
 
 //----------- END OF FUNCTION Misc::str_chr -------------//
@@ -199,25 +203,28 @@ int Misc::str_chr(const char *str, char chr, int spos, int epos) {
 //          FAIL / NULL if not found
 //
 
-int Misc::str_str(const char *str, const char *fstr, int spos, int epos) {
-  int i, j, flen;
+int Misc::str_str(const char *str, const char *fstr, int spos, int epos)
+{
+    int i, j, flen;
 
-  if (epos == -1)
-    epos = strlen(str);
+    if (epos == -1)
+        epos = strlen(str);
 
-  flen = strlen(fstr);
-  epos -= flen;
+    flen = strlen(fstr);
+    epos -= flen;
 
-  for (i = spos - 1; str[i] && i <= epos; i++) {
-    for (j = 0; j < flen && str[i + j]; j++) {
-      if (str[i + j] != fstr[j]) // exactly equal
-        break;
+    for (i = spos - 1; str[i] && i <= epos; i++)
+    {
+        for (j = 0; j < flen && str[i + j]; j++)
+        {
+            if (str[i + j] != fstr[j]) // exactly equal
+                break;
+        }
+        if (j == flen) // all equal
+            return (i + 1);
     }
-    if (j == flen) // all equal
-      return (i + 1);
-  }
 
-  return 0;
+    return 0;
 }
 
 //----------- END OF FUNCTION Misc::str_str -------------//
@@ -231,11 +238,12 @@ int Misc::str_str(const char *str, const char *fstr, int spos, int epos) {
 // return : the converted character
 //
 //
-int Misc::upper(int inchar) {
-  if (inchar >= 'a' && inchar <= 'z')
-    inchar -= 32;
+int Misc::upper(int inchar)
+{
+    if (inchar >= 'a' && inchar <= 'z')
+        inchar -= 32;
 
-  return (inchar);
+    return (inchar);
 }
 
 //----- END OF FUNCTION Misc::upper ------------//
@@ -249,11 +257,12 @@ int Misc::upper(int inchar) {
 // return : the converted character
 //
 //
-int Misc::lower(int inchar) {
-  if (inchar >= 'A' && inchar <= 'Z')
-    inchar += 32;
+int Misc::lower(int inchar)
+{
+    if (inchar >= 'A' && inchar <= 'Z')
+        inchar += 32;
 
-  return (inchar);
+    return (inchar);
 }
 
 //----- END OF FUNCTION Misc::lower ------------//
@@ -263,16 +272,17 @@ int Misc::lower(int inchar) {
 // Description : return the number of character in the string
 //               with left space cut
 //
-int Misc::ltrim_len(char *inStr, int spos, int len) {
-  int i, j;
+int Misc::ltrim_len(char *inStr, int spos, int len)
+{
+    int i, j;
 
-  if (len == -1)
-    len = strlen(inStr);
+    if (len == -1)
+        len = strlen(inStr);
 
-  for (i = spos - 1, j = 0; j < len && inStr[i] == ' '; i++)
-    j++;
+    for (i = spos - 1, j = 0; j < len && inStr[i] == ' '; i++)
+        j++;
 
-  return len - j;
+    return len - j;
 }
 //--------- END OF FUNCTION Misc::ltrim_len -------------//
 
@@ -287,16 +297,17 @@ int Misc::ltrim_len(char *inStr, int spos, int len) {
 // [int]   len   = length of the string
 //                 (default : until NULL)
 //
-int Misc::rtrim_len(char *inStr, int spos, int len) {
-  int i, j;
+int Misc::rtrim_len(char *inStr, int spos, int len)
+{
+    int i, j;
 
-  if (len == -1)
-    len = strlen(inStr);
+    if (len == -1)
+        len = strlen(inStr);
 
-  for (i = spos + len - 2, j = 0; j < len && inStr[i] == ' '; i--)
-    j++;
+    for (i = spos + len - 2, j = 0; j < len && inStr[i] == ' '; i--)
+        j++;
 
-  return len - j;
+    return len - j;
 }
 //--------- END OF FUNCTION Misc::rtrim_len -------------//
 
@@ -307,13 +318,14 @@ int Misc::rtrim_len(char *inStr, int spos, int len) {
 //
 // Note : the destination memory must be allocated
 //
-void Misc::rtrim(char *des, char *src) {
-  int i;
+void Misc::rtrim(char *des, char *src)
+{
+    int i;
 
-  for (i = strlen(src) - 1; src[i] == ' ' && i >= 0; i--)
-    des[i] = src[i];
+    for (i = strlen(src) - 1; src[i] == ' ' && i >= 0; i--)
+        des[i] = src[i];
 
-  des[i + 1] = '\0';
+    des[i + 1] = '\0';
 }
 //------- END OF FUNCTION Misc::rtrim --------//
 
@@ -324,16 +336,17 @@ void Misc::rtrim(char *des, char *src) {
 //
 // Note : the destination memory must be allocated
 //
-void Misc::ltrim(char *des, char *src) {
-  int i, j;
+void Misc::ltrim(char *des, char *src)
+{
+    int i, j;
 
-  for (i = 0; src[i] == ' ' && src[i];)
-    i++;
+    for (i = 0; src[i] == ' ' && src[i];)
+        i++;
 
-  for (j = 0; src[i]; i++, j++)
-    des[j] = src[i];
+    for (j = 0; src[i]; i++, j++)
+        des[j] = src[i];
 
-  des[j] = '\0';
+    des[j] = '\0';
 }
 //------- END OF FUNCTION Misc::ltrim --------//
 
@@ -344,16 +357,17 @@ void Misc::ltrim(char *des, char *src) {
 //
 // Note : the destination memory must be allocated
 //
-void Misc::alltrim(char *des, char *src) {
-  int i, j;
+void Misc::alltrim(char *des, char *src)
+{
+    int i, j;
 
-  for (i = 0; src[i] == ' ' && src[i];)
-    i++;
+    for (i = 0; src[i] == ' ' && src[i];)
+        i++;
 
-  for (j = 0; src[i] && src[i] != ' '; i++, j++)
-    des[j] = src[i];
+    for (j = 0; src[i] && src[i] != ' '; i++, j++)
+        des[j] = src[i];
 
-  des[j] = '\0';
+    des[j] = '\0';
 }
 //------- END OF FUNCTION Misc::alltrim --------//
 
@@ -361,15 +375,16 @@ void Misc::alltrim(char *des, char *src) {
 //
 // <char*> = the string, the result is put back into the original string pointer
 //
-char *Misc::rtrim(char *str) {
-  int i;
+char *Misc::rtrim(char *str)
+{
+    int i;
 
-  for (i = strlen(str) - 1; str[i] == ' ' && i >= 0; i--)
-    ;
+    for (i = strlen(str) - 1; str[i] == ' ' && i >= 0; i--)
+        ;
 
-  str[i + 1] = '\0';
+    str[i + 1] = '\0';
 
-  return str;
+    return str;
 }
 //------- END OF FUNCTION Misc::rtrim --------//
 
@@ -377,18 +392,19 @@ char *Misc::rtrim(char *str) {
 //
 // <char*> = the string
 //
-char *Misc::ltrim(char *str) {
-  int i, j;
+char *Misc::ltrim(char *str)
+{
+    int i, j;
 
-  for (i = 0; str[i] == ' ' && str[i]; i++)
-    ;
+    for (i = 0; str[i] == ' ' && str[i]; i++)
+        ;
 
-  for (j = 0; str[i]; i++, j++)
-    str[j] = str[i];
+    for (j = 0; str[i]; i++, j++)
+        str[j] = str[i];
 
-  str[j] = '\0';
+    str[j] = '\0';
 
-  return str;
+    return str;
 }
 //------- END OF FUNCTION Misc::ltrim --------//
 
@@ -396,18 +412,19 @@ char *Misc::ltrim(char *str) {
 //
 // <char*> = the string
 //
-char *Misc::alltrim(char *str) {
-  int i, j;
+char *Misc::alltrim(char *str)
+{
+    int i, j;
 
-  for (i = 0; str[i] == ' ' && str[i]; i++)
-    ;
+    for (i = 0; str[i] == ' ' && str[i]; i++)
+        ;
 
-  for (j = 0; str[i] && str[i] != ' '; i++, j++)
-    str[j] = str[i];
+    for (j = 0; str[i] && str[i] != ' '; i++, j++)
+        str[j] = str[i];
 
-  str[j] = '\0';
+    str[j] = '\0';
 
-  return str;
+    return str;
 }
 //------- END OF FUNCTION Misc::alltrim --------//
 
@@ -420,9 +437,10 @@ char *Misc::alltrim(char *str) {
 // <*char> = the pointer of the string
 // <int>   = the length of the string (not include the null string )
 //
-void Misc::empty(char *inStr, int strLen) {
-  memset(inStr, ' ', strLen);
-  inStr[strLen] = '\0';
+void Misc::empty(char *inStr, int strLen)
+{
+    memset(inStr, ' ', strLen);
+    inStr[strLen] = '\0';
 }
 
 //-------- END OF FUNCTION Misc::empty ---------//
@@ -436,18 +454,20 @@ void Misc::empty(char *inStr, int strLen) {
 // <*char> = the pointer of the string
 // [int]   = the length of the string (not include the null string )
 //
-int Misc::is_empty(char *inStr, int strLen) {
-  int i;
+int Misc::is_empty(char *inStr, int strLen)
+{
+    int i;
 
-  if (!strLen)
-    strLen = strlen(inStr);
+    if (!strLen)
+        strLen = strlen(inStr);
 
-  for (i = 0; i < strLen; i++) {
-    if (inStr[i] != ' ')
-      return 0;
-  }
+    for (i = 0; i < strLen; i++)
+    {
+        if (inStr[i] != ' ')
+            return 0;
+    }
 
-  return 1;
+    return 1;
 }
 //-------- END OF FUNCTION Misc::is_empty ---------//
 
@@ -462,21 +482,23 @@ int Misc::is_empty(char *inStr, int strLen) {
 // [char]  endChar = the end character of the string ( default : NULL terminator
 // )
 //
-void Misc::fix_str(char *str, int len, char endChar) {
-  int oldLen;
+void Misc::fix_str(char *str, int len, char endChar)
+{
+    int oldLen;
 
-  if (endChar == '\0')
-    oldLen = strlen(str);
-  else {
-    oldLen = Misc::str_chr(str, endChar) - 1;
-    err_if(oldLen == -1) // the end character not found
-        err_now("Misc::fix_str");
-  }
+    if (endChar == '\0')
+        oldLen = strlen(str);
+    else
+    {
+        oldLen = Misc::str_chr(str, endChar) - 1;
+        err_if(oldLen == -1) // the end character not found
+            err_now("Misc::fix_str");
+    }
 
-  if (len > oldLen)
-    memset(str + oldLen, ' ', len - oldLen);
+    if (len > oldLen)
+        memset(str + oldLen, ' ', len - oldLen);
 
-  str[len] = '\0';
+    str[len] = '\0';
 }
 
 //--------- END OF FUNCTION Misc::fix_str ---------//
@@ -492,10 +514,10 @@ void Misc::fix_str(char *str, int len, char endChar) {
 // return      : SUCCEED or FAIL
 //
 
-int Misc::valid_char(char ch) {
-  return (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' ||
-          ch >= '0' && ch <= '9' || ch == '\\' || ch == '.' || ch == '_' ||
-          ch == ':');
+int Misc::valid_char(char ch)
+{
+    return (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '\\' || ch == '.' ||
+            ch == '_' || ch == ':');
 }
 
 //--------- END OF FUNCTION Misc::valid_char ----------//
@@ -512,16 +534,17 @@ int Misc::valid_char(char ch) {
 //     "ABCDE"    <> "ABCDEF"
 //     "ABCDE"    <> "ABCDE "
 
-int Misc::str_cmp(const char *str1, const char *str2) {
-  err_when(!str1 || !str2);
+int Misc::str_cmp(const char *str1, const char *str2)
+{
+    err_when(!str1 || !str2);
 
-  int i;
+    int i;
 
-  for (i = 0; str1[i] && str2[i]; i++)
-    if (str1[i] != str2[i])
-      return 0;
+    for (i = 0; str1[i] && str2[i]; i++)
+        if (str1[i] != str2[i])
+            return 0;
 
-  return (str2[i] == '\0' && (str1[i] == '\0' || str1[i] == ' '));
+    return (str2[i] == '\0' && (str1[i] == '\0' || str1[i] == ' '));
 }
 
 //--------- END OF FUNCTION Misc::str_cmp -----------//
@@ -538,16 +561,17 @@ int Misc::str_cmp(const char *str1, const char *str2) {
 //     "ABCDE"    <> "ABCDEF"
 //     "ABCDE"    <> "ABCDE "
 //
-int Misc::str_cmpx(const char *str1, const char *str2) {
-  err_when(!str1 || !str2);
+int Misc::str_cmpx(const char *str1, const char *str2)
+{
+    err_when(!str1 || !str2);
 
-  int i;
+    int i;
 
-  for (i = 0; str1[i] && str2[i]; i++)
-    if (str1[i] != str2[i])
-      return 0;
+    for (i = 0; str1[i] && str2[i]; i++)
+        if (str1[i] != str2[i])
+            return 0;
 
-  return (str2[i] == '\0');
+    return (str2[i] == '\0');
 }
 
 //--------- END OF FUNCTION Misc::str_cmpx -----------//
@@ -564,24 +588,26 @@ int Misc::str_cmpx(const char *str1, const char *str2) {
 //     "ABCDE"    <> "ABCDEF"
 //     "ABCDE"    <> "ABCDE "
 
-int Misc::str_icmpx(const char *str1, const char *str2) {
-  err_when(!str1 || !str2);
+int Misc::str_icmpx(const char *str1, const char *str2)
+{
+    err_when(!str1 || !str2);
 
-  int i;
-  register int a, b;
+    int i;
+    register int a, b;
 
-  for (i = 0; (a = str1[i]) != '\0' && (b = str2[i]) != '\0'; i++) {
-    if (a >= 'a' && a <= 'z')
-      a -= 32;
+    for (i = 0; (a = str1[i]) != '\0' && (b = str2[i]) != '\0'; i++)
+    {
+        if (a >= 'a' && a <= 'z')
+            a -= 32;
 
-    if (b >= 'a' && b <= 'z')
-      b -= 32;
+        if (b >= 'a' && b <= 'z')
+            b -= 32;
 
-    if (a != b)
-      return 0;
-  }
+        if (a != b)
+            return 0;
+    }
 
-  return (str2[i] == '\0');
+    return (str2[i] == '\0');
 }
 
 //--------- END OF FUNCTION Misc::str_icmpx -----------//
@@ -593,16 +619,17 @@ int Misc::str_icmpx(const char *str1, const char *str2) {
 // <char*> = the string
 // [int]   = length of the string
 
-int Misc::check_sum(char *str, int len) {
-  int i, checksum;
+int Misc::check_sum(char *str, int len)
+{
+    int i, checksum;
 
-  if (len == -1)
-    len = strlen(str);
+    if (len == -1)
+        len = strlen(str);
 
-  for (checksum = 0, i = 0; i < len; i++, str++)
-    checksum += (*str) * (i + checksum + 1);
+    for (checksum = 0, i = 0; i < len; i++, str++)
+        checksum += (*str) * (i + checksum + 1);
 
-  return checksum;
+    return checksum;
 }
 
 //--------- END OF FUNCTION Misc::check_sum -----------//
@@ -624,57 +651,61 @@ int Misc::check_sum(char *str, int len) {
 //                is stored in static variable which will be overwritten
 //                in next call.
 //
-char *Misc::format(int inNum, int formatType) {
-  static char outBuf[35];
-  static char longBuf[25];
-  char *outPtr = outBuf;
-  char *longStr;
-  int i, intDigit, sign;
+char *Misc::format(int inNum, int formatType)
+{
+    static char outBuf[35];
+    static char longBuf[25];
+    char *outPtr = outBuf;
+    char *longStr;
+    int i, intDigit, sign;
 
-  if (inNum < 0) {
-    sign = -1;
-    inNum = -inNum;
-  } else
-    sign = 0;
-
-  longStr = ltoa(inNum, longBuf, 10);
-  intDigit = strlen(longStr); // no. of integer digits
-
-  //--------- negetive bracket ------------//
-
-  if (sign < 0)
-    *outPtr++ = '(';
-
-  //--------- dollar sign ------------//
-
-  if (formatType == 2)
-    *outPtr++ = '$';
-
-  //-------- integer number -----------//
-
-  for (i = intDigit; i > 0; i--) {
-    if (formatType != 4) // no thousand separators for format 4
+    if (inNum < 0)
     {
-      if (i % THOUSAND_SEPARATOR_COUNT == 0 && i < intDigit)
-        *outPtr++ = THOUSAND_SEPARATOR;
+        sign = -1;
+        inNum = -inNum;
+    }
+    else
+        sign = 0;
+
+    longStr = ltoa(inNum, longBuf, 10);
+    intDigit = strlen(longStr); // no. of integer digits
+
+    //--------- negetive bracket ------------//
+
+    if (sign < 0)
+        *outPtr++ = '(';
+
+    //--------- dollar sign ------------//
+
+    if (formatType == 2)
+        *outPtr++ = '$';
+
+    //-------- integer number -----------//
+
+    for (i = intDigit; i > 0; i--)
+    {
+        if (formatType != 4) // no thousand separators for format 4
+        {
+            if (i % THOUSAND_SEPARATOR_COUNT == 0 && i < intDigit)
+                *outPtr++ = THOUSAND_SEPARATOR;
+        }
+
+        *outPtr++ = *longStr++;
     }
 
-    *outPtr++ = *longStr++;
-  }
+    //--------- percent sign (%) ------------//
 
-  //--------- percent sign (%) ------------//
+    if (formatType == 3)
+        *outPtr++ = '%';
 
-  if (formatType == 3)
-    *outPtr++ = '%';
+    //--------- negetive bracket ----------//
 
-  //--------- negetive bracket ----------//
+    if (sign < 0)
+        *outPtr++ = ')';
 
-  if (sign < 0)
-    *outPtr++ = ')';
+    *outPtr++ = '\0';
 
-  *outPtr++ = '\0';
-
-  return outBuf;
+    return outBuf;
 }
 //---------- End of function Misc::format ---------//
 
@@ -693,75 +724,76 @@ char *Misc::format(int inNum, int formatType) {
 //                is stored in static variable which will be overwritten
 //                in next call.
 //
-char *Misc::format(double inNum, int formatType) {
-  static char outBuf[35];
-  char *outPtr = outBuf;
-  char floatBuf[35];
-  char *floatStr;
-  int i, intDigit; // intDigit = no. of integer digits
+char *Misc::format(double inNum, int formatType)
+{
+    static char outBuf[35];
+    char *outPtr = outBuf;
+    char floatBuf[35];
+    char *floatStr;
+    int i, intDigit; // intDigit = no. of integer digits
 
-  intDigit = snprintf(floatBuf, sizeof(floatBuf), "%.0lf", fabs(inNum) * 100.0);
-  intDigit -= 2;
-  floatStr = floatBuf;
+    intDigit = snprintf(floatBuf, sizeof(floatBuf), "%.0lf", fabs(inNum) * 100.0);
+    intDigit -= 2;
+    floatStr = floatBuf;
 
 #ifdef DEBUG
-  if (intDigit > 29) // integer digits can't exceed 29
-    err.run("Misc::format(), inNum : %e, formatType : %d", inNum, formatType);
+    if (intDigit > 29) // integer digits can't exceed 29
+        err.run("Misc::format(), inNum : %e, formatType : %d", inNum, formatType);
 #endif
 
-  //--------- negetive bracket ------------//
+    //--------- negetive bracket ------------//
 
-  if (inNum < 0)
-    *outPtr++ = '(';
+    if (inNum < 0)
+        *outPtr++ = '(';
 
-  //--------- dollar sign ($) ------------//
+    //--------- dollar sign ($) ------------//
 
-  if (formatType == 2)
-    *outPtr++ = '$';
+    if (formatType == 2)
+        *outPtr++ = '$';
 
-  //------- integer number -----------//
+    //------- integer number -----------//
 
-  for (i = intDigit; i > 0; i--) {
-    if (i % THOUSAND_SEPARATOR_COUNT == 0 && i < intDigit)
-      *outPtr++ = THOUSAND_SEPARATOR;
+    for (i = intDigit; i > 0; i--)
+    {
+        if (i % THOUSAND_SEPARATOR_COUNT == 0 && i < intDigit)
+            *outPtr++ = THOUSAND_SEPARATOR;
 
-    *outPtr++ = *floatStr++;
-  }
+        *outPtr++ = *floatStr++;
+    }
 
-  if (intDigit <= 0)
-    *outPtr++ = '0';
+    if (intDigit <= 0)
+        *outPtr++ = '0';
 
-  //------- dec. place number -----------//
+    //------- dec. place number -----------//
 
-  if (inNum > -1000 &&
-      inNum < 1000) // if the number is less than 1000, add dec. places
-  { // if the number is greater than 1000, truncate any dec. places
-    *outPtr++ = DECIMAL_SEPARATOR;
+    if (inNum > -1000 && inNum < 1000) // if the number is less than 1000, add dec. places
+    {                                  // if the number is greater than 1000, truncate any dec. places
+        *outPtr++ = DECIMAL_SEPARATOR;
 
-    if (*floatStr && intDigit >= 0) // e.g. 0.03 --> str:"3", intDight:-1
-      *outPtr++ = *floatStr++;      // 1st dec. place
-    else
-      *outPtr++ = '0'; // add a '0' when intDigit < 0
+        if (*floatStr && intDigit >= 0) // e.g. 0.03 --> str:"3", intDight:-1
+            *outPtr++ = *floatStr++;    // 1st dec. place
+        else
+            *outPtr++ = '0'; // add a '0' when intDigit < 0
 
-    if (*floatStr) // 2nd dec. place
-      *outPtr++ = *floatStr++;
-    else
-      *outPtr++ = '0';
-  }
+        if (*floatStr) // 2nd dec. place
+            *outPtr++ = *floatStr++;
+        else
+            *outPtr++ = '0';
+    }
 
-  //--------- percent sign (%) ------------//
+    //--------- percent sign (%) ------------//
 
-  if (formatType == 3)
-    *outPtr++ = '%';
+    if (formatType == 3)
+        *outPtr++ = '%';
 
-  //--------- negetive bracket ------------//
+    //--------- negetive bracket ------------//
 
-  if (inNum < 0)
-    *outPtr++ = ')';
+    if (inNum < 0)
+        *outPtr++ = ')';
 
-  *outPtr++ = '\0';
+    *outPtr++ = '\0';
 
-  return outBuf;
+    return outBuf;
 }
 //---------- End of function Misc::format ---------//
 
@@ -773,10 +805,11 @@ char *Misc::format(double inNum, int formatType) {
 //
 // return : <char*> the converted string.
 //
-char *Misc::num_to_str(int inNum) {
-  static char strBuf[25];
+char *Misc::num_to_str(int inNum)
+{
+    static char strBuf[25];
 
-  return ltoa(inNum, strBuf, 10);
+    return ltoa(inNum, strBuf, 10);
 }
 //---------- End of function Misc::format ---------//
 
@@ -793,26 +826,28 @@ char *Misc::num_to_str(int inNum) {
 // note : if the string is longer than the buffer space, the string
 //        will be truncated
 //
-char *Misc::nullify(char *strPtr, int strLen) {
-  int i;
+char *Misc::nullify(char *strPtr, int strLen)
+{
+    int i;
 
-  if (strLen > STR_BUF_LEN)
-    strLen = STR_BUF_LEN;
+    if (strLen > STR_BUF_LEN)
+        strLen = STR_BUF_LEN;
 
-  memcpy(str_buf, strPtr, strLen);
+    memcpy(str_buf, strPtr, strLen);
 
-  for (i = strLen - 1; i >= 0; i--) // Right Trim
-  {
-    if (str_buf[i] != ' ') {
-      str_buf[i + 1] = '\0';
-      break;
+    for (i = strLen - 1; i >= 0; i--) // Right Trim
+    {
+        if (str_buf[i] != ' ')
+        {
+            str_buf[i + 1] = '\0';
+            break;
+        }
     }
-  }
 
-  if (i < 0) // Empty value
-    str_buf[0] = '\0';
+    if (i < 0) // Empty value
+        str_buf[0] = '\0';
 
-  return str_buf;
+    return str_buf;
 }
 //----------- End of function Misc::nullify ----------//
 
@@ -826,11 +861,12 @@ char *Misc::nullify(char *strPtr, int strLen) {
 //
 // Note <varPtr> must be pre-allocated with a len > fldLen+1
 //
-void Misc::rtrim_fld(char *varPtr, char *fldPtr, int fldLen) {
-  int rtrimLen = rtrim_len(fldPtr, 1, fldLen);
+void Misc::rtrim_fld(char *varPtr, char *fldPtr, int fldLen)
+{
+    int rtrimLen = rtrim_len(fldPtr, 1, fldLen);
 
-  memcpy(varPtr, fldPtr, rtrimLen);
-  varPtr[rtrimLen] = '\0';
+    memcpy(varPtr, fldPtr, rtrimLen);
+    varPtr[rtrimLen] = '\0';
 }
 //---------- End of function Misc::rtrim_fld ---------//
 
@@ -842,13 +878,14 @@ void Misc::rtrim_fld(char *varPtr, char *fldPtr, int fldLen) {
 // <char*> str    = the string to be converted to integer
 // <int>   strLen = length of the string
 
-int Misc::atoi(char *str, int strLen) {
-  if (strLen >= sizeof(str_buf))
-    strLen = sizeof(str_buf) - 1;
+int Misc::atoi(char *str, int strLen)
+{
+    if (strLen >= sizeof(str_buf))
+        strLen = sizeof(str_buf) - 1;
 
-  memcpy(str_buf, str, (size_t)strLen);
-  str_buf[strLen] = '\0';
-  return ::atoi(str_buf);
+    memcpy(str_buf, str, (size_t)strLen);
+    str_buf[strLen] = '\0';
+    return ::atoi(str_buf);
 }
 //---------- End of function Misc::atoi ---------//
 
@@ -858,25 +895,27 @@ int Misc::atoi(char *str, int strLen) {
 //
 // <int> x = the value for calculating its square root
 //
-int Misc::sqrt(long x) {
-  err_when(x < 0);
+int Misc::sqrt(long x)
+{
+    err_when(x < 0);
 
-  long OddInt, OldArg, FirstSqrt;
+    long OddInt, OldArg, FirstSqrt;
 
-  OddInt = 1;
-  OldArg = x;
+    OddInt = 1;
+    OldArg = x;
 
-  while (x >= 0) {
-    x -= OddInt;
-    OddInt += 2;
-  }
+    while (x >= 0)
+    {
+        x -= OddInt;
+        OddInt += 2;
+    }
 
-  FirstSqrt = OddInt >> 1;
+    FirstSqrt = OddInt >> 1;
 
-  if (FirstSqrt * FirstSqrt - FirstSqrt + 1 > OldArg)
-    return (FirstSqrt - 1);
-  else
-    return (FirstSqrt);
+    if (FirstSqrt * FirstSqrt - FirstSqrt + 1 > OldArg)
+        return (FirstSqrt - 1);
+    else
+        return (FirstSqrt);
 }
 //---------- End of function Misc::sqrt ---------//
 
@@ -889,11 +928,12 @@ int Misc::sqrt(long x) {
 // <int> x1, y1 = the starting point of the diagonal line
 // <int> x2, y2 = the ending point of the diagonal line
 //
-int Misc::diagonal_distance(int x1, int y1, int x2, int y2) {
-  int x = abs(x1 - x2);
-  int y = abs(y1 - y2);
+int Misc::diagonal_distance(int x1, int y1, int x2, int y2)
+{
+    int x = abs(x1 - x2);
+    int y = abs(y1 - y2);
 
-  return Misc::sqrt(x * x + y * y);
+    return Misc::sqrt(x * x + y * y);
 }
 //---------- End of function Misc::diagonal_distance ---------//
 
@@ -906,31 +946,39 @@ int Misc::diagonal_distance(int x1, int y1, int x2, int y2) {
 // <int> x1, y1 = the starting point of the diagonal line
 // <int> x2, y2 = the ending point of the diagonal line
 //
-int Misc::points_distance(int x1, int y1, int x2, int y2) {
-  int x = abs(x1 - x2);
-  int y = abs(y1 - y2);
+int Misc::points_distance(int x1, int y1, int x2, int y2)
+{
+    int x = abs(x1 - x2);
+    int y = abs(y1 - y2);
 
-  return MAX(x, y);
+    return MAX(x, y);
 }
 //---------- End of function Misc::points_distance ---------//
 
 //------- Begin of function Misc::get_random_seed --------//
 //
-long Misc::get_random_seed() { return random_seed; }
+long Misc::get_random_seed()
+{
+    return random_seed;
+}
 //---------- End of function Misc::get_random_seed ---------//
 
 //------- Begin of function Misc::randomize --------//
 //
-void Misc::randomize() { set_random_seed(time(NULL)); }
+void Misc::randomize()
+{
+    set_random_seed(time(NULL));
+}
 //---------- End of function Misc::randomize ---------//
 
 //------- Begin of function Misc::set_random_seed --------//
 //
-void Misc::set_random_seed(long randomSeed) {
-  // ###### begin Gilbert 19/6 ######//
-  err_when(is_seed_locked());
-  // ###### end Gilbert 19/6 ######//
-  random_seed = randomSeed;
+void Misc::set_random_seed(long randomSeed)
+{
+    // ###### begin Gilbert 19/6 ######//
+    err_when(is_seed_locked());
+    // ###### end Gilbert 19/6 ######//
+    random_seed = randomSeed;
 }
 //---------- End of function Misc::set_random_seed ---------//
 
@@ -941,19 +989,20 @@ void Misc::set_random_seed(long randomSeed) {
 //
 // return : <int> the random number
 //
-int Misc::random(int maxNum) {
-  err_if(maxNum < 0 || maxNum > 0x7FFF) err_now("Misc::random()");
+int Misc::random(int maxNum)
+{
+    err_if(maxNum < 0 || maxNum > 0x7FFF) err_now("Misc::random()");
 
-  // ###### begin Gilbert 19/6 ######//
-  err_when(is_seed_locked());
-  // ###### end Gilbert 19/6 ######//
+    // ###### begin Gilbert 19/6 ######//
+    err_when(is_seed_locked());
+    // ###### end Gilbert 19/6 ######//
 #define MULTIPLIER 0x015a4e35L
 #define INCREMENT 1
 #define RANDOM_MAX 0x7FFFU
 
-  random_seed = MULTIPLIER * random_seed + INCREMENT;
+    random_seed = MULTIPLIER * random_seed + INCREMENT;
 
-  return maxNum * ((random_seed >> 16) & RANDOM_MAX) / (RANDOM_MAX + 1);
+    return maxNum * ((random_seed >> 16) & RANDOM_MAX) / (RANDOM_MAX + 1);
 }
 //---------- End of function Misc::random ---------//
 
@@ -963,17 +1012,18 @@ int Misc::random(int maxNum) {
 //
 // return : <int> a random number from from 0 to 0x7FFF
 //
-int Misc::rand() {
+int Misc::rand()
+{
 #define MULTIPLIER 0x015a4e35L
 #define INCREMENT 1
 #define RANDOM_MAX 0x7FFFU
 
-  // ###### begin Gilbert 19/6 ######//
-  err_when(is_seed_locked());
-  // ###### end Gilbert 19/6 ######//
-  random_seed = MULTIPLIER * random_seed + INCREMENT;
+    // ###### begin Gilbert 19/6 ######//
+    err_when(is_seed_locked());
+    // ###### end Gilbert 19/6 ######//
+    random_seed = MULTIPLIER * random_seed + INCREMENT;
 
-  return ((random_seed >> 16) & RANDOM_MAX);
+    return ((random_seed >> 16) & RANDOM_MAX);
 }
 //---------- End of function Misc::rand ---------//
 
@@ -983,15 +1033,16 @@ int Misc::rand() {
 //
 // return : <int> a random long number
 //
-int Misc::rand_long() {
+int Misc::rand_long()
+{
 #define MULTIPLIER 0x015a4e35L
 #define INCREMENT 1
 #define RANDOM_MAX 0x7FFFU
 
-  err_when(is_seed_locked());
-  random_seed = MULTIPLIER * random_seed + INCREMENT;
+    err_when(is_seed_locked());
+    random_seed = MULTIPLIER * random_seed + INCREMENT;
 
-  return random_seed;
+    return random_seed;
 }
 //---------- End of function Misc::rand_long ---------//
 
@@ -1012,37 +1063,40 @@ int Misc::rand_long() {
 //
 // return : <float> the rounded number
 //
-float Misc::round(float inValue, int signPlace, int roundDirection) {
-  int i;
-  float baseValue = (float)1;
-  float minValue = (float)10;
+float Misc::round(float inValue, int signPlace, int roundDirection)
+{
+    int i;
+    float baseValue = (float)1;
+    float minValue = (float)10;
 
-  for (i = 2; i <= signPlace; i++)
-    minValue *= 10;
+    for (i = 2; i <= signPlace; i++)
+        minValue *= 10;
 
-  while (inValue > minValue) {
-    inValue /= 10;
-    baseValue *= 10;
-  }
-
-  float outValue = (float)((int)inValue) * baseValue;
-
-  //-----------------------------------------------//
-  //
-  // If the result number is smaller than the given number
-  // and the roundDirection is rounding to a bigger number,
-  // than increase result number.
-  //
-  //-----------------------------------------------//
-
-  if (outValue != inValue) {
-    if ((roundDirection == 0 && ((int)inValue) % 10 >= 5) ||
-        roundDirection == 2) {
-      outValue = (float)((int)inValue + 1) * baseValue;
+    while (inValue > minValue)
+    {
+        inValue /= 10;
+        baseValue *= 10;
     }
-  }
 
-  return outValue;
+    float outValue = (float)((int)inValue) * baseValue;
+
+    //-----------------------------------------------//
+    //
+    // If the result number is smaller than the given number
+    // and the roundDirection is rounding to a bigger number,
+    // than increase result number.
+    //
+    //-----------------------------------------------//
+
+    if (outValue != inValue)
+    {
+        if ((roundDirection == 0 && ((int)inValue) % 10 >= 5) || roundDirection == 2)
+        {
+            outValue = (float)((int)inValue + 1) * baseValue;
+        }
+    }
+
+    return outValue;
 }
 //---------- End of function Misc::round ---------//
 
@@ -1054,7 +1108,10 @@ float Misc::round(float inValue, int signPlace, int roundDirection) {
 //
 // Return : <float> the output number
 //
-float Misc::round_dec(float inNum) { return (float)((int)(inNum * 100)) / 100; }
+float Misc::round_dec(float inNum)
+{
+    return (float)((int)(inNum * 100)) / 100;
+}
 //---------- End of function Misc::round_dec ---------//
 
 //------- Begin of function Misc::is_file_exist ---------//
@@ -1066,8 +1123,9 @@ float Misc::round_dec(float inNum) { return (float)((int)(inNum * 100)) / 100; }
 // return : <int> 1 - the file exists
 //                0 - doesn't exist
 //
-int Misc::is_file_exist(const char *fileName) {
-  return boost::filesystem::exists(fileName);
+int Misc::is_file_exist(const char *fileName)
+{
+    return boost::filesystem::exists(fileName);
 }
 //---------- End of function Misc::is_file_exist ---------//
 
@@ -1079,45 +1137,49 @@ int Misc::is_file_exist(const char *fileName) {
 // The return is 1 on success. If length of src1+src2 is greater than
 // max_len-1, then the return is 0, and the dest string contents is null.
 //
-int Misc::path_cat(char *dest, const char *src1, const char *src2,
-                   int max_len) {
-  int c = 0;
-  char *d = dest;
-  for (; c < max_len - 1; c++) {
-    if (!*src1)
-      break;
-    *d = *src1;
-    d++;
-    src1++;
-  }
-  for (; c < max_len - 1; c++) {
-    if (!*src2)
-      break;
-    *d = *src2;
-    d++;
-    src2++;
-  }
-  if (c >= max_len - 1) {
-    *dest = 0;
-    return 0;
-  }
-  *d = 0;
-  return 1;
+int Misc::path_cat(char *dest, const char *src1, const char *src2, int max_len)
+{
+    int c = 0;
+    char *d = dest;
+    for (; c < max_len - 1; c++)
+    {
+        if (!*src1)
+            break;
+        *d = *src1;
+        d++;
+        src1++;
+    }
+    for (; c < max_len - 1; c++)
+    {
+        if (!*src2)
+            break;
+        *d = *src2;
+        d++;
+        src2++;
+    }
+    if (c >= max_len - 1)
+    {
+        *dest = 0;
+        return 0;
+    }
+    *d = 0;
+    return 1;
 }
 //---------- End of function Misc::path_cat ---------//
 
 // misc_mkdir -- helper function to mkpath
-int misc_mkdir(char *path) {
+int misc_mkdir(char *path)
+{
 #ifdef NO_WINDOWS
-  return mkdir(path, 0777) == -1 ? errno == EEXIST : 1;
+    return mkdir(path, 0777) == -1 ? errno == EEXIST : 1;
 #else // WINDOWS
-  if (!path[2] && path[1] == ':' && isalpha(path[0])) {
-    // don't try to make a drive letter path
-    // this actually works on windows, but not on Wine
-    return 1;
-  }
-  return !CreateDirectory(path, NULL) ? GetLastError() == ERROR_ALREADY_EXISTS
-                                      : 1;
+    if (!path[2] && path[1] == ':' && isalpha(path[0]))
+    {
+        // don't try to make a drive letter path
+        // this actually works on windows, but not on Wine
+        return 1;
+    }
+    return !CreateDirectory(path, NULL) ? GetLastError() == ERROR_ALREADY_EXISTS : 1;
 #endif
 }
 
@@ -1125,29 +1187,35 @@ int misc_mkdir(char *path) {
 // Given an absolute path to a directory, create the
 // directory, and all intermediate directories if
 // necessary.
-int Misc::mkpath(char *abs_path) {
-  char path_copy[MAX_PATH + 1];
-  int count;
+int Misc::mkpath(char *abs_path)
+{
+    char path_copy[MAX_PATH + 1];
+    int count;
 
-  count = 0;
-  while (count < MAX_PATH) {
-    if (!abs_path[count]) {
-      if (count > 0) {
-        path_copy[count] = 0;
-        if (!misc_mkdir(path_copy))
-          return 0;
-      }
-      return 1;
-    } else if (abs_path[count] == PATH_DELIM[0] && count > 0) {
-      path_copy[count] = 0;
-      if (!misc_mkdir(path_copy))
-        return 0;
+    count = 0;
+    while (count < MAX_PATH)
+    {
+        if (!abs_path[count])
+        {
+            if (count > 0)
+            {
+                path_copy[count] = 0;
+                if (!misc_mkdir(path_copy))
+                    return 0;
+            }
+            return 1;
+        }
+        else if (abs_path[count] == PATH_DELIM[0] && count > 0)
+        {
+            path_copy[count] = 0;
+            if (!misc_mkdir(path_copy))
+                return 0;
+        }
+
+        path_copy[count] = abs_path[count];
+        count++;
     }
-
-    path_copy[count] = abs_path[count];
-    count++;
-  }
-  return 0;
+    return 0;
 }
 //-------- End of function Misc::mkpath ----------//
 
@@ -1167,27 +1235,26 @@ void DumpBin(char *s, int Length);
 void Dump(char *s);
 void Dump(int i);
 // SXM
-void Misc::change_file_ext(char *desFileName, const char *srcFileName,
-                           const char *newExt) {
-  int nameLen =
-      misc.str_chr(srcFileName, '.'); // include the '.' in the nameLen
+void Misc::change_file_ext(char *desFileName, const char *srcFileName, const char *newExt)
+{
+    int nameLen = misc.str_chr(srcFileName, '.'); // include the '.' in the nameLen
 
 #if (defined(CHINESE))
 #ifdef DEBUG
-  Dump("SXMSXM");
-  Dump(desFileName);
-  Dump("\n");
-  Dump(srcFileName);
-  Dump("\n");
-  Dump(newExt);
-  Dump("\n");
+    Dump("SXMSXM");
+    Dump(desFileName);
+    Dump("\n");
+    Dump(srcFileName);
+    Dump("\n");
+    Dump(newExt);
+    Dump("\n");
 #endif
 #endif
 
-  err_when(nameLen < 1 || nameLen > 9 || strlen(newExt) > 3);
+    err_when(nameLen < 1 || nameLen > 9 || strlen(newExt) > 3);
 
-  memcpy(desFileName, srcFileName, nameLen);
-  strcpy(desFileName + nameLen, newExt); // extension for scenarion text file
+    memcpy(desFileName, srcFileName, nameLen);
+    strcpy(desFileName + nameLen, newExt); // extension for scenarion text file
 }
 //---------- End of function Misc::change_file_ext ---------//
 
@@ -1198,15 +1265,17 @@ void Misc::change_file_ext(char *desFileName, const char *srcFileName,
 // <char*> desFileName = the destination buffer to be written
 // <char*> srcFileName = the source file name
 //
-void Misc::extract_file_name(char *desFileName, const char *srcFileName) {
-  int i;
-  for (i = strlen(srcFileName); i >= 0; i--) {
-    if (srcFileName[i] == '/') // get last '/' before the file name
-      break;
-  }
+void Misc::extract_file_name(char *desFileName, const char *srcFileName)
+{
+    int i;
+    for (i = strlen(srcFileName); i >= 0; i--)
+    {
+        if (srcFileName[i] == '/') // get last '/' before the file name
+            break;
+    }
 
-  strncpy(desFileName, srcFileName + i + 1, MAX_PATH);
-  desFileName[MAX_PATH] = '\0';
+    strncpy(desFileName, srcFileName + i + 1, MAX_PATH);
+    desFileName[MAX_PATH] = '\0';
 }
 //---------- End of function Misc::extract_file_name ---------//
 
@@ -1218,65 +1287,72 @@ void Misc::extract_file_name(char *desFileName, const char *srcFileName) {
 //
 // return : <char*> the result string
 //
-char *Misc::num_th(int inNum) {
-  static String str;
+char *Misc::num_th(int inNum)
+{
+    static String str;
 
-  str = format(inNum);
+    str = format(inNum);
 
 #if (defined(SPANISH) || defined(ITALIAN))
-  str += "�";
+    str += "�";
 #elif (defined(FRENCH))
-  if (inNum == 1)
-    str += "er";
-  else
-    str += "�me";
+    if (inNum == 1)
+        str += "er";
+    else
+        str += "�me";
 #elif (defined(GERMAN))
-  str += ".";
+    str += ".";
 #elif (defined(CHINESE))
-  // nothing
+    // nothing
 #else
-  if (inNum >= 11 && inNum <= 13) {
-    str += "th";
-  } else {
-    switch (inNum % 10) {
-    case 1:
-      str += "st";
-      break;
-    case 2:
-      str += "nd";
-      break;
-    case 3:
-      str += "rd";
-      break;
-    default:
-      str += "th";
+    if (inNum >= 11 && inNum <= 13)
+    {
+        str += "th";
     }
-  }
+    else
+    {
+        switch (inNum % 10)
+        {
+        case 1:
+            str += "st";
+            break;
+        case 2:
+            str += "nd";
+            break;
+        case 3:
+            str += "rd";
+            break;
+        default:
+            str += "th";
+        }
+    }
 #endif
 
-  return str;
+    return str;
 }
 //---------- End of function Misc::num_th ---------//
 
 //------- Begin of function Misc::get_time ---------//
 //
-unsigned long Misc::get_time() {
+unsigned long Misc::get_time()
+{
 #ifndef NO_WINDOWS
-  return GetTickCount();
+    return GetTickCount();
 #else
-  struct timeval tv;
-  int ret;
-  static time_t starting_time = 0;
+    struct timeval tv;
+    int ret;
+    static time_t starting_time = 0;
 
-  if (!starting_time)
-    starting_time = time(NULL);
+    if (!starting_time)
+        starting_time = time(NULL);
 
-  ret = gettimeofday(&tv, NULL);
-  if (ret) {
-    ERR("gettimeofday returned %d\n", ret);
-    return 0;
-  }
-  return (tv.tv_sec - starting_time) * 1000 + tv.tv_usec / 1000;
+    ret = gettimeofday(&tv, NULL);
+    if (ret)
+    {
+        ERR("gettimeofday returned %d\n", ret);
+        return 0;
+    }
+    return (tv.tv_sec - starting_time) * 1000 + tv.tv_usec / 1000;
 #endif
 }
 //---------- End of function Misc::get_time ---------//
@@ -1290,18 +1366,17 @@ unsigned long Misc::get_time() {
 // <int>   recSize	- record size
 // <int>   delRecno  - recno to be deleted.
 //
-void Misc::del_array_rec(void *arrayBody, int arraySize, int recSize,
-                         int delRecno) {
-  err_when(arraySize < 1);
+void Misc::del_array_rec(void *arrayBody, int arraySize, int recSize, int delRecno)
+{
+    err_when(arraySize < 1);
 
-  err_when(delRecno < 1 || delRecno > arraySize);
+    err_when(delRecno < 1 || delRecno > arraySize);
 
-  int t = delRecno - 1;
+    int t = delRecno - 1;
 
-  char *arrayPtr = (char *)arrayBody;
+    char *arrayPtr = (char *)arrayBody;
 
-  memmove(arrayPtr + recSize * t, arrayPtr + recSize * (t + 1),
-          recSize * (arraySize - t - 1));
+    memmove(arrayPtr + recSize * t, arrayPtr + recSize * (t + 1), recSize * (arraySize - t - 1));
 }
 //---------- End of function Misc::del_array_rec ---------//
 
@@ -1325,163 +1400,169 @@ void Misc::del_array_rec(void *arrayBody, int arraySize, int recSize,
 //
 //   For num>25 in this case, multiply of 25 will be cut out until num<=25.
 //
-void Misc::cal_move_around_a_point(short num, short width, short height,
-                                   int &xShift, int &yShift) {
-  short maxSqtSize = (width > height) ? height + 1 : width + 1;
-  // short num2 = num%(maxSqtSize*maxSqtSize) + 1;
-  short num2 = (num - 1) % (maxSqtSize * maxSqtSize) + 1;
+void Misc::cal_move_around_a_point(short num, short width, short height, int &xShift, int &yShift)
+{
+    short maxSqtSize = (width > height) ? height + 1 : width + 1;
+    // short num2 = num%(maxSqtSize*maxSqtSize) + 1;
+    short num2 = (num - 1) % (maxSqtSize * maxSqtSize) + 1;
 
-  if (num2 <= MOVE_AROUND_TABLE_SIZE) {
-    xShift = int(*(move_around_table_x + num2 - 1));
-    yShift = int(*(move_around_table_y + num2 - 1));
+    if (num2 <= MOVE_AROUND_TABLE_SIZE)
+    {
+        xShift = int(*(move_around_table_x + num2 - 1));
+        yShift = int(*(move_around_table_y + num2 - 1));
 
-    /*#ifdef DEBUG2
-            int xShift2, yShift2;
-            cal_move_around_a_point_v2(num, width, height, xShift2, yShift2);
-            err_when(xShift!=xShift2);
-            err_when(yShift!=yShift2);
-    #endif*/
-    return;
-  } else
-    cal_move_around_a_point_v2(num, width, height, xShift, yShift);
+        /*#ifdef DEBUG2
+                int xShift2, yShift2;
+                cal_move_around_a_point_v2(num, width, height, xShift2, yShift2);
+                err_when(xShift!=xShift2);
+                err_when(yShift!=yShift2);
+        #endif*/
+        return;
+    }
+    else
+        cal_move_around_a_point_v2(num, width, height, xShift, yShift);
 }
 //------ End of function Misc::cal_move_around_a_point ---------//
 
 //-------- Begin of function Misc::cal_move_around_a_point_v2 -------//
-void Misc::cal_move_around_a_point_v2(short num, short width, short height,
-                                      int &xShift, int &yShift) {
-  short maxSqtSize = (width > height) ? height + 1 : width + 1;
-  // short num2 = num%(maxSqtSize*maxSqtSize) + 1;
-  short num2 = (num - 1) % (maxSqtSize * maxSqtSize) + 1;
+void Misc::cal_move_around_a_point_v2(short num, short width, short height, int &xShift, int &yShift)
+{
+    short maxSqtSize = (width > height) ? height + 1 : width + 1;
+    // short num2 = num%(maxSqtSize*maxSqtSize) + 1;
+    short num2 = (num - 1) % (maxSqtSize * maxSqtSize) + 1;
 
-  if (num2 <= 1) {
-    xShift = yShift = 0;
-    return;
-  }
+    if (num2 <= 1)
+    {
+        xShift = yShift = 0;
+        return;
+    }
 
-  int sqtCount = 1;
+    int sqtCount = 1;
 
-  while (sqtCount < 210) // the max. size of the map is 200x200
-  {
-    if (num2 <= sqtCount * sqtCount)
-      break;
+    while (sqtCount < 210) // the max. size of the map is 200x200
+    {
+        if (num2 <= sqtCount * sqtCount)
+            break;
+        else
+            sqtCount += 2;
+    }
+
+    int filter = (sqtCount - 1) / 2; // is an integer
+    int refNum = num2 - (sqtCount - 2) * (sqtCount - 2);
+
+    //=====================================//
+    // some adjustment to the refNum can
+    // generate different mode of result
+    //=====================================//
+    // note: sqtCount>=3 for this mode
+    refNum = (refNum - 1 - (sqtCount - 3) / 2) % (4 * (sqtCount - 1)) + 1;
+
+    //-------------------------------------------------//
+    // determine xMag
+    //-------------------------------------------------//
+    int xMag;
+    if (refNum < sqtCount)
+        xMag = refNum - 1;
     else
-      sqtCount += 2;
-  }
+    {
+        if (refNum >= sqtCount && refNum <= 3 * (sqtCount - 1))
+            xMag = (sqtCount << 1) - 1 - refNum; //(sqtCount-1) - (refNum-sqtCount);
+        else if (refNum >= sqtCount + 2 * (sqtCount - 1))
+            xMag = refNum + 3 - (sqtCount << 2); //(refNum-sqtCount-2*(sqtCount-1)) - (sqtCount-1);
+        else
+            err_here();
+    }
 
-  int filter = (sqtCount - 1) / 2; // is an integer
-  int refNum = num2 - (sqtCount - 2) * (sqtCount - 2);
+    //-------------------------------------------------//
+    // calculate xShift
+    //-------------------------------------------------//
+    if (xMag > 0) // +ve
+        xShift = (xMag > filter) ? filter : xMag;
+    else // -ve
+        xShift = (-xMag > filter) ? -filter : xMag;
 
-  //=====================================//
-  // some adjustment to the refNum can
-  // generate different mode of result
-  //=====================================//
-  // note: sqtCount>=3 for this mode
-  refNum = (refNum - 1 - (sqtCount - 3) / 2) % (4 * (sqtCount - 1)) + 1;
-
-  //-------------------------------------------------//
-  // determine xMag
-  //-------------------------------------------------//
-  int xMag;
-  if (refNum < sqtCount)
-    xMag = refNum - 1;
-  else {
-    if (refNum >= sqtCount && refNum <= 3 * (sqtCount - 1))
-      xMag = (sqtCount << 1) - 1 - refNum; //(sqtCount-1) - (refNum-sqtCount);
-    else if (refNum >= sqtCount + 2 * (sqtCount - 1))
-      xMag = refNum + 3 -
-             (sqtCount << 2); //(refNum-sqtCount-2*(sqtCount-1)) - (sqtCount-1);
-    else
-      err_here();
-  }
-
-  //-------------------------------------------------//
-  // calculate xShift
-  //-------------------------------------------------//
-  if (xMag > 0) // +ve
-    xShift = (xMag > filter) ? filter : xMag;
-  else // -ve
-    xShift = (-xMag > filter) ? -filter : xMag;
-
-  //-------------------------------------------------//
-  // calculate yShift
-  //-------------------------------------------------//
-  // ySign = (refNum>sqtCount && refNum<=3*sqtCount-3) ? -1 : 1;
-  int yMag =
-      (sqtCount - 1) - abs(xMag); // abs(xMag) + abs(yMag) always = (sqtCount-1)
-  if (refNum > sqtCount && refNum <= 3 * sqtCount - 3) // -ve
-    yShift = (yMag > filter) ? -filter : -yMag;
-  else // +ve
-    yShift = (yMag > filter) ? filter : yMag;
+    //-------------------------------------------------//
+    // calculate yShift
+    //-------------------------------------------------//
+    // ySign = (refNum>sqtCount && refNum<=3*sqtCount-3) ? -1 : 1;
+    int yMag = (sqtCount - 1) - abs(xMag);               // abs(xMag) + abs(yMag) always = (sqtCount-1)
+    if (refNum > sqtCount && refNum <= 3 * sqtCount - 3) // -ve
+        yShift = (yMag > filter) ? -filter : -yMag;
+    else // +ve
+        yShift = (yMag > filter) ? filter : yMag;
 }
 //------ End of function Misc::cal_move_around_a_point_v2 ---------//
 
 //-------- Begin of function Misc::construct_move_around_table -------//
-void Misc::construct_move_around_table() {
-  if (move_around_table_size == MOVE_AROUND_TABLE_SIZE)
-    return; // table already created
+void Misc::construct_move_around_table()
+{
+    if (move_around_table_size == MOVE_AROUND_TABLE_SIZE)
+        return; // table already created
 
-  int xShift, yShift;
-  char *xPtr = move_around_table_x;
-  char *yPtr = move_around_table_y;
-  for (int i = 1; i <= MOVE_AROUND_TABLE_SIZE; ++i, xPtr++, yPtr++) {
-    cal_move_around_a_point_v2(i, MOVE_AROUND_TABLE_SIZE,
-                               MOVE_AROUND_TABLE_SIZE, xShift, yShift);
-    *xPtr = char(xShift);
-    *yPtr = char(yShift);
-  }
+    int xShift, yShift;
+    char *xPtr = move_around_table_x;
+    char *yPtr = move_around_table_y;
+    for (int i = 1; i <= MOVE_AROUND_TABLE_SIZE; ++i, xPtr++, yPtr++)
+    {
+        cal_move_around_a_point_v2(i, MOVE_AROUND_TABLE_SIZE, MOVE_AROUND_TABLE_SIZE, xShift, yShift);
+        *xPtr = char(xShift);
+        *yPtr = char(yShift);
+    }
 
-  move_around_table_size = MOVE_AROUND_TABLE_SIZE;
+    move_around_table_size = MOVE_AROUND_TABLE_SIZE;
 }
 //------ End of function Misc::construct_move_around_table ---------//
 
 //-------- Begin of function Misc::set_surround_bit -------//
-void Misc::set_surround_bit(long int &flag, int bitNo) {
-  static long int bitFlag[20] = {
-      0x000001, 0x000002, 0x000004, 0x000008, 0x000010, 0x000020, 0x000040,
-      0x000080, 0x000100, 0x000200, 0x000400, 0x000800, 0x001000, 0x002000,
-      0x004000, 0x008000, 0x010000, 0x020000, 0x040000, 0x080000};
+void Misc::set_surround_bit(long int &flag, int bitNo)
+{
+    static long int bitFlag[20] = {0x000001, 0x000002, 0x000004, 0x000008, 0x000010, 0x000020, 0x000040,
+                                   0x000080, 0x000100, 0x000200, 0x000400, 0x000800, 0x001000, 0x002000,
+                                   0x004000, 0x008000, 0x010000, 0x020000, 0x040000, 0x080000};
 
-  err_when(bitNo < 0 || bitNo >= 20);
-  flag |= bitFlag[bitNo];
+    err_when(bitNo < 0 || bitNo >= 20);
+    flag |= bitFlag[bitNo];
 }
 //------ End of function Misc::set_surround_bit ---------//
 
 //------- Begin of function Misc::roman_number -------//
 
-char *Misc::roman_number(int inNum) {
-  err_when(inNum < 1 || inNum >= 1000);
+char *Misc::roman_number(int inNum)
+{
+    err_when(inNum < 1 || inNum >= 1000);
 
-  static const char *roman_number_array[] = {"I",  "II",  "III",  "IV", "V",
-                                             "VI", "VII", "VIII", "IX", "X"};
+    static const char *roman_number_array[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
 
-  static String str;
+    static String str;
 
-  str = "";
+    str = "";
 
-  if (inNum > 100) {
-    str += roman_number_array[inNum / 100 - 1];
-    inNum = inNum - inNum / 100 * 100;
-  }
+    if (inNum > 100)
+    {
+        str += roman_number_array[inNum / 100 - 1];
+        inNum = inNum - inNum / 100 * 100;
+    }
 
-  if (inNum > 10) {
-    str += roman_number_array[(inNum - 1) / 10 - 1];
-    inNum = inNum - (inNum - 1) / 10 * 10;
-  }
+    if (inNum > 10)
+    {
+        str += roman_number_array[(inNum - 1) / 10 - 1];
+        inNum = inNum - (inNum - 1) / 10 * 10;
+    }
 
-  err_when(inNum < 1 || inNum > 10);
+    err_when(inNum < 1 || inNum > 10);
 
-  str += roman_number_array[inNum - 1];
+    str += roman_number_array[inNum - 1];
 
-  return str;
+    return str;
 }
 //------ End of function Misc::roman_number ---------//
 
 //------- Begin of function Misc::memsetw -------//
 
-void Misc::memsetw(short *p, int w, size_t count) {
+void Misc::memsetw(short *p, int w, size_t count)
+{
 #ifdef ASM_FOR_MSVC
-  _asm {
+    _asm {
 		mov	ax, word ptr w
 		shl	eax, 16
 		mov	ax, word ptr w
@@ -1492,58 +1573,71 @@ void Misc::memsetw(short *p, int w, size_t count) {
 		jnc	memsetw_end
 		stosw						; // remaining last word
 memsetw_end:
-  }
+    }
 #else
-  for (size_t i = 0; i < count; ++i) {
-    *p = w;
-    ++p;
-  }
+    for (size_t i = 0; i < count; ++i)
+    {
+        *p = w;
+        ++p;
+    }
 #endif
 }
 //------- End of function Misc::memsetw -------//
 
 // ###### begin Gilbert 19/6 ########//
-Misc::Misc() {
-  freeze_seed = 0;
-  construct_move_around_table();
+Misc::Misc()
+{
+    freeze_seed = 0;
+    construct_move_around_table();
 }
 
-void Misc::lock_seed() { freeze_seed = 1; }
+void Misc::lock_seed()
+{
+    freeze_seed = 1;
+}
 
-void Misc::unlock_seed() { freeze_seed = 0; }
+void Misc::unlock_seed()
+{
+    freeze_seed = 0;
+}
 
-int Misc::is_seed_locked() { return freeze_seed > 0; }
+int Misc::is_seed_locked()
+{
+    return freeze_seed > 0;
+}
 // ###### end Gilbert 19/6 ########//
 
 //----------Begin of function Misc::angle_lookup--------//
 // This function look up an angle by angle vector
-int Misc::angle_lookup(int x, int y) {
-  // lookups the angle based on the vector x,y
-  static int lookup[3][3] = {{225, 270, 315}, {180, 0, 0}, {135, 90, 45}};
-  return lookup[x + 1][y + 1];
+int Misc::angle_lookup(int x, int y)
+{
+    // lookups the angle based on the vector x,y
+    static int lookup[3][3] = {{225, 270, 315}, {180, 0, 0}, {135, 90, 45}};
+    return lookup[x + 1][y + 1];
 }
 //----------End of function Unit::angle_lookup----------//
 
 //----------Begin of function Misc::xy_lookup-----------//
-void Misc::xy_lookup(int angle, int &x, int &y) {
-  // this function looks up the correspondiing angle vector from an angle
+void Misc::xy_lookup(int angle, int &x, int &y)
+{
+    // this function looks up the correspondiing angle vector from an angle
 
-  // lookups the x and y given the angle
-  while (angle < 0)
-    angle += 360;
-  angle %= 360;
-  if (angle > 44 && angle < 136)
-    x = 1;
-  else if (angle > 185 && angle < 354)
-    x = -1;
-  else
-    x = 0;
-  if (angle > 95 && angle < 265)
-    y = -1;
-  else if (angle < 85 || angle > 273)
-    y = 1;
-  else
-    y = 0;
+    // lookups the x and y given the angle
+    while (angle < 0)
+        angle += 360;
+    angle %= 360;
+    if (angle > 44 && angle < 136)
+        x = 1;
+    else if (angle > 185 && angle < 354)
+        x = -1;
+    else
+        x = 0;
+    if (angle > 95 && angle < 265)
+        y = -1;
+    else if (angle < 85 || angle > 273)
+        y = 1;
+    else
+        y = 0;
 }
 //-------- End of function Unit::xy_lookup---------------//
 
@@ -1552,50 +1646,57 @@ void Misc::xy_lookup(int angle, int &x, int &y) {
 // distance of two rectange
 // if rectangles touch, return 0
 //
-int Misc::area_distance(int x1a, int y1a, int x2a, int y2a, int x1b, int y1b,
-                        int x2b, int y2b) {
-  int dx, dy;
+int Misc::area_distance(int x1a, int y1a, int x2a, int y2a, int x1b, int y1b, int x2b, int y2b)
+{
+    int dx, dy;
 
-  // rect b on top of rect a
-  if (y2b < y1a) {
-    dy = y1a - y2b;
-  }
+    // rect b on top of rect a
+    if (y2b < y1a)
+    {
+        dy = y1a - y2b;
+    }
 
-  // rect b on bottom of rect a
-  else if (y1b > y2a) {
-    dy = y1b - y2a;
-  }
+    // rect b on bottom of rect a
+    else if (y1b > y2a)
+    {
+        dy = y1b - y2a;
+    }
 
-  // touch
-  else {
-    dy = 0;
-  }
+    // touch
+    else
+    {
+        dy = 0;
+    }
 
-  // rect b on left of rect a
-  if (x2b < x1a) {
-    dx = x1a - x2b;
-  }
+    // rect b on left of rect a
+    if (x2b < x1a)
+    {
+        dx = x1a - x2b;
+    }
 
-  // rect b on right of rect a
-  else if (x1b > x2a) {
-    dx = x1b - x2a;
-  }
+    // rect b on right of rect a
+    else if (x1b > x2a)
+    {
+        dx = x1b - x2a;
+    }
 
-  // touch
-  else {
-    dx = 0;
-  }
+    // touch
+    else
+    {
+        dx = 0;
+    }
 
-  err_when(dx < 0 || dy < 0);
-  return MAX(dx, dy);
+    err_when(dx < 0 || dy < 0);
+    return MAX(dx, dy);
 }
 //---------- End of function Misc::area_distance -----------//
 
 //------- Begin of function Misc::randomize_chance ---------//
 //
-void Misc::randomize_chance() {
-  random_chance = misc.random(100) + 1;
-  random_chance_accumulated = 0;
+void Misc::randomize_chance()
+{
+    random_chance = misc.random(100) + 1;
+    random_chance_accumulated = 0;
 }
 //---------- End of function Misc::randomize_chance ---------//
 
@@ -1605,10 +1706,11 @@ void Misc::randomize_chance() {
 //
 // return: <int> return whether the testChance meets the random chance.
 //
-int Misc::chance(int testChance) {
-  random_chance_accumulated += testChance;
+int Misc::chance(int testChance)
+{
+    random_chance_accumulated += testChance;
 
-  return random_chance < random_chance_accumulated;
+    return random_chance < random_chance_accumulated;
 }
 //---------- End of function Misc::chance ---------//
 
@@ -1617,22 +1719,25 @@ int Misc::chance(int testChance) {
 // <char> dir1, dir2      0 - 7 to represent direction
 // return the (abs) difference between two directions, the range is 0 to 4
 //
-char Misc::abs_direction_diff(char dir1, char dir2) {
-  char absDirDiff;
-  err_when(dir1 < 0 || dir1 >= 8);
-  err_when(dir2 < 0 || dir2 >= 8);
+char Misc::abs_direction_diff(char dir1, char dir2)
+{
+    char absDirDiff;
+    err_when(dir1 < 0 || dir1 >= 8);
+    err_when(dir2 < 0 || dir2 >= 8);
 
-  if (dir1 >= dir2) // range is (-8,8), map it [0,4]
-  {
-    if ((absDirDiff = dir1 - dir2) > 4)
-      return 8 - absDirDiff;
+    if (dir1 >= dir2) // range is (-8,8), map it [0,4]
+    {
+        if ((absDirDiff = dir1 - dir2) > 4)
+            return 8 - absDirDiff;
+        else
+            return absDirDiff;
+    }
     else
-      return absDirDiff;
-  } else {
-    if ((absDirDiff = dir2 - dir1) > 4)
-      return 8 - absDirDiff;
-    else
-      return absDirDiff;
-  }
+    {
+        if ((absDirDiff = dir2 - dir1) > 4)
+            return 8 - absDirDiff;
+        else
+            return absDirDiff;
+    }
 }
 //------- End of function Misc::abs_direction_diff ---------//

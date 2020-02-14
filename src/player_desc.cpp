@@ -26,37 +26,47 @@
 #include <player_desc.h>
 #include <string.h>
 
-PlayerDesc::PlayerDesc() {
-  id = 0;
-  strcpy(name, "?Anonymous?");
-  address.host = ENET_HOST_ANY;
-  address.port = 0;
-  authorized = 0;
+PlayerDesc::PlayerDesc()
+{
+    id = 0;
+    strcpy(name, "?Anonymous?");
+    address.host = ENET_HOST_ANY;
+    address.port = 0;
+    authorized = 0;
 }
 
-PlayerDesc::PlayerDesc(ENetAddress *address) {
-  id = 0;
-  strcpy(name, "?Anonymous?");
-  this->address.host = address->host;
-  this->address.port = address->port;
-  authorized = 0;
+PlayerDesc::PlayerDesc(ENetAddress *address)
+{
+    id = 0;
+    strcpy(name, "?Anonymous?");
+    this->address.host = address->host;
+    this->address.port = address->port;
+    authorized = 0;
 }
 
-PlayerDesc::PlayerDesc(char *name) {
-  id = 0;
-  strcpy(this->name, name);
-  address.host = ENET_HOST_ANY;
-  address.port = 0;
-  authorized = 0;
+PlayerDesc::PlayerDesc(char *name)
+{
+    id = 0;
+    strcpy(this->name, name);
+    address.host = ENET_HOST_ANY;
+    address.port = 0;
+    authorized = 0;
 }
 
-uint32_t PlayerDesc::pid() { return id; }
+uint32_t PlayerDesc::pid()
+{
+    return id;
+}
 
-char *PlayerDesc::friendly_name_str() { return name; }
+char *PlayerDesc::friendly_name_str()
+{
+    return name;
+}
 
-ENetAddress *PlayerDesc::get_address() {
-  if (address.host == ENET_HOST_ANY)
-    return NULL;
+ENetAddress *PlayerDesc::get_address()
+{
+    if (address.host == ENET_HOST_ANY)
+        return NULL;
 
-  return &this->address;
+    return &this->address;
 }

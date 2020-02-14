@@ -28,21 +28,23 @@
 
 typedef void (*ExtraHandler)();
 
-class Error {
-private:
-  ExtraHandler extra_handler; // extra error handler
+class Error
+{
+  private:
+    ExtraHandler extra_handler; // extra error handler
 
-public:
-  Error();
+  public:
+    Error();
 
-  void internal(char *, const char *, int);
-  void mem();
-  void msg(const char *, ...);
-  void run(const char *, ...);
+    void internal(char *, const char *, int);
+    void mem();
+    void msg(const char *, ...);
+    void run(const char *, ...);
 
-  void set_extra_handler(ExtraHandler extraHandler) {
-    extra_handler = extraHandler;
-  }
+    void set_extra_handler(ExtraHandler extraHandler)
+    {
+        extra_handler = extraHandler;
+    }
 };
 
 extern Error err;
@@ -50,9 +52,9 @@ extern Error err;
 //-------- error handling functions ----------//
 
 #ifdef DEBUG
-#define err_when(cond)                                                         \
-  if (cond)                                                                    \
-  err.internal(NULL, __FILE__, __LINE__)
+#define err_when(cond)                                                                                                 \
+    if (cond)                                                                                                          \
+    err.internal(NULL, __FILE__, __LINE__)
 #define err_here() err.internal(NULL, __FILE__, __LINE__)
 #define err_if(cond) if (cond)
 #define err_else else

@@ -29,7 +29,7 @@
 //#define GAME_VERSION_STR   "1.1"
 extern const char *GAME_VERSION_STR;
 //#define GAME_VERSION       110          // Version 1.00, don't change it
-//unless the format of save game files has been changed
+// unless the format of save game files has been changed
 extern const int GAME_VERSION;
 
 //-------- Define constant ------------//
@@ -67,25 +67,30 @@ extern const int GAME_VERSION;
 
 //--------- Define direction types -----------//
 
-enum { MAX_DIR = 8 };
+enum
+{
+    MAX_DIR = 8
+};
 
-enum {
-  DIR_N, // building directions
-  DIR_NE,
-  DIR_E,
-  DIR_SE,
-  DIR_S,
-  DIR_SW,
-  DIR_W,
-  DIR_NW
+enum
+{
+    DIR_N, // building directions
+    DIR_NE,
+    DIR_E,
+    DIR_SE,
+    DIR_S,
+    DIR_SW,
+    DIR_W,
+    DIR_NW
 };
 
 //------------ Mobile Types -------------//
 
-enum {
-  UNIT_AIR = 'A',
-  UNIT_LAND = 'L',
-  UNIT_SEA = 'S',
+enum
+{
+    UNIT_AIR = 'A',
+    UNIT_LAND = 'L',
+    UNIT_SEA = 'S',
 };
 
 //---------- Link enable/disable status ---------//
@@ -97,7 +102,13 @@ enum {
 
 //------------- define command types ------------//
 
-enum { COMMAND_PLAYER = 0, COMMAND_REMOTE = 1, COMMAND_AI, COMMAND_AUTO };
+enum
+{
+    COMMAND_PLAYER = 0,
+    COMMAND_REMOTE = 1,
+    COMMAND_AI,
+    COMMAND_AUTO
+};
 
 //-------- Define maximum game constant ---------//
 
@@ -126,17 +137,14 @@ enum { COMMAND_PLAYER = 0, COMMAND_REMOTE = 1, COMMAND_AI, COMMAND_AUTO };
 
 #define EFFECTIVE_POWER_DISTANCE 3
 
-#define PROCESS_GOODS_INTERVAL                                                 \
-  3 // Process goods in mines, factories and market places once 3 days
+#define PROCESS_GOODS_INTERVAL 3 // Process goods in mines, factories and market places once 3 days
 
-#define PEASANT_FOOD_YEAR_PRODUCTION                                           \
-  30 // A peasant produce 2 units of food per month
-#define UNIT_FOOD_YEAR_CONSUMPTION                                             \
-  10 // consume one unit of food per unit per month
+#define PEASANT_FOOD_YEAR_PRODUCTION 30 // A peasant produce 2 units of food per month
+#define UNIT_FOOD_YEAR_CONSUMPTION 10   // consume one unit of food per unit per month
 
-#define NO_FOOD_LOYALTY_DECREASE_INTERVAL                                      \
-  5 // When your kingdom runs out of food, the loyalty of all your units will
-    // decrease 1 point every 5 days.
+#define NO_FOOD_LOYALTY_DECREASE_INTERVAL                                                                              \
+    5 // When your kingdom runs out of food, the loyalty of all your units will \
+      // decrease 1 point every 5 days.
 
 #define RAW_PRICE float(1.5)      // Cost per raw material
 #define PRODUCT_PRICE 3           // Cost per product
@@ -145,23 +153,20 @@ enum { COMMAND_PLAYER = 0, COMMAND_REMOTE = 1, COMMAND_AI, COMMAND_AUTO };
 #define REWARD_COST 30
 #define REWARD_LOYALTY_INCREASE 10
 
-#define UNIT_BETRAY_LOYALTY                                                    \
-  30 // if a unit's loyalty is below this, it will betray
+#define UNIT_BETRAY_LOYALTY 30 // if a unit's loyalty is below this, it will betray
 
 #define PROMOTE_LOYALTY_INCREASE 20
 #define DEMOTE_LOYALTY_DECREASE 40
 
-#define ATTACK_SLOW_DOWN                                                       \
-  3 // how many times attacking damages should be reduced, this lessens all
-    // attacking damages, thus slowing down all battles.
+#define ATTACK_SLOW_DOWN                                                                                               \
+    3 // how many times attacking damages should be reduced, this lessens all \
+      // attacking damages, thus slowing down all battles.
 
 #define SPY_KILLED_REPUTATION_DECREASE 3
 
-#define REPAIR_POINTS_PER_DAY                                                  \
-  1.0f // points can be repaired per day for firms and towns
+#define REPAIR_POINTS_PER_DAY 1.0f // points can be repaired per day for firms and towns
 
-#define INTER_PLACE_SPACE                                                      \
-  2 // the no. of space locations between places (including firms and towns)
+#define INTER_PLACE_SPACE 2 // the no. of space locations between places (including firms and towns)
 
 #define MAX_ROYAL_UNIT 10 // the max no. of royal units
 

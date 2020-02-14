@@ -90,16 +90,17 @@ char VgaBuf::color_border = (char)0x98; // color of the border
 // <int> x2,y2       - the bottom right vertex of the bar
 // <int> color index - the index of a 256 color palette
 //
-void VgaBuf::bar(int x1, int y1, int x2, int y2, int colorCode) {
-  err_when(!buf_locked);
+void VgaBuf::bar(int x1, int y1, int x2, int y2, int colorCode)
+{
+    err_when(!buf_locked);
 
-  if (is_front)
-    mouse.hide_area(x1, y1, x2, y2);
+    if (is_front)
+        mouse.hide_area(x1, y1, x2, y2);
 
-  IMGbar(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, translate_color(colorCode));
+    IMGbar(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, translate_color(colorCode));
 
-  if (is_front)
-    mouse.show_area();
+    if (is_front)
+        mouse.show_area();
 }
 //--------------- End of function VgaBuf::bar --------------//
 
@@ -164,13 +165,14 @@ void VgaBuf::pixelize(int x1,int y1,int x2,int y2,int colorCode)
 // int lineThick   - thickness of the lines of the rect
 // int color       - the color of the rect
 //
-void VgaBuf::rect(int x1, int y1, int x2, int y2, int lt, int color) {
-  lt--;
+void VgaBuf::rect(int x1, int y1, int x2, int y2, int lt, int color)
+{
+    lt--;
 
-  bar(x1, y1, x2, y1 + lt, color);
-  bar(x1, y1, x1 + lt, y2, color);
-  bar(x1, y2 - lt, x2, y2, color);
-  bar(x2 - lt, y1, x2, y2, color);
+    bar(x1, y1, x2, y1 + lt, color);
+    bar(x1, y1, x1 + lt, y2, color);
+    bar(x1, y2 - lt, x2, y2, color);
+    bar(x2 - lt, y1, x2, y2, color);
 }
 //--------------- End of function VgaBuf::rect --------------//
 
@@ -183,9 +185,10 @@ void VgaBuf::rect(int x1, int y1, int x2, int y2, int lt, int color) {
 // int x1,y1       - the top left vertex of the d3_rect
 // int x2,y2       - the bottom right vertex of the d3_rect
 
-void VgaBuf::d3_rect(int x1, int y1, int x2, int y2) {
-  rect(x1 + 1, y1 + 1, x2, y2, 1, V_WHITE);
-  rect(x1, y1, x2 - 1, y2 - 1, 1, VGA_GRAY + 8);
+void VgaBuf::d3_rect(int x1, int y1, int x2, int y2)
+{
+    rect(x1 + 1, y1 + 1, x2, y2, 1, V_WHITE);
+    rect(x1, y1, x2 - 1, y2 - 1, 1, VGA_GRAY + 8);
 }
 //--------------- End of function VgaBuf::d3_rect --------------//
 
@@ -241,15 +244,18 @@ y2>=image_height ) err_now( "VgaBuf::tile (image)" );
 // int x1,y1       - the top left vertex of the separator
 // int x2,y2       - the bottom right vertex of the separator
 //
-void VgaBuf::separator(int x1, int y1, int x2, int y2) {
-  if (y1 + 1 == y2) // horizontal line
-  {
-    bar(x1, y1, x2, y1, V_WHITE);
-    bar(x1, y2, x2, y2, color_dark);
-  } else {
-    bar(x1, y1, x1, y2, V_WHITE);
-    bar(x2, y1, x2, y2, color_dark);
-  }
+void VgaBuf::separator(int x1, int y1, int x2, int y2)
+{
+    if (y1 + 1 == y2) // horizontal line
+    {
+        bar(x1, y1, x2, y1, V_WHITE);
+        bar(x1, y2, x2, y2, color_dark);
+    }
+    else
+    {
+        bar(x1, y1, x1, y2, V_WHITE);
+        bar(x2, y1, x2, y2, color_dark);
+    }
 }
 //--------------- End of function VgaBuf::separator --------------//
 
@@ -263,82 +269,84 @@ void VgaBuf::separator(int x1, int y1, int x2, int y2) {
 //                          (default : vga.color_down)
 //			    (-2 if don't paint background color)
 //
-void VgaBuf::indicator(int x1, int y1, int x2, int y2, float curValue,
-                       float maxValue, int indiColor, int backColor) {
-  if (backColor == -1)
-    backColor = color_down;
-
-  /*
-if( curValue > maxValue )
-          curValue = maxValue;
-
-if( curValue > 0 )
+void VgaBuf::indicator(int x1, int y1, int x2, int y2, float curValue, float maxValue, int indiColor, int backColor)
 {
-int barWidth = (int) ((float)(x2-x1) * curValue / maxValue);
+    if (backColor == -1)
+        backColor = color_down;
 
-          int halfHeight = (y2-y1+1)/2-1;
-          int tx2        = x1+barWidth;
-          int y;
+    /*
+  if( curValue > maxValue )
+            curValue = maxValue;
 
-          indiColor+=halfHeight;
-
-          for( y=y1 ; y<y1+halfHeight ; y++, indiColor-- )
-                  bar( x1, y, tx2, y, indiColor );
-
-          for( ; y<=y2 ; y++, indiColor++ )
-                  bar( x1, y, tx2, y, indiColor );
-
-          if( backColor != -2 )	// -2 if don't paint background color
-          {
-                  if( x1+barWidth < x2 )
-                  bar( x1+barWidth+1, y1, x2, y2, backColor );
-          }
-  }
-  else
+  if( curValue > 0 )
   {
-          if( backColor != -2 )	// -2 if don't paint background color
-                  bar( x1, y1, x2, y2, backColor );
-}
-  */
+  int barWidth = (int) ((float)(x2-x1) * curValue / maxValue);
 
-  int cutPoint;
-  if (curValue <= 0.0f)
-    cutPoint = x1;
-  else if (curValue >= maxValue)
-    cutPoint = x2 + 1;
-  else
-    cutPoint = x1 + int(float(x2 - x1 + 1) * curValue / maxValue);
+            int halfHeight = (y2-y1+1)/2-1;
+            int tx2        = x1+barWidth;
+            int y;
 
-  if (cutPoint > x1) {
-    if (is_front)
-      mouse.hide_area(x1, y1, cutPoint, y2);
+            indiColor+=halfHeight;
 
-    int cutHeight = (y1 * 5 + y2 * 3) / 8; // cut at 3/8 of between y1 and y2
-    err_when(y2 - y1 - 1 < 4);
+            for( y=y1 ; y<y1+halfHeight ; y++, indiColor-- )
+                    bar( x1, y, tx2, y, indiColor );
 
-    LinearCounter brightness;
-    brightness.init(y1, 0, cutHeight,
-                    MAX_BRIGHTNESS_ADJUST_DEGREE - 2); // glowing
-    int y;
-    for (y = y1; y <= cutHeight; y++, brightness.inc()) {
-      barW_fast(x1, y, cutPoint, y,
-                vga.vga_color_table->get_table(brightness.y)[indiColor]);
+            for( ; y<=y2 ; y++, indiColor++ )
+                    bar( x1, y, tx2, y, indiColor );
+
+            if( backColor != -2 )	// -2 if don't paint background color
+            {
+                    if( x1+barWidth < x2 )
+                    bar( x1+barWidth+1, y1, x2, y2, backColor );
+            }
+    }
+    else
+    {
+            if( backColor != -2 )	// -2 if don't paint background color
+                    bar( x1, y1, x2, y2, backColor );
+  }
+    */
+
+    int cutPoint;
+    if (curValue <= 0.0f)
+        cutPoint = x1;
+    else if (curValue >= maxValue)
+        cutPoint = x2 + 1;
+    else
+        cutPoint = x1 + int(float(x2 - x1 + 1) * curValue / maxValue);
+
+    if (cutPoint > x1)
+    {
+        if (is_front)
+            mouse.hide_area(x1, y1, cutPoint, y2);
+
+        int cutHeight = (y1 * 5 + y2 * 3) / 8; // cut at 3/8 of between y1 and y2
+        err_when(y2 - y1 - 1 < 4);
+
+        LinearCounter brightness;
+        brightness.init(y1, 0, cutHeight,
+                        MAX_BRIGHTNESS_ADJUST_DEGREE - 2); // glowing
+        int y;
+        for (y = y1; y <= cutHeight; y++, brightness.inc())
+        {
+            barW_fast(x1, y, cutPoint, y, vga.vga_color_table->get_table(brightness.y)[indiColor]);
+        }
+
+        brightness.init(cutHeight, MAX_BRIGHTNESS_ADJUST_DEGREE - 2, y2,
+                        -MAX_BRIGHTNESS_ADJUST_DEGREE / 2); //
+        for (; y <= y2; ++y, brightness.inc())
+        {
+            barW_fast(x1, y, cutPoint, y, vga.vga_color_table->get_table(brightness.y)[indiColor]);
+        }
+
+        if (is_front)
+            mouse.show_area();
     }
 
-    brightness.init(cutHeight, MAX_BRIGHTNESS_ADJUST_DEGREE - 2, y2,
-                    -MAX_BRIGHTNESS_ADJUST_DEGREE / 2); //
-    for (; y <= y2; ++y, brightness.inc()) {
-      barW_fast(x1, y, cutPoint, y,
-                vga.vga_color_table->get_table(brightness.y)[indiColor]);
+    if (cutPoint <= x2)
+    {
+        bar(cutPoint, y1, x2, y2, backColor);
     }
-
-    if (is_front)
-      mouse.show_area();
-  }
-
-  if (cutPoint <= x2) {
-    bar(cutPoint, y1, x2, y2, backColor);
-  }
 }
 //--------------- End of function VgaBuf::indicator --------------//
 
@@ -351,44 +359,42 @@ int barWidth = (int) ((float)(x2-x1) * curValue / maxValue);
 // <float> maxValue       = max value, the bar width = maxBarWidth * curValue /
 // maxValue <int>   colorScheme    = color of the indicator // not used
 //
-void VgaBuf::indicator(int barType, int x1, int y1, float curValue,
-                       float maxValue, int colorScheme) {
-  int barWidth = 106;
-  int barHeight = 35;
-  int barLeftMargin = 15;
-  int barRightMargin = 15;
-  int barFluidMaxWidth = barWidth - barLeftMargin - barRightMargin;
+void VgaBuf::indicator(int barType, int x1, int y1, float curValue, float maxValue, int colorScheme)
+{
+    int barWidth = 106;
+    int barHeight = 35;
+    int barLeftMargin = 15;
+    int barRightMargin = 15;
+    int barFluidMaxWidth = barWidth - barLeftMargin - barRightMargin;
 
-  char *emptyBitmapName = barType & 2 ? (char *)"MTR_00" : (char *)"MTR_B1";
-  char *fullBitmapName = barType & 2 ? (char *)"MTR_40" : (char *)"MTR_B4";
+    char *emptyBitmapName = barType & 2 ? (char *)"MTR_00" : (char *)"MTR_B1";
+    char *fullBitmapName = barType & 2 ? (char *)"MTR_40" : (char *)"MTR_B4";
 
-  int cutPoint;
-  if (curValue <= 0.0f)
-    cutPoint = barLeftMargin;
-  else if (curValue >= maxValue)
-    cutPoint = barWidth - barRightMargin;
-  else
-    cutPoint =
-        barLeftMargin + int((float)barFluidMaxWidth * curValue / maxValue);
+    int cutPoint;
+    if (curValue <= 0.0f)
+        cutPoint = barLeftMargin;
+    else if (curValue >= maxValue)
+        cutPoint = barWidth - barRightMargin;
+    else
+        cutPoint = barLeftMargin + int((float)barFluidMaxWidth * curValue / maxValue);
 
-  // ignore barType & 8;
-  if (cutPoint > 0)
-    put_bitmap_area_trans(x1, y1, image_spict.read(fullBitmapName), 0, 0,
-                          cutPoint - 1, barHeight - 1);
-  if (cutPoint < barWidth)
-    put_bitmap_area_trans(x1, y1, image_spict.read(emptyBitmapName), cutPoint,
-                          0, barWidth - 1, barHeight - 1);
+    // ignore barType & 8;
+    if (cutPoint > 0)
+        put_bitmap_area_trans(x1, y1, image_spict.read(fullBitmapName), 0, 0, cutPoint - 1, barHeight - 1);
+    if (cutPoint < barWidth)
+        put_bitmap_area_trans(x1, y1, image_spict.read(emptyBitmapName), cutPoint, 0, barWidth - 1, barHeight - 1);
 
-  if (barType & 1) {
-    String str;
-    str = (int)curValue;
-    if (barType & 2) {
-      str += "/";
-      str += (int)maxValue;
+    if (barType & 1)
+    {
+        String str;
+        str = (int)curValue;
+        if (barType & 2)
+        {
+            str += "/";
+            str += (int)maxValue;
+        }
+        font_hitpoint.center_put(x1, y1, x1 + barWidth - 1, y1 + barHeight - 1, str);
     }
-    font_hitpoint.center_put(x1, y1, x1 + barWidth - 1, y1 + barHeight - 1,
-                             str);
-  }
 }
 //------------- End of function VgaBuf::indicator --------------//
 
@@ -404,33 +410,35 @@ void VgaBuf::indicator(int barType, int x1, int y1, float curValue,
 // background color
 //                          (default : vga.color_down)
 //
-void VgaBuf::v_indicator(int x1, int y1, int x2, int y2, float curValue,
-                         float maxValue, int indiColor, int backColor) {
-  if (backColor == -1)
-    backColor = color_down;
+void VgaBuf::v_indicator(int x1, int y1, int x2, int y2, float curValue, float maxValue, int indiColor, int backColor)
+{
+    if (backColor == -1)
+        backColor = color_down;
 
-  if (curValue > 0) {
-    int barHeight = (int)((float)(y2 - y1) * curValue / maxValue);
+    if (curValue > 0)
+    {
+        int barHeight = (int)((float)(y2 - y1) * curValue / maxValue);
 
-    int halfWidth = (x2 - x1 + 1) / 2 - 1;
-    int ty1 =
-        MAX(y2 - barHeight, y1); // when curValue>0, even the actual bar width <
-                                 // 1, one pixel will also be painted
-    int x;
+        int halfWidth = (x2 - x1 + 1) / 2 - 1;
+        int ty1 = MAX(y2 - barHeight, y1); // when curValue>0, even the actual bar width <
+                                           // 1, one pixel will also be painted
+        int x;
 
-    indiColor += halfWidth;
+        indiColor += halfWidth;
 
-    for (x = x1; x < x1 + halfWidth; x++, indiColor--)
-      bar(x, ty1, x, y2, indiColor);
+        for (x = x1; x < x1 + halfWidth; x++, indiColor--)
+            bar(x, ty1, x, y2, indiColor);
 
-    for (; x <= x2; x++, indiColor++)
-      bar(x, ty1, x, y2, indiColor);
+        for (; x <= x2; x++, indiColor++)
+            bar(x, ty1, x, y2, indiColor);
 
-    if (y1 < y2 - barHeight)
-      bar(x1, y1, x2, y2 - barHeight - 1, backColor);
-  } else {
-    bar(x1, y1, x2, y2, backColor);
-  }
+        if (y1 < y2 - barHeight)
+            bar(x1, y1, x2, y2 - barHeight - 1, backColor);
+    }
+    else
+    {
+        bar(x1, y1, x2, y2, backColor);
+    }
 }
 //--------------- End of function VgaBuf::v_indicator --------------//
 
@@ -441,16 +449,16 @@ void VgaBuf::v_indicator(int x1, int y1, int x2, int y2, float curValue,
 // <int> x1,y1,x2,y2 = the coordination of the line
 // <int> lineColor   = color of the line
 //
-void VgaBuf::line(int x1, int y1, int x2, int y2, int lineColor) {
-  if (is_front)
-    mouse.hide_area(x1, y1, x2,
-                    y2); // if the mouse cursor is in that area, hide it
+void VgaBuf::line(int x1, int y1, int x2, int y2, int lineColor)
+{
+    if (is_front)
+        mouse.hide_area(x1, y1, x2,
+                        y2); // if the mouse cursor is in that area, hide it
 
-  IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2,
-          translate_color(lineColor));
+    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2, translate_color(lineColor));
 
-  if (is_front)
-    mouse.show_area();
+    if (is_front)
+        mouse.show_area();
 }
 //------------ End of function VgaBuf::line -------------//
 
@@ -461,47 +469,39 @@ void VgaBuf::line(int x1, int y1, int x2, int y2, int lineColor) {
 // <int> x1,y1,x2,y2 = the coordination of the line
 // <int> lineColor   = color of the line
 //
-void VgaBuf::thick_line(int x1, int y1, int x2, int y2, int lineColor) {
-  err_when(x1 < 0 || y1 < 0 || x2 >= VGA_WIDTH || y2 >= VGA_HEIGHT);
+void VgaBuf::thick_line(int x1, int y1, int x2, int y2, int lineColor)
+{
+    err_when(x1 < 0 || y1 < 0 || x2 >= VGA_WIDTH || y2 >= VGA_HEIGHT);
 
-  if (is_front)
-    mouse.hide_area(x1, y1, x2,
-                    y2); // if the mouse cursor is in that area, hide it
+    if (is_front)
+        mouse.hide_area(x1, y1, x2,
+                        y2); // if the mouse cursor is in that area, hide it
 
-  if (y1 - y2 > abs(x2 - x1)) // keep thickness of the line to 3
-  {
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 - 1, x2,
-            y2 - 1, lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2,
-            lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 + 1, x2,
-            y2 + 1, lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1 + 1, y1 + 1,
-            x2 + 1, y2 + 1, lineColor);
-  }
+    if (y1 - y2 > abs(x2 - x1)) // keep thickness of the line to 3
+    {
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 - 1, x2, y2 - 1, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 + 1, x2, y2 + 1, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1 + 1, y1 + 1, x2 + 1, y2 + 1, lineColor);
+    }
 
-  else if (y2 - y1 > abs(x2 - x1)) {
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1 + 1, y1 - 1,
-            x2 + 1, y2 - 1, lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 - 1, x2,
-            y2 - 1, lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2,
-            lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 + 1, x2,
-            y2 + 1, lineColor);
-  }
+    else if (y2 - y1 > abs(x2 - x1))
+    {
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1 + 1, y1 - 1, x2 + 1, y2 - 1, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 - 1, x2, y2 - 1, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 + 1, x2, y2 + 1, lineColor);
+    }
 
-  else {
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 - 1, x2,
-            y2 - 1, lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2,
-            lineColor);
-    IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 + 1, x2,
-            y2 + 1, lineColor);
-  }
+    else
+    {
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 - 1, x2, y2 - 1, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1, x2, y2, lineColor);
+        IMGline(cur_buf_ptr, cur_pitch, buf_width(), buf_height(), x1, y1 + 1, x2, y2 + 1, lineColor);
+    }
 
-  if (is_front)
-    mouse.show_area();
+    if (is_front)
+        mouse.show_area();
 }
 //------------ End of function VgaBuf::thick_line -------------//
 
@@ -518,160 +518,162 @@ void VgaBuf::thick_line(int x1, int y1, int x2, int y2, int lineColor) {
 //                     pass 0 if the area has just been painted with bar()
 //                     (default:1)
 //
-void VgaBuf::d3_panel_up(int x1, int y1, int x2, int y2, int t,
-                         int paintCentre) {
-  // int i,x,y;
+void VgaBuf::d3_panel_up(int x1, int y1, int x2, int y2, int t, int paintCentre)
+{
+    // int i,x,y;
 
-  err_when(x1 > x2 || y1 > y2 || x1 < 0 || y1 < 0 || x2 >= VGA_WIDTH ||
-           y2 >= VGA_HEIGHT);
+    err_when(x1 > x2 || y1 > y2 || x1 < 0 || y1 < 0 || x2 >= VGA_WIDTH || y2 >= VGA_HEIGHT);
 
-  if (is_front)
-    mouse.hide_area(x1, y1, x2, y2);
+    if (is_front)
+        mouse.hide_area(x1, y1, x2, y2);
 
-  //------------------------------------------------//
+    //------------------------------------------------//
 
-  // ####### begin Gilbert 17/10 ##########//
-  /*
-  if( paintCentre )
-          bar_fast(x1+2, y1+2, x2-3, y2-3, color_up );  // center
+    // ####### begin Gilbert 17/10 ##########//
+    /*
+    if( paintCentre )
+            bar_fast(x1+2, y1+2, x2-3, y2-3, color_up );  // center
 
-  //--------- white border on top and left sides -----------//
+    //--------- white border on top and left sides -----------//
 
-  bar_fast(x1,y1,x2-3,y1+1,0x9a );
-  draw_pixel(x2-2, y1, 0x9a);
-  bar_fast(x1,y1+2,x1+1,y2-3, 0x9a );    // left side
-  draw_pixel(x1, y2-2, 0x9a);
+    bar_fast(x1,y1,x2-3,y1+1,0x9a );
+    draw_pixel(x2-2, y1, 0x9a);
+    bar_fast(x1,y1+2,x1+1,y2-3, 0x9a );    // left side
+    draw_pixel(x1, y2-2, 0x9a);
 
-  //--------- black border on bottom and right sides -----------//
+    //--------- black border on bottom and right sides -----------//
 
-  bar_fast(x2-2,y1+2,x2-1,y2-1, 0x90 );     // bottom side
-  draw_pixel(x2-1, y1+1, 0x90);
-  bar_fast(x1+2,y2-2,x2-3,y2-1, 0x90 );		 // right side
-  draw_pixel(x1+1, y2-1, 0x90);
+    bar_fast(x2-2,y1+2,x2-1,y2-1, 0x90 );     // bottom side
+    draw_pixel(x2-1, y1+1, 0x90);
+    bar_fast(x1+2,y2-2,x2-3,y2-1, 0x90 );		 // right side
+    draw_pixel(x1+1, y2-1, 0x90);
 
-  //--------- junction between white and black border --------//
-  draw_pixel(x2-1, y1, 0x97);
-  draw_pixel(x2-2, y1+1, 0x97);
-  draw_pixel(x1, y2-1, 0x97);
-  draw_pixel(x1+1, y2-2, 0x97);
+    //--------- junction between white and black border --------//
+    draw_pixel(x2-1, y1, 0x97);
+    draw_pixel(x2-2, y1+1, 0x97);
+    draw_pixel(x1, y2-1, 0x97);
+    draw_pixel(x1+1, y2-2, 0x97);
 
-  //--------- gray shadow on bottom and right sides -----------//
-  bar_fast(x2, y1+1, x2, y2, 0x97);
-  bar_fast(x1+1, y2, x2-1, y2, 0x97);
+    //--------- gray shadow on bottom and right sides -----------//
+    bar_fast(x2, y1+1, x2, y2, 0x97);
+    bar_fast(x1+1, y2, x2-1, y2, 0x97);
 
-  //-------------------------------------------//
-  */
+    //-------------------------------------------//
+    */
 
-  LinearCounter redCount, greenCount, blueCount;
+    LinearCounter redCount, greenCount, blueCount;
 
-  if (paintCentre) {
-    bar_fast(x1 + 4, y1 + 4, x2 - 4, y2 - 4, color_up); // center
-  }
+    if (paintCentre)
+    {
+        bar_fast(x1 + 4, y1 + 4, x2 - 4, y2 - 4, color_up); // center
+    }
 
-  short *pixelPtr;
-  int pitch = buf_pitch();
-  // outer layer, top border
+    short *pixelPtr;
+    int pitch = buf_pitch();
+    // outer layer, top border
 
-  redCount.init(x1, D3_PANEL_L1_X1Y1_R, x2, D3_PANEL_L1_X2Y1_R);
-  greenCount.init(x1, D3_PANEL_L1_X1Y1_G, x2, D3_PANEL_L1_X2Y1_G);
-  blueCount.init(x1, D3_PANEL_L1_X1Y1_B, x2, D3_PANEL_L1_X2Y1_B);
-  pixelPtr = buf_ptr(x1, y1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    redCount.init(x1, D3_PANEL_L1_X1Y1_R, x2, D3_PANEL_L1_X2Y1_R);
+    greenCount.init(x1, D3_PANEL_L1_X1Y1_G, x2, D3_PANEL_L1_X2Y1_G);
+    blueCount.init(x1, D3_PANEL_L1_X1Y1_B, x2, D3_PANEL_L1_X2Y1_B);
+    pixelPtr = buf_ptr(x1, y1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // outer layer, bottom border
-  redCount.init(x1, D3_PANEL_L1_X1Y2_R, x2, D3_PANEL_L1_X2Y2_R);
-  greenCount.init(x1, D3_PANEL_L1_X1Y2_G, x2, D3_PANEL_L1_X2Y2_G);
-  blueCount.init(x1, D3_PANEL_L1_X1Y2_B, x2, D3_PANEL_L1_X2Y2_B);
-  pixelPtr = buf_ptr(x1, y2);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // outer layer, bottom border
+    redCount.init(x1, D3_PANEL_L1_X1Y2_R, x2, D3_PANEL_L1_X2Y2_R);
+    greenCount.init(x1, D3_PANEL_L1_X1Y2_G, x2, D3_PANEL_L1_X2Y2_G);
+    blueCount.init(x1, D3_PANEL_L1_X1Y2_B, x2, D3_PANEL_L1_X2Y2_B);
+    pixelPtr = buf_ptr(x1, y2);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // outer layer left border
-  redCount.init(y1, D3_PANEL_L1_X1Y1_R, y2, D3_PANEL_L1_X1Y2_R);
-  greenCount.init(y1, D3_PANEL_L1_X1Y1_G, y2, D3_PANEL_L1_X1Y2_G);
-  blueCount.init(y1, D3_PANEL_L1_X1Y1_B, y2, D3_PANEL_L1_X1Y2_B);
-  pixelPtr = buf_ptr(x1, y1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // outer layer left border
+    redCount.init(y1, D3_PANEL_L1_X1Y1_R, y2, D3_PANEL_L1_X1Y2_R);
+    greenCount.init(y1, D3_PANEL_L1_X1Y1_G, y2, D3_PANEL_L1_X1Y2_G);
+    blueCount.init(y1, D3_PANEL_L1_X1Y1_B, y2, D3_PANEL_L1_X1Y2_B);
+    pixelPtr = buf_ptr(x1, y1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // outer layer right border
-  redCount.init(y1, D3_PANEL_L1_X2Y1_R, y2, D3_PANEL_L1_X2Y2_R);
-  greenCount.init(y1, D3_PANEL_L1_X2Y1_G, y2, D3_PANEL_L1_X2Y2_G);
-  blueCount.init(y1, D3_PANEL_L1_X2Y1_B, y2, D3_PANEL_L1_X2Y2_B);
-  pixelPtr = buf_ptr(x2, y1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // outer layer right border
+    redCount.init(y1, D3_PANEL_L1_X2Y1_R, y2, D3_PANEL_L1_X2Y2_R);
+    greenCount.init(y1, D3_PANEL_L1_X2Y1_G, y2, D3_PANEL_L1_X2Y2_G);
+    blueCount.init(y1, D3_PANEL_L1_X2Y1_B, y2, D3_PANEL_L1_X2Y2_B);
+    pixelPtr = buf_ptr(x2, y1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer, top border
+    // inner layer, top border
 
-  redCount.init(x1 + 1, D3_PANEL_L2_X1Y1_R, x2 - 1, D3_PANEL_L2_X2Y1_R);
-  greenCount.init(x1 + 1, D3_PANEL_L2_X1Y1_G, x2 - 1, D3_PANEL_L2_X2Y1_G);
-  blueCount.init(x1 + 1, D3_PANEL_L2_X1Y1_B, x2 - 1, D3_PANEL_L2_X2Y1_B);
-  pixelPtr = buf_ptr(x1 + 1, y1 + 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    redCount.init(x1 + 1, D3_PANEL_L2_X1Y1_R, x2 - 1, D3_PANEL_L2_X2Y1_R);
+    greenCount.init(x1 + 1, D3_PANEL_L2_X1Y1_G, x2 - 1, D3_PANEL_L2_X2Y1_G);
+    blueCount.init(x1 + 1, D3_PANEL_L2_X1Y1_B, x2 - 1, D3_PANEL_L2_X2Y1_B);
+    pixelPtr = buf_ptr(x1 + 1, y1 + 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer, bottom border
-  redCount.init(x1 + 1, D3_PANEL_L2_X1Y2_R, x2 - 1, D3_PANEL_L2_X2Y2_R);
-  greenCount.init(x1 + 1, D3_PANEL_L2_X1Y2_G, x2 - 1, D3_PANEL_L2_X2Y2_G);
-  blueCount.init(x1 + 1, D3_PANEL_L2_X1Y2_B, x2 - 1, D3_PANEL_L2_X2Y2_B);
-  pixelPtr = buf_ptr(x1 + 1, y2 - 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // inner layer, bottom border
+    redCount.init(x1 + 1, D3_PANEL_L2_X1Y2_R, x2 - 1, D3_PANEL_L2_X2Y2_R);
+    greenCount.init(x1 + 1, D3_PANEL_L2_X1Y2_G, x2 - 1, D3_PANEL_L2_X2Y2_G);
+    blueCount.init(x1 + 1, D3_PANEL_L2_X1Y2_B, x2 - 1, D3_PANEL_L2_X2Y2_B);
+    pixelPtr = buf_ptr(x1 + 1, y2 - 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer left border
-  redCount.init(y1 + 1, D3_PANEL_L2_X1Y1_R, y2 - 1, D3_PANEL_L2_X1Y2_R);
-  greenCount.init(y1 + 1, D3_PANEL_L2_X1Y1_G, y2 - 1, D3_PANEL_L2_X1Y2_G);
-  blueCount.init(y1 + 1, D3_PANEL_L2_X1Y1_B, y2 - 1, D3_PANEL_L2_X1Y2_B);
-  pixelPtr = buf_ptr(x1 + 1, y1 + 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // inner layer left border
+    redCount.init(y1 + 1, D3_PANEL_L2_X1Y1_R, y2 - 1, D3_PANEL_L2_X1Y2_R);
+    greenCount.init(y1 + 1, D3_PANEL_L2_X1Y1_G, y2 - 1, D3_PANEL_L2_X1Y2_G);
+    blueCount.init(y1 + 1, D3_PANEL_L2_X1Y1_B, y2 - 1, D3_PANEL_L2_X1Y2_B);
+    pixelPtr = buf_ptr(x1 + 1, y1 + 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer right border
-  redCount.init(y1 + 1, D3_PANEL_L2_X2Y1_R, y2 - 1, D3_PANEL_L2_X2Y2_R);
-  greenCount.init(y1 + 1, D3_PANEL_L2_X2Y1_G, y2 - 1, D3_PANEL_L2_X2Y2_G);
-  blueCount.init(y1 + 1, D3_PANEL_L2_X2Y1_B, y2 - 1, D3_PANEL_L2_X2Y2_B);
-  pixelPtr = buf_ptr(x2 - 1, y1 + 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // inner layer right border
+    redCount.init(y1 + 1, D3_PANEL_L2_X2Y1_R, y2 - 1, D3_PANEL_L2_X2Y2_R);
+    greenCount.init(y1 + 1, D3_PANEL_L2_X2Y1_G, y2 - 1, D3_PANEL_L2_X2Y2_G);
+    blueCount.init(y1 + 1, D3_PANEL_L2_X2Y1_B, y2 - 1, D3_PANEL_L2_X2Y2_B);
+    pixelPtr = buf_ptr(x2 - 1, y1 + 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // layer 3
-  if (x2 - x1 >= 4 && y2 - y1 >= 4) {
-    bar_fast(x1 + 2, y1 + 2, x2 - 2, y1 + 2, D3_PANEL_L3_COLOR); // top
-    bar_fast(x1 + 2, y2 - 2, x2 - 2, y2 - 2, D3_PANEL_L3_COLOR); // bottom
-    bar_fast(x1 + 2, y1 + 2, x1 + 2, y2 - 2, D3_PANEL_L3_COLOR); // left
-    bar_fast(x2 - 2, y1 + 2, x2 - 2, y2 - 2, D3_PANEL_L3_COLOR); // right
-  }
+    // layer 3
+    if (x2 - x1 >= 4 && y2 - y1 >= 4)
+    {
+        bar_fast(x1 + 2, y1 + 2, x2 - 2, y1 + 2, D3_PANEL_L3_COLOR); // top
+        bar_fast(x1 + 2, y2 - 2, x2 - 2, y2 - 2, D3_PANEL_L3_COLOR); // bottom
+        bar_fast(x1 + 2, y1 + 2, x1 + 2, y2 - 2, D3_PANEL_L3_COLOR); // left
+        bar_fast(x2 - 2, y1 + 2, x2 - 2, y2 - 2, D3_PANEL_L3_COLOR); // right
+    }
 
-  // layer 4
-  if (x2 - x1 >= 6 && y2 - y1 >= 6) {
-    bar_fast(x1 + 3, y1 + 3, x2 - 3, y1 + 3, D3_PANEL_L4_COLOR); // top
-    bar_fast(x1 + 3, y2 - 3, x2 - 3, y2 - 3, D3_PANEL_L4_COLOR); // bottom
-    bar_fast(x1 + 3, y1 + 3, x1 + 3, y2 - 3, D3_PANEL_L4_COLOR); // left
-    bar_fast(x2 - 3, y1 + 3, x2 - 3, y2 - 3, D3_PANEL_L4_COLOR); // right
-  }
+    // layer 4
+    if (x2 - x1 >= 6 && y2 - y1 >= 6)
+    {
+        bar_fast(x1 + 3, y1 + 3, x2 - 3, y1 + 3, D3_PANEL_L4_COLOR); // top
+        bar_fast(x1 + 3, y2 - 3, x2 - 3, y2 - 3, D3_PANEL_L4_COLOR); // bottom
+        bar_fast(x1 + 3, y1 + 3, x1 + 3, y2 - 3, D3_PANEL_L4_COLOR); // left
+        bar_fast(x2 - 3, y1 + 3, x2 - 3, y2 - 3, D3_PANEL_L4_COLOR); // right
+    }
 
-  // ####### begin Gilbert 17/10 ##########//
+    // ####### begin Gilbert 17/10 ##########//
 
-  if (is_front)
-    mouse.show_area();
+    if (is_front)
+        mouse.show_area();
 }
 //------------- End of function VgaBuf::d3_panel_up ------------//
 
@@ -686,157 +688,159 @@ void VgaBuf::d3_panel_up(int x1, int y1, int x2, int y2, int t,
 //                     pass 0 if the area has just been painted with bar()
 //                     (default:1)
 //
-void VgaBuf::d3_panel_down(int x1, int y1, int x2, int y2, int t,
-                           int paintCentre) {
-  err_when(x1 > x2 || y1 > y2 || x1 < 0 || y1 < 0 || x2 >= VGA_WIDTH ||
-           y2 >= VGA_HEIGHT);
+void VgaBuf::d3_panel_down(int x1, int y1, int x2, int y2, int t, int paintCentre)
+{
+    err_when(x1 > x2 || y1 > y2 || x1 < 0 || y1 < 0 || x2 >= VGA_WIDTH || y2 >= VGA_HEIGHT);
 
-  if (is_front)
-    mouse.hide_area(x1, y1, x2, y2);
+    if (is_front)
+        mouse.hide_area(x1, y1, x2, y2);
 
-  //---------- main center area -----------//
+    //---------- main center area -----------//
 
-  // ####### begin Gilbert 17/10 ##########//
-  /*
-  if( paintCentre )
-          bar_fast(x1+2, y1+2, x2-3, y2-3, color_down );  // center
+    // ####### begin Gilbert 17/10 ##########//
+    /*
+    if( paintCentre )
+            bar_fast(x1+2, y1+2, x2-3, y2-3, color_down );  // center
 
-  //--------- black border on top and left sides -----------//
+    //--------- black border on top and left sides -----------//
 
-  bar_fast(x1,y1,x2-3,y1+1,0x90 );
-  draw_pixel(x2-2, y1, 0x90);
-  bar_fast(x1,y1+2,x1+1,y2-3, 0x90 );    // left side
-  draw_pixel(x1, y2-2, 0x90);
+    bar_fast(x1,y1,x2-3,y1+1,0x90 );
+    draw_pixel(x2-2, y1, 0x90);
+    bar_fast(x1,y1+2,x1+1,y2-3, 0x90 );    // left side
+    draw_pixel(x1, y2-2, 0x90);
 
-  //--------- while border on bottom and right sides -----------//
+    //--------- while border on bottom and right sides -----------//
 
-  bar_fast(x2-2,y1+2,x2-1,y2-1, 0x9a );     // bottom side
-  draw_pixel(x2-1, y1+1, 0x9a);
-  bar_fast(x1+2,y2-2,x2-3,y2-1, 0x9a );		 // right side
-  draw_pixel(x1+1, y2-1, 0x9a);
+    bar_fast(x2-2,y1+2,x2-1,y2-1, 0x9a );     // bottom side
+    draw_pixel(x2-1, y1+1, 0x9a);
+    bar_fast(x1+2,y2-2,x2-3,y2-1, 0x9a );		 // right side
+    draw_pixel(x1+1, y2-1, 0x9a);
 
-  //--------- junction between white and black border --------//
-  draw_pixel(x2-1, y1, 0x97);
-  draw_pixel(x2-2, y1+1, 0x97);
-  draw_pixel(x1, y2-1, 0x97);
-  draw_pixel(x1+1, y2-2, 0x97);
+    //--------- junction between white and black border --------//
+    draw_pixel(x2-1, y1, 0x97);
+    draw_pixel(x2-2, y1+1, 0x97);
+    draw_pixel(x1, y2-1, 0x97);
+    draw_pixel(x1+1, y2-2, 0x97);
 
-  //--------- remove shadow, copy from back  -----------//
-  bar_fast(x2, y1+1, x2, y2, 0x9c);
-  bar_fast(x1+1, y2, x2-1, y2, 0x9c);
-*/
+    //--------- remove shadow, copy from back  -----------//
+    bar_fast(x2, y1+1, x2, y2, 0x9c);
+    bar_fast(x1+1, y2, x2-1, y2, 0x9c);
+  */
 
-  LinearCounter redCount, greenCount, blueCount;
+    LinearCounter redCount, greenCount, blueCount;
 
-  if (paintCentre) {
-    bar_fast(x1 + 5, y1 + 5, x2 - 3, y2 - 3, color_down); // center
-  }
+    if (paintCentre)
+    {
+        bar_fast(x1 + 5, y1 + 5, x2 - 3, y2 - 3, color_down); // center
+    }
 
-  short *pixelPtr;
-  int pitch = buf_pitch();
-  // outer layer, top border
+    short *pixelPtr;
+    int pitch = buf_pitch();
+    // outer layer, top border
 
-  redCount.init(x1, D3_PANEL_L1_X1Y1_R, x2, D3_PANEL_L1_X2Y1_R);
-  greenCount.init(x1, D3_PANEL_L1_X1Y1_G, x2, D3_PANEL_L1_X2Y1_G);
-  blueCount.init(x1, D3_PANEL_L1_X1Y1_B, x2, D3_PANEL_L1_X2Y1_B);
-  pixelPtr = buf_ptr(x1, y1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    redCount.init(x1, D3_PANEL_L1_X1Y1_R, x2, D3_PANEL_L1_X2Y1_R);
+    greenCount.init(x1, D3_PANEL_L1_X1Y1_G, x2, D3_PANEL_L1_X2Y1_G);
+    blueCount.init(x1, D3_PANEL_L1_X1Y1_B, x2, D3_PANEL_L1_X2Y1_B);
+    pixelPtr = buf_ptr(x1, y1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // outer layer, bottom border
-  redCount.init(x1, D3_PANEL_L1_X1Y2_R, x2, D3_PANEL_L1_X2Y2_R);
-  greenCount.init(x1, D3_PANEL_L1_X1Y2_G, x2, D3_PANEL_L1_X2Y2_G);
-  blueCount.init(x1, D3_PANEL_L1_X1Y2_B, x2, D3_PANEL_L1_X2Y2_B);
-  pixelPtr = buf_ptr(x1, y2);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // outer layer, bottom border
+    redCount.init(x1, D3_PANEL_L1_X1Y2_R, x2, D3_PANEL_L1_X2Y2_R);
+    greenCount.init(x1, D3_PANEL_L1_X1Y2_G, x2, D3_PANEL_L1_X2Y2_G);
+    blueCount.init(x1, D3_PANEL_L1_X1Y2_B, x2, D3_PANEL_L1_X2Y2_B);
+    pixelPtr = buf_ptr(x1, y2);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // outer layer left border
-  redCount.init(y1, D3_PANEL_L1_X1Y1_R, y2, D3_PANEL_L1_X1Y2_R);
-  greenCount.init(y1, D3_PANEL_L1_X1Y1_G, y2, D3_PANEL_L1_X1Y2_G);
-  blueCount.init(y1, D3_PANEL_L1_X1Y1_B, y2, D3_PANEL_L1_X1Y2_B);
-  pixelPtr = buf_ptr(x1, y1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // outer layer left border
+    redCount.init(y1, D3_PANEL_L1_X1Y1_R, y2, D3_PANEL_L1_X1Y2_R);
+    greenCount.init(y1, D3_PANEL_L1_X1Y1_G, y2, D3_PANEL_L1_X1Y2_G);
+    blueCount.init(y1, D3_PANEL_L1_X1Y1_B, y2, D3_PANEL_L1_X1Y2_B);
+    pixelPtr = buf_ptr(x1, y1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // outer layer right border
-  redCount.init(y1, D3_PANEL_L1_X2Y1_R, y2, D3_PANEL_L1_X2Y2_R);
-  greenCount.init(y1, D3_PANEL_L1_X2Y1_G, y2, D3_PANEL_L1_X2Y2_G);
-  blueCount.init(y1, D3_PANEL_L1_X2Y1_B, y2, D3_PANEL_L1_X2Y2_B);
-  pixelPtr = buf_ptr(x2, y1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // outer layer right border
+    redCount.init(y1, D3_PANEL_L1_X2Y1_R, y2, D3_PANEL_L1_X2Y2_R);
+    greenCount.init(y1, D3_PANEL_L1_X2Y1_G, y2, D3_PANEL_L1_X2Y2_G);
+    blueCount.init(y1, D3_PANEL_L1_X2Y1_B, y2, D3_PANEL_L1_X2Y2_B);
+    pixelPtr = buf_ptr(x2, y1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer, top border
+    // inner layer, top border
 
-  redCount.init(x1 + 1, D3_PANEL_L2_X1Y1_R, x2 - 1, D3_PANEL_L2_X2Y1_R);
-  greenCount.init(x1 + 1, D3_PANEL_L2_X1Y1_G, x2 - 1, D3_PANEL_L2_X2Y1_G);
-  blueCount.init(x1 + 1, D3_PANEL_L2_X1Y1_B, x2 - 1, D3_PANEL_L2_X2Y1_B);
-  pixelPtr = buf_ptr(x1 + 1, y1 + 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    redCount.init(x1 + 1, D3_PANEL_L2_X1Y1_R, x2 - 1, D3_PANEL_L2_X2Y1_R);
+    greenCount.init(x1 + 1, D3_PANEL_L2_X1Y1_G, x2 - 1, D3_PANEL_L2_X2Y1_G);
+    blueCount.init(x1 + 1, D3_PANEL_L2_X1Y1_B, x2 - 1, D3_PANEL_L2_X2Y1_B);
+    pixelPtr = buf_ptr(x1 + 1, y1 + 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer, bottom border
-  redCount.init(x1 + 1, D3_PANEL_L2_X1Y2_R, x2 - 1, D3_PANEL_L2_X2Y2_R);
-  greenCount.init(x1 + 1, D3_PANEL_L2_X1Y2_G, x2 - 1, D3_PANEL_L2_X2Y2_G);
-  blueCount.init(x1 + 1, D3_PANEL_L2_X1Y2_B, x2 - 1, D3_PANEL_L2_X2Y2_B);
-  pixelPtr = buf_ptr(x1 + 1, y2 - 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // inner layer, bottom border
+    redCount.init(x1 + 1, D3_PANEL_L2_X1Y2_R, x2 - 1, D3_PANEL_L2_X2Y2_R);
+    greenCount.init(x1 + 1, D3_PANEL_L2_X1Y2_G, x2 - 1, D3_PANEL_L2_X2Y2_G);
+    blueCount.init(x1 + 1, D3_PANEL_L2_X1Y2_B, x2 - 1, D3_PANEL_L2_X2Y2_B);
+    pixelPtr = buf_ptr(x1 + 1, y2 - 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), ++pixelPtr)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer left border
-  redCount.init(y1 + 1, D3_PANEL_L2_X1Y1_R, y2 - 1, D3_PANEL_L2_X1Y2_R);
-  greenCount.init(y1 + 1, D3_PANEL_L2_X1Y1_G, y2 - 1, D3_PANEL_L2_X1Y2_G);
-  blueCount.init(y1 + 1, D3_PANEL_L2_X1Y1_B, y2 - 1, D3_PANEL_L2_X1Y2_B);
-  pixelPtr = buf_ptr(x1 + 1, y1 + 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // inner layer left border
+    redCount.init(y1 + 1, D3_PANEL_L2_X1Y1_R, y2 - 1, D3_PANEL_L2_X1Y2_R);
+    greenCount.init(y1 + 1, D3_PANEL_L2_X1Y1_G, y2 - 1, D3_PANEL_L2_X1Y2_G);
+    blueCount.init(y1 + 1, D3_PANEL_L2_X1Y1_B, y2 - 1, D3_PANEL_L2_X1Y2_B);
+    pixelPtr = buf_ptr(x1 + 1, y1 + 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // inner layer right border
-  redCount.init(y1 + 1, D3_PANEL_L2_X2Y1_R, y2 - 1, D3_PANEL_L2_X2Y2_R);
-  greenCount.init(y1 + 1, D3_PANEL_L2_X2Y1_G, y2 - 1, D3_PANEL_L2_X2Y2_G);
-  blueCount.init(y1 + 1, D3_PANEL_L2_X2Y1_B, y2 - 1, D3_PANEL_L2_X2Y2_B);
-  pixelPtr = buf_ptr(x2 - 1, y1 + 1);
-  for (; !redCount.is_end();
-       redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch) {
-    *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
-  }
+    // inner layer right border
+    redCount.init(y1 + 1, D3_PANEL_L2_X2Y1_R, y2 - 1, D3_PANEL_L2_X2Y2_R);
+    greenCount.init(y1 + 1, D3_PANEL_L2_X2Y1_G, y2 - 1, D3_PANEL_L2_X2Y2_G);
+    blueCount.init(y1 + 1, D3_PANEL_L2_X2Y1_B, y2 - 1, D3_PANEL_L2_X2Y2_B);
+    pixelPtr = buf_ptr(x2 - 1, y1 + 1);
+    for (; !redCount.is_end(); redCount.inc(), greenCount.inc(), blueCount.inc(), pixelPtr += pitch)
+    {
+        *pixelPtr = vga.make_pixel(redCount.y, greenCount.y, blueCount.y);
+    }
 
-  // layer 3
-  if (x2 - x1 >= 4 && y2 - y1 >= 4) {
-    bar_fast(x1 + 2, y1 + 2, x2 - 2, y1 + 3, D3_PANEL_L3_COLOR); // top, width 2
-    bar_fast(x1 + 2, y1 + 2, x1 + 3, y2 - 2,
-             D3_PANEL_L3_COLOR); // left, width 2
-  }
+    // layer 3
+    if (x2 - x1 >= 4 && y2 - y1 >= 4)
+    {
+        bar_fast(x1 + 2, y1 + 2, x2 - 2, y1 + 3, D3_PANEL_L3_COLOR); // top, width 2
+        bar_fast(x1 + 2, y1 + 2, x1 + 3, y2 - 2,
+                 D3_PANEL_L3_COLOR); // left, width 2
+    }
 
-  // layer 4
-  if (x2 - x1 >= 6 && y2 - y1 >= 6) {
-    bar_fast(x1 + 4, y1 + 4, x2 - 2, y1 + 4, D3_PANEL_L4_COLOR); // top
-    bar_fast(x1 + 4, y2 - 2, x2 - 2, y2 - 2, D3_PANEL_L4_COLOR); // bottom
-    bar_fast(x1 + 4, y1 + 4, x1 + 4, y2 - 2, D3_PANEL_L4_COLOR); // left
-    bar_fast(x2 - 2, y1 + 4, x2 - 2, y2 - 2, D3_PANEL_L4_COLOR); // right
-  }
+    // layer 4
+    if (x2 - x1 >= 6 && y2 - y1 >= 6)
+    {
+        bar_fast(x1 + 4, y1 + 4, x2 - 2, y1 + 4, D3_PANEL_L4_COLOR); // top
+        bar_fast(x1 + 4, y2 - 2, x2 - 2, y2 - 2, D3_PANEL_L4_COLOR); // bottom
+        bar_fast(x1 + 4, y1 + 4, x1 + 4, y2 - 2, D3_PANEL_L4_COLOR); // left
+        bar_fast(x2 - 2, y1 + 4, x2 - 2, y2 - 2, D3_PANEL_L4_COLOR); // right
+    }
 
-  // ####### end Gilbert 17/10 ##########//
+    // ####### end Gilbert 17/10 ##########//
 
-  //----------- show mouse ----------//
+    //----------- show mouse ----------//
 
-  if (is_front)
-    mouse.show_area();
+    if (is_front)
+        mouse.show_area();
 }
 //------------- End of function VgaBuf::d3_panel_down ------------//
 
@@ -848,10 +852,11 @@ void VgaBuf::d3_panel_down(int x1, int y1, int x2, int y2, int t,
 // [int] thick       = thickness of the border
 //                     (default:2)
 //
-void VgaBuf::d3_panel_up_clear(int x1, int y1, int x2, int y2, int t) {
-  // ####### begin Gilbert 19/10 #########//
-  bar(x1 + 4, y1 + 4, x2 - 4, y2 - 4, color_up);
-  // ####### end Gilbert 19/10 #########//
+void VgaBuf::d3_panel_up_clear(int x1, int y1, int x2, int y2, int t)
+{
+    // ####### begin Gilbert 19/10 #########//
+    bar(x1 + 4, y1 + 4, x2 - 4, y2 - 4, color_up);
+    // ####### end Gilbert 19/10 #########//
 }
 //------------- End of function VgaBuf::d3_panel_up_clear ------------//
 
@@ -863,10 +868,11 @@ void VgaBuf::d3_panel_up_clear(int x1, int y1, int x2, int y2, int t) {
 // [int] thick       = thickness of the border
 //                     (default:2)
 //
-void VgaBuf::d3_panel_down_clear(int x1, int y1, int x2, int y2, int t) {
-  // ####### begin Gilbert 19/10 #########//
-  bar(x1 + 5, y1 + 5, x2 - 3, y2 - 3, color_down);
-  // ####### end Gilbert 19/10 #########//
+void VgaBuf::d3_panel_down_clear(int x1, int y1, int x2, int y2, int t)
+{
+    // ####### begin Gilbert 19/10 #########//
+    bar(x1 + 5, y1 + 5, x2 - 3, y2 - 3, color_down);
+    // ####### end Gilbert 19/10 #########//
 }
 //------------- End of function VgaBuf::d3_panel_down_clear ------------//
 
@@ -877,26 +883,25 @@ void VgaBuf::d3_panel_down_clear(int x1, int y1, int x2, int y2, int t) {
 // <int> x1,y1,x2,y2  = the four vertex of the panel
 // <int> adjustDegree = the degree of brightness to adjust
 //							   (a value from -10 to
-//10)
+// 10)
 //
-void VgaBuf::adjust_brightness(int x1, int y1, int x2, int y2,
-                               int adjustDegree) {
-  if (is_front)
-    mouse.hide_area(x1, y1, x2, y2);
+void VgaBuf::adjust_brightness(int x1, int y1, int x2, int y2, int adjustDegree)
+{
+    if (is_front)
+        mouse.hide_area(x1, y1, x2, y2);
 #if (MAX_BRIGHTNESS_ADJUST_DEGREE > 10)
-  adjustDegree *= MAX_BRIGHTNESS_ADJUST_DEGREE / 10;
+    adjustDegree *= MAX_BRIGHTNESS_ADJUST_DEGREE / 10;
 #endif
 
-  err_when(adjustDegree < -MAX_BRIGHTNESS_ADJUST_DEGREE ||
-           adjustDegree > MAX_BRIGHTNESS_ADJUST_DEGREE);
+    err_when(adjustDegree < -MAX_BRIGHTNESS_ADJUST_DEGREE || adjustDegree > MAX_BRIGHTNESS_ADJUST_DEGREE);
 
-  //	unsigned char* colorRemapTable =
-  //vga.vga_color_table->get_table(adjustDegree); 	remap_bar(x1, y1, x2, y2,
-  //colorRemapTable);
-  IMGbrightBar(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, adjustDegree);
+    //	unsigned char* colorRemapTable =
+    // vga.vga_color_table->get_table(adjustDegree); 	remap_bar(x1, y1, x2,
+    // y2, colorRemapTable);
+    IMGbrightBar(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, adjustDegree);
 
-  if (is_front)
-    mouse.show_area();
+    if (is_front)
+        mouse.show_area();
 }
 //------------- End of function VgaBuf::adjust_brightness ------------//
 
@@ -904,17 +909,16 @@ void VgaBuf::adjust_brightness(int x1, int y1, int x2, int y2,
 //
 // copy and change brightness of an area
 //
-void VgaBuf::blt_buf_bright(VgaBuf *srcBuf, int srcX1, int srcY1, int srcX2,
-                            int srcY2, int adjustDegree) {
+void VgaBuf::blt_buf_bright(VgaBuf *srcBuf, int srcX1, int srcY1, int srcX2, int srcY2, int adjustDegree)
+{
 #if (MAX_BRIGHTNESS_ADJUST_DEGREE > 10)
-  adjustDegree *= MAX_BRIGHTNESS_ADJUST_DEGREE / 10;
+    adjustDegree *= MAX_BRIGHTNESS_ADJUST_DEGREE / 10;
 #endif
 
-  err_when(adjustDegree < -MAX_BRIGHTNESS_ADJUST_DEGREE ||
-           adjustDegree > MAX_BRIGHTNESS_ADJUST_DEGREE);
+    err_when(adjustDegree < -MAX_BRIGHTNESS_ADJUST_DEGREE || adjustDegree > MAX_BRIGHTNESS_ADJUST_DEGREE);
 
-  IMGcopyWbright(cur_buf_ptr, cur_pitch, srcBuf->cur_buf_ptr, srcBuf->cur_pitch,
-                 srcX1, srcY1, srcX2, srcY2, adjustDegree);
+    IMGcopyWbright(cur_buf_ptr, cur_pitch, srcBuf->cur_buf_ptr, srcBuf->cur_pitch, srcX1, srcY1, srcX2, srcY2,
+                   adjustDegree);
 }
 //----------- End of function VgaBuf::blt_buf_bright ----------//
 
@@ -922,35 +926,36 @@ void VgaBuf::blt_buf_bright(VgaBuf *srcBuf, int srcX1, int srcY1, int srcX2,
 //
 // Draw interface border.
 //
-void VgaBuf::draw_d3_up_border(int x1, int y1, int x2, int y2) {
-  // ##### begin Gilbert 19/10 #######//
-  /*
-          err_when( x1>x2 || y1>y2 || x1<0 || y1<0 || x2>=VGA_WIDTH ||
-     y2>=VGA_HEIGHT );
+void VgaBuf::draw_d3_up_border(int x1, int y1, int x2, int y2)
+{
+    // ##### begin Gilbert 19/10 #######//
+    /*
+            err_when( x1>x2 || y1>y2 || x1<0 || y1<0 || x2>=VGA_WIDTH ||
+       y2>=VGA_HEIGHT );
 
-          if( is_front )
-                  mouse.hide_area( x1,y1,x2,y2 );
+            if( is_front )
+                    mouse.hide_area( x1,y1,x2,y2 );
 
-          //--------- white border on top and left sides -----------//
+            //--------- white border on top and left sides -----------//
 
-          bar_fast( x1+1,y1,x2,y1, IF_LIGHT_BORDER_COLOR );    // top side
-          bar_fast( x1,y1,x1,y2  , IF_LIGHT_BORDER_COLOR );    // left side
+            bar_fast( x1+1,y1,x2,y1, IF_LIGHT_BORDER_COLOR );    // top side
+            bar_fast( x1,y1,x1,y2  , IF_LIGHT_BORDER_COLOR );    // left side
 
-          //--------- black border on bottom and right sides -----------//
+            //--------- black border on bottom and right sides -----------//
 
-          bar_fast( x1+1,y2,x2,y2, IF_DARK_BORDER_COLOR );     // bottom side
-          bar_fast( x2,y1+1,x2,y2, IF_DARK_BORDER_COLOR );		 // right
-     side
+            bar_fast( x1+1,y2,x2,y2, IF_DARK_BORDER_COLOR );     // bottom side
+            bar_fast( x2,y1+1,x2,y2, IF_DARK_BORDER_COLOR );		 //
+       right side
 
-          //-------------------------------------------//
+            //-------------------------------------------//
 
-          if( is_front )
-                  mouse.show_area();
+            if( is_front )
+                    mouse.show_area();
 
-  */
-  d3_panel_up(x1, y1, x2, y2, 4, 0);
+    */
+    d3_panel_up(x1, y1, x2, y2, 4, 0);
 
-  // ##### end Gilbert 19/10 #######//
+    // ##### end Gilbert 19/10 #######//
 }
 //------------- End of function VgaBuf::draw_d3_up_border ------------//
 
@@ -958,50 +963,52 @@ void VgaBuf::draw_d3_up_border(int x1, int y1, int x2, int y2) {
 //
 // Draw interface border.
 //
-void VgaBuf::draw_d3_down_border(int x1, int y1, int x2, int y2) {
-  // #### begin Gilbert 19/10 #######//
-  /*
-          err_when( x1>x2 || y1>y2 || x1<0 || y1<0 || x2>=VGA_WIDTH ||
-     y2>=VGA_HEIGHT );
+void VgaBuf::draw_d3_down_border(int x1, int y1, int x2, int y2)
+{
+    // #### begin Gilbert 19/10 #######//
+    /*
+            err_when( x1>x2 || y1>y2 || x1<0 || y1<0 || x2>=VGA_WIDTH ||
+       y2>=VGA_HEIGHT );
 
-          if( is_front )
-                  mouse.hide_area( x1,y1,x2,y2 );
+            if( is_front )
+                    mouse.hide_area( x1,y1,x2,y2 );
 
-          //--------- white border on top and left sides -----------//
+            //--------- white border on top and left sides -----------//
 
 
-          bar_fast( x1+1,y1,x2,y1, IF_DARK_BORDER_COLOR );    // top side
-          bar_fast( x1,y1,x1,y2  , IF_DARK_BORDER_COLOR );    // left side
+            bar_fast( x1+1,y1,x2,y1, IF_DARK_BORDER_COLOR );    // top side
+            bar_fast( x1,y1,x1,y2  , IF_DARK_BORDER_COLOR );    // left side
 
-          //--------- black border on bottom and right sides -----------//
+            //--------- black border on bottom and right sides -----------//
 
-          bar_fast( x1+1,y2,x2,y2, IF_LIGHT_BORDER_COLOR );     // bottom side
-          bar_fast( x2,y1+1,x2,y2, IF_LIGHT_BORDER_COLOR );		 // right
-     side
+            bar_fast( x1+1,y2,x2,y2, IF_LIGHT_BORDER_COLOR );     // bottom side
+            bar_fast( x2,y1+1,x2,y2, IF_LIGHT_BORDER_COLOR );		 //
+       right side
 
-          //-------------------------------------------//
+            //-------------------------------------------//
 
-          if( is_front )
-                  mouse.show_area();
-  */
+            if( is_front )
+                    mouse.show_area();
+    */
 
-  d3_panel_down(x1, y1, x2, y2, 4, 0);
-  // ##### end Gilbert 19/10 ######//
+    d3_panel_down(x1, y1, x2, y2, 4, 0);
+    // ##### end Gilbert 19/10 ######//
 }
 //------------- End of function VgaBuf::draw_d3_down_border ------------//
 
 //------------- Begin of function VgaBuf::blt_buf ------------//
 // copy put whole part of a vgaBuf to (x1,y1) of this VgaBuf
-void VgaBuf::blt_buf(VgaBuf *srcBuf, int x1, int y1) {
-  short *srcPtr = srcBuf->cur_buf_ptr;
-  int srcWidth = srcBuf->buf_width();
-  int srcPitch = srcBuf->cur_pitch;
-  int srcHeight = srcBuf->buf_height();
-  short *destPtr = cur_buf_ptr;
-  int destPitch = cur_pitch;
+void VgaBuf::blt_buf(VgaBuf *srcBuf, int x1, int y1)
+{
+    short *srcPtr = srcBuf->cur_buf_ptr;
+    int srcWidth = srcBuf->buf_width();
+    int srcPitch = srcBuf->cur_pitch;
+    int srcHeight = srcBuf->buf_height();
+    short *destPtr = cur_buf_ptr;
+    int destPitch = cur_pitch;
 
 #ifdef ASM_FOR_MSVC
-  _asm {
+    _asm {
 		mov	eax, y1
 		imul	destPitch
 		add	eax, x1
@@ -1024,7 +1031,7 @@ blt_buf_1:
 		add	edi, destPitch
 		add	esi, srcPitch
 		loop	blt_buf_1
-  }
+    }
 #endif
 }
 //------------- End of function VgaBuf::blt_buf ------------//
@@ -1042,27 +1049,30 @@ blt_buf_1:
 //
 // logAlpha : 0=transparent ... 5=opaque colorCode
 //
-void VgaBuf::bar_alpha(int x1, int y1, int x2, int y2, int logAlpha,
-                       int colorCode) {
-  err_when(!buf_locked);
+void VgaBuf::bar_alpha(int x1, int y1, int x2, int y2, int logAlpha, int colorCode)
+{
+    err_when(!buf_locked);
 
-  if (logAlpha <= 0) {
-    err_when(logAlpha < 0);
-    // if logAlpha == 0, no change
-  } else if (logAlpha < 5) {
-    if (is_front)
-      mouse.hide_area(x1, y1, x2, y2);
-    IMGbarAlpha(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, logAlpha,
-                translate_color(colorCode));
-    if (is_front)
-      mouse.show_area();
-  } else // logAlpha >= 5, equivalence to VgaBuf::bar
-  {
-    if (is_front)
-      mouse.hide_area(x1, y1, x2, y2);
-    IMGbar(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, translate_color(colorCode));
-    if (is_front)
-      mouse.show_area();
-  }
+    if (logAlpha <= 0)
+    {
+        err_when(logAlpha < 0);
+        // if logAlpha == 0, no change
+    }
+    else if (logAlpha < 5)
+    {
+        if (is_front)
+            mouse.hide_area(x1, y1, x2, y2);
+        IMGbarAlpha(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, logAlpha, translate_color(colorCode));
+        if (is_front)
+            mouse.show_area();
+    }
+    else // logAlpha >= 5, equivalence to VgaBuf::bar
+    {
+        if (is_front)
+            mouse.hide_area(x1, y1, x2, y2);
+        IMGbar(cur_buf_ptr, cur_pitch, x1, y1, x2, y2, translate_color(colorCode));
+        if (is_front)
+            mouse.show_area();
+    }
 }
 //--------------- End of function VgaBuf::bar_alpha --------------//

@@ -172,8 +172,7 @@ Font font_tut;
 Font font_scre, font_cmpa, font_cmph, font_cmpf, font_cmpo;
 
 Font font_hall;
-ImageRes image_icon, image_interface, image_menu, image_button, image_spict,
-    image_gameif;
+ImageRes image_icon, image_interface, image_menu, image_button, image_spict, image_gameif;
 ImageRes image_encyc;
 ImageRes image_tutorial;
 ImageRes &image_menu2 = image_menu;
@@ -306,9 +305,8 @@ char debug_seed_status_flag = 0;
 int debug_sim_game_type = 0;
 int unit_search_node_used = 0;
 short nation_hand_over_flag = 0;
-int unit_search_tries = 0; // the number of tries used in the current searching
-char unit_search_tries_flag =
-    0; // indicate num of tries is set, reset after searching
+int unit_search_tries = 0;       // the number of tries used in the current searching
+char unit_search_tries_flag = 0; // indicate num of tries is set, reset after searching
 
 char new_config_dat_flag = 0;
 
@@ -386,119 +384,134 @@ static void extra_error_handler();
 // DEBUG3 - debugging some functions (e.g. Location::get_loc()) which
 //          will cause major slowdown.
 //
-int main(int argc, char **argv) {
-  const char *lobbyJoinCmdLine = "-join";
-  const char *lobbyHostCmdLine = "-host";
-  const char *lobbyNameCmdLine = "-name";
-  char *join_host = NULL;
-  int lobbied = 0;
+int main(int argc, char **argv)
+{
+    const char *lobbyJoinCmdLine = "-join";
+    const char *lobbyHostCmdLine = "-host";
+    const char *lobbyNameCmdLine = "-name";
+    char *join_host = NULL;
+    int lobbied = 0;
 
-  sys.set_config_dir();
+    sys.set_config_dir();
 
-  // try to read from config.dat, moved to AM.CPP
+    // try to read from config.dat, moved to AM.CPP
 
-  // ####### patch begin Gilbert 14/1 ########//
-  // validate
-  if (!config.load("config.dat") || !config.validate()) {
-    new_config_dat_flag = 1;
-    config.init();
-  }
-  // ####### patch end Gilbert 14/1 ########//
+    // ####### patch begin Gilbert 14/1 ########//
+    // validate
+    if (!config.load("config.dat") || !config.validate())
+    {
+        new_config_dat_flag = 1;
+        config.init();
+    }
+    // ####### patch end Gilbert 14/1 ########//
 
-  // try to read serial_repository
-  if (!serial_repository.load())
-    serial_repository.init();
+    // try to read serial_repository
+    if (!serial_repository.load())
+        serial_repository.init();
 
-    //--------------------------------------//
+        //--------------------------------------//
 
 #if (defined(BETA))
 #define EXPIRE_YEAR 1999
 #define EXPIRE_MONTH 8
 #define EXPIRE_DAY 31
-  SYSTEMTIME sysTime;
-  GetLocalTime(&sysTime);
-  if (config.expired_flag || sysTime.wYear > EXPIRE_YEAR ||
-      (sysTime.wYear == EXPIRE_YEAR &&
-       (sysTime.wMonth > EXPIRE_MONTH ||
-        sysTime.wMonth == EXPIRE_MONTH && sysTime.wDay >= EXPIRE_DAY))) {
-    if (!config.expired_flag) {
-      // write back config with expired_flag set
-      config.expired_flag = 1;
-      config.save("CONFIG.DAT");
+    SYSTEMTIME sysTime;
+    GetLocalTime(&sysTime);
+    if (config.expired_flag || sysTime.wYear > EXPIRE_YEAR ||
+        (sysTime.wYear == EXPIRE_YEAR &&
+         (sysTime.wMonth > EXPIRE_MONTH || sysTime.wMonth == EXPIRE_MONTH && sysTime.wDay >= EXPIRE_DAY)))
+    {
+        if (!config.expired_flag)
+        {
+            // write back config with expired_flag set
+            config.expired_flag = 1;
+            config.save("CONFIG.DAT");
+        }
+        MessageBox(NULL, "Beta version expired", "Seven Kingdoms 2",
+                   MB_OK | MB_ICONSTOP | MB_DEFBUTTON1 | MB_TASKMODAL);
+        return 2;
     }
-    MessageBox(NULL, "Beta version expired", "Seven Kingdoms 2",
-               MB_OK | MB_ICONSTOP | MB_DEFBUTTON1 | MB_TASKMODAL);
-    return 2;
-  }
 #endif
 
-  //----- read command line arguments -----//
+    //----- read command line arguments -----//
 
-  for (int i = 0; i < argc; i++) {
-    if (!strcmp(argv[i], lobbyJoinCmdLine)) {
-      if (lobbied) {
-        ERR("You cannot specify multiple -host or -join options.\n");
-        return 1;
-      }
-      if (i >= argc - 1) {
-        ERR("The %s switch requires a hostname parameter.\n", lobbyJoinCmdLine);
-        return 1;
-      }
-      lobbied = 1;
-      join_host = argv[i + 1];
-      i++;
-    } else if (!strcmp(argv[i], lobbyHostCmdLine)) {
-      if (lobbied) {
-        ERR("You cannot specify multiple -host or -join options.\n");
-        return 1;
-      }
-      lobbied = 1;
-    } else if (!strcmp(argv[i], lobbyNameCmdLine)) {
-      if (i >= argc - 1) {
-        ERR("The %s switch requires a name parameter.\n", lobbyNameCmdLine);
-        return 1;
-      }
-      strncpy(config.player_name, argv[i + 1], config.PLAYER_NAME_LEN);
-      config.player_name[config.PLAYER_NAME_LEN] = 0;
-      i++;
+    for (int i = 0; i < argc; i++)
+    {
+        if (!strcmp(argv[i], lobbyJoinCmdLine))
+        {
+            if (lobbied)
+            {
+                ERR("You cannot specify multiple -host or -join options.\n");
+                return 1;
+            }
+            if (i >= argc - 1)
+            {
+                ERR("The %s switch requires a hostname parameter.\n", lobbyJoinCmdLine);
+                return 1;
+            }
+            lobbied = 1;
+            join_host = argv[i + 1];
+            i++;
+        }
+        else if (!strcmp(argv[i], lobbyHostCmdLine))
+        {
+            if (lobbied)
+            {
+                ERR("You cannot specify multiple -host or -join options.\n");
+                return 1;
+            }
+            lobbied = 1;
+        }
+        else if (!strcmp(argv[i], lobbyNameCmdLine))
+        {
+            if (i >= argc - 1)
+            {
+                ERR("The %s switch requires a name parameter.\n", lobbyNameCmdLine);
+                return 1;
+            }
+            strncpy(config.player_name, argv[i + 1], config.PLAYER_NAME_LEN);
+            config.player_name[config.PLAYER_NAME_LEN] = 0;
+            i++;
+        }
     }
-  }
 
-  if (!sys.init())
-    return FALSE;
+    if (!sys.init())
+        return FALSE;
 
-  err.set_extra_handler(extra_error_handler); // set extra error handler, save
-                                              // the game when a error happens
+    err.set_extra_handler(extra_error_handler); // set extra error handler, save
+                                                // the game when a error happens
 
-  if (!lobbied)
-    game.main_menu();
+    if (!lobbied)
+        game.main_menu();
 #ifndef DISABLE_MULTI_PLAYER
-  else
-    game.multi_player_menu(lobbied, join_host);
+    else
+        game.multi_player_menu(lobbied, join_host);
 #endif // DISABLE_MULTI_PLAYER
 
 #ifdef DEMO
-  if (vga.is_inited()) {
-    vga_util.disp_image_file("FEATURE1");
-    mouse.wait_press(60);
-    vga_util.disp_image_file("FEATURE2");
-    mouse.wait_press(60);
-  }
+    if (vga.is_inited())
+    {
+        vga_util.disp_image_file("FEATURE1");
+        mouse.wait_press(60);
+        vga_util.disp_image_file("FEATURE2");
+        mouse.wait_press(60);
+    }
 #endif
 
-  sys.deinit();
+    sys.deinit();
 
-  return 1;
+    return 1;
 }
 //---------- End of function WinMain ----------//
 
 //------- Begin of function extra_error_handler -----------//
 
-static void extra_error_handler() {
-  //	if( game.game_mode != GAME_SINGLE_PLAYER )
-  //		return;
-  //	game_file_array.save_new_game("ERROR.SAV");  // save a new game
-  //immediately without prompting menu 	box.msg( "Error encountered. The game has
-  //been saved to ERROR.SAV" );
+static void extra_error_handler()
+{
+    //	if( game.game_mode != GAME_SINGLE_PLAYER )
+    //		return;
+    //	game_file_array.save_new_game("ERROR.SAV");  // save a new game
+    // immediately without prompting menu 	box.msg( "Error encountered. The game
+    // has been saved to ERROR.SAV" );
 }
 //----------- End of function extra_error_handler -------------//

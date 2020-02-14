@@ -29,45 +29,49 @@
 //------- Define class FirmSpecial -------//
 
 #pragma pack(1)
-class FirmSpecial : public FirmTrain {
-public:
-  FirmSpecial();
+class FirmSpecial : public FirmTrain
+{
+  public:
+    FirmSpecial();
 
-  void process_ai();
+    void process_ai();
 
-  //------- type casting function --------//
+    //------- type casting function --------//
 
-  virtual FirmSpecial *cast_to_FirmSpecial() { return this; }
+    virtual FirmSpecial *cast_to_FirmSpecial()
+    {
+        return this;
+    }
 
-  //-------- interface functions ----------//
+    //-------- interface functions ----------//
 
-  void put_info(int refreshFlag);
-  void detect_info();
-  int represent_attribute(int traineeId);
+    void put_info(int refreshFlag);
+    void detect_info();
+    int represent_attribute(int traineeId);
 
-  // -------- rally point ----------//
+    // -------- rally point ----------//
 
-  int can_set_rally_point(int destBaseObjRecno = 0);
+    int can_set_rally_point(int destBaseObjRecno = 0);
 
-  //------- multiplayer checking codes -------//
+    //------- multiplayer checking codes -------//
 
-  virtual UCHAR crc8();
-  virtual void clear_ptr();
+    virtual UCHAR crc8();
+    virtual void clear_ptr();
 
-protected:
-  void disp_firm_info(int dispY1, int refreshFlag);
-  void detect_firm_info();
+  protected:
+    void disp_firm_info(int dispY1, int refreshFlag);
+    void detect_firm_info();
 
-  void disp_train_menu(int refreshFlag);
-  void detect_train_menu();
-  void disp_spy_menu(int refreshFlag);
-  void detect_spy_menu();
+    void disp_train_menu(int refreshFlag);
+    void detect_train_menu();
+    void disp_spy_menu(int refreshFlag);
+    void detect_spy_menu();
 
-  //-------- AI actions ---------//
+    //-------- AI actions ---------//
 
-  void think_train_new();
-  int think_del();
-  int think_transfer_unit();
+    void think_train_new();
+    int think_del();
+    int think_transfer_unit();
 };
 #pragma pack()
 

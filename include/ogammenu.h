@@ -142,101 +142,120 @@
 
 // -------- define temp class for loading resource -------//
 
-class TempGameSet {
-private:
-  char inited_flag;
+class TempGameSet
+{
+  private:
+    char inited_flag;
 
-public:
-  TempGameSet(int s) {
-    if (!(inited_flag = game_set.set_opened_flag)) {
-      game_set.open_set(1);
+  public:
+    TempGameSet(int s)
+    {
+        if (!(inited_flag = game_set.set_opened_flag))
+        {
+            game_set.open_set(1);
+        }
     }
-  }
 
-  ~TempGameSet() {
-    if (!inited_flag)
-      game_set.close_set();
-  }
+    ~TempGameSet()
+    {
+        if (!inited_flag)
+            game_set.close_set();
+    }
 };
 
-class TempUnitRes {
-private:
-  char inited_flag;
+class TempUnitRes
+{
+  private:
+    char inited_flag;
 
-public:
-  TempUnitRes() {
-    if (!(inited_flag = unit_res.init_flag))
-      unit_res.init();
-  }
+  public:
+    TempUnitRes()
+    {
+        if (!(inited_flag = unit_res.init_flag))
+            unit_res.init();
+    }
 
-  ~TempUnitRes() {
-    if (!inited_flag)
-      unit_res.deinit();
-  }
+    ~TempUnitRes()
+    {
+        if (!inited_flag)
+            unit_res.deinit();
+    }
 };
 
-class TempRaceRes {
-private:
-  char inited_flag;
+class TempRaceRes
+{
+  private:
+    char inited_flag;
 
-public:
-  TempRaceRes() {
-    if (!(inited_flag = race_res.init_flag))
-      race_res.init();
-  }
+  public:
+    TempRaceRes()
+    {
+        if (!(inited_flag = race_res.init_flag))
+            race_res.init();
+    }
 
-  ~TempRaceRes() {
-    if (!inited_flag)
-      race_res.deinit();
-  }
+    ~TempRaceRes()
+    {
+        if (!inited_flag)
+            race_res.deinit();
+    }
 };
 
-class TempMonsterRes {
-private:
-  char inited_flag;
+class TempMonsterRes
+{
+  private:
+    char inited_flag;
 
-public:
-  TempMonsterRes() {
-    if (!(inited_flag = monster_res.init_flag))
-      monster_res.init();
-  }
+  public:
+    TempMonsterRes()
+    {
+        if (!(inited_flag = monster_res.init_flag))
+            monster_res.init();
+    }
 
-  ~TempMonsterRes() {
-    if (!inited_flag)
-      monster_res.deinit();
-  }
+    ~TempMonsterRes()
+    {
+        if (!inited_flag)
+            monster_res.deinit();
+    }
 };
 
-class TempHeroRes {
-private:
-  char inited_flag;
+class TempHeroRes
+{
+  private:
+    char inited_flag;
 
-public:
-  TempHeroRes() {
-    if (!(inited_flag = hero_res.init_flag))
-      hero_res.init();
-  }
+  public:
+    TempHeroRes()
+    {
+        if (!(inited_flag = hero_res.init_flag))
+            hero_res.init();
+    }
 
-  ~TempHeroRes() {
-    if (!inited_flag)
-      hero_res.deinit();
-  }
+    ~TempHeroRes()
+    {
+        if (!inited_flag)
+            hero_res.deinit();
+    }
 };
 
-class TempItemRes {
-private:
-  char inited_flag;
+class TempItemRes
+{
+  private:
+    char inited_flag;
 
-public:
-  TempItemRes() {
-    if (!(inited_flag = item_res.init_flag))
-      item_res.init();
-  }
+  public:
+    TempItemRes()
+    {
+        if (!(inited_flag = item_res.init_flag))
+            item_res.init();
+    }
 
-  ~TempItemRes() {
-    if (!inited_flag)
-      item_res.deinit();
-  }
+    ~TempItemRes()
+    {
+        if (!inited_flag)
+            item_res.deinit();
+    }
 };
 
 #endif
