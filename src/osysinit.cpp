@@ -507,6 +507,11 @@ int Sys::set_config_dir()
 }
 //------- End of function Sys::set_config_dir -----------//
 
+void Sys::set_game_base_dir(const std::string& basePath)
+{
+	strcpy(dir_basepath, basePath.c_str());
+}
+
 //-------- Begin of function Sys::set_game_dir ----------//
 //
 // Set all game directories.

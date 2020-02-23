@@ -611,7 +611,9 @@ void Game::main_menu()
             {
                 emptyProfileTesting = 0;
 
-                if (PlayerProfile::load_count_profiles(NULL, 1) == 0) // maxLoad=1 for fast testing
+                auto numberOfProfiles = PlayerProfile::load_count_profiles(NULL, 1);
+
+                if (numberOfProfiles == 0) // maxLoad=1 for fast testing
                 {
                     box.msg(text_game_menu.str_first_welcome());
 
@@ -629,6 +631,12 @@ void Game::main_menu()
                         tutor.run(2, 0);         // 2 - is the first fryhtan training tutorial id, 0
                                                  // - not inGameCall
                     }
+                }
+                else
+                {
+                    player_profiles.resize(numberOfProfiles);
+                    PlayerProfile::load_count_profiles(&player_profiles[0], 1);
+                    memcpy(&player_profile, &player_profiles[0], sizeof(player_profile));
                 }
 
                 if (sys.signal_exit_flag == 1)

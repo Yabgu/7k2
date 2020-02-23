@@ -36,6 +36,8 @@
 #include <ounit.h>
 #include <ounitres.h>
 #include <stdlib.h>
+#include <string>
+#include <boost/filesystem/path.hpp>
 
 DBGLOG_DEFAULT_CHANNEL(PlayerProfile);
 
@@ -85,15 +87,15 @@ int PlayerProfile::save()
 
     char full_path[MAX_PATH + 1];
     File f;
-    String str;
-    str = file_name;
+    std::string str = file_name;
     str += ".prf";
 
-    if (!misc.path_cat(full_path, sys.dir_config, str, MAX_PATH))
+    if (!misc.path_cat(full_path, sys.dir_config, str.c_str(), MAX_PATH))
     {
         ERR("Path to the player profile too long.\n");
         return 0;
     }
+
     f.file_create(full_path);
     int rc = f.file_write(this, sizeof(*this));
     f.file_close();
@@ -119,9 +121,11 @@ int PlayerProfile::load(char *fileName)
 
     if (f.file_handle != NULL && f.file_read(&tmp, sizeof(tmp)) && tmp.decrypt())
     {
+    	boost::filesystem::path filePath = f.file_name;
+    	std::string fileNameOnly = filePath.filename().string();
         *this = tmp;
         // set file_name to fileName without extension
-        strncpy(file_name, fileName, SAVE_GAME_DIR_LEN);
+        strncpy(file_name, fileNameOnly.c_str(), SAVE_GAME_DIR_LEN);
         file_name[SAVE_GAME_DIR_LEN] = '\0';
         char *dotPos;
         if ((dotPos = strchr(file_name, '.')))

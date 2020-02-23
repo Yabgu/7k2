@@ -246,14 +246,15 @@ void MonsterRes::second_init()
             name_array[i].name[MonsterName::NAME_LEN] = '\0';
         }
 
+        // TODO: Check the purpose of this
         //--- convert the name to lower cases except the first letter ---//
 
-        strLen = (int)strlen(name_array[i].name);
+        /*strLen = (int)strlen(name_array[i].name);
 
         for (j = 1; j < strLen; j++)
         {
             name_array[i].name[j] = misc.lower(name_array[i].name[j]);
-        }
+        }*/
     }
 
     mem_del(nameArrayA);

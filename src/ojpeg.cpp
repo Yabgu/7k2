@@ -98,7 +98,7 @@ Jpeg::~Jpeg()
     mem_del(cinfo);
 }
 
-int Jpeg::put_to_buf(VgaBuf *vgaBuf, int x, int y, char *filename)
+int Jpeg::put_to_buf(VgaBuf *vgaBuf, int x, int y, const char *filename)
 {
     FILE *infile;      /* source file */
     JSAMPARRAY buffer; /* Output row buffer */

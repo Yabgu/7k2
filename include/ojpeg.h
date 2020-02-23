@@ -42,7 +42,7 @@ class Jpeg
     Jpeg();
     ~Jpeg();
 
-    int put_to_buf(VgaBuf *vgaBuf, int x, int y, char *filename);
+    int put_to_buf(VgaBuf *vgaBuf, int x, int y, const char *filename);
 };
 
 extern Jpeg jpeg;

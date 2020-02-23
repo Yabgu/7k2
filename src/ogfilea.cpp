@@ -51,9 +51,11 @@
 #include <ot_gmenu.h>
 #include <ounitres.h>
 #include <ovga.h>
+#include <osys.h>
 #include <stdio.h>
 #include <vga_util.h>
 #include <win32_compat.h>
+#include <boost/filesystem/path.hpp>
 
 DBGLOG_DEFAULT_CHANNEL(GameFile);
 
@@ -1165,29 +1167,28 @@ int GameFileArray::read_hall_of_fame()
 //
 // Load all headers of all saved game files in current directory.
 //
-void GameFileArray::load_all_game_header(const char *path, const char *extStr)
+void GameFileArray::load_all_game_header(const std::string& path, const std::string& extStr)
 {
     int i;
-    Directory gameDir;
+    Directory gameDir(sys.dir_basepath);
     GameFile gameFile;
     File file;
 
     // ##### begin Gilbert 26/5 ######//
-    String str;
-    if (path && path[0] != '\0')
+    std::string filePath;
+    if (!path.empty())
     {
-        str = path;
-        str += PATH_DELIM;
-        str += extStr;
+    	boost::filesystem::path basePath = path;
+    	filePath = (basePath / extStr).string();
     }
     else
     {
-        str = extStr;
+    	filePath = extStr;
     }
 
     // gameDir.read( player_profile.save_game_path(extStr), 1 );  // 1-Sort file
     // names
-    gameDir.read(str, 1); // 1-Sort file names
+    gameDir.read(filePath.c_str(), 1); // 1-Sort file names
 
     //-------- read in the headers of all game sets -------//
 
@@ -1196,18 +1197,17 @@ void GameFileArray::load_all_game_header(const char *path, const char *extStr)
     for (i = 1; i <= gameDir.size(); i++)
     {
         // Directory store file name without path
-        if (path && path[0] != '\0')
+        if (!path.empty())
         {
-            str = path;
-            str += PATH_DELIM;
-            str += gameDir[i]->name;
+        	boost::filesystem::path basePath = path;
+			filePath = (basePath / gameDir[i]->name).string();
         }
         else
         {
-            str = gameDir[i]->name;
+            filePath = gameDir[i]->name;
         }
 
-        if (file.file_open(str, 1, 1) // last 1=allow varying read & write size
+        if (file.file_open(filePath.c_str(), 1, 1) // last 1=allow varying read & write size
             && file.file_read(&gameFile, sizeof(GameFile)) && gameFile.validate_header())
         {
             strcpy(gameFile.file_name,

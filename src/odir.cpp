@@ -32,6 +32,10 @@
 #endif
 
 #include <dbglog.h>
+#include <osys.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 DBGLOG_DEFAULT_CHANNEL(Directory);
 
@@ -59,20 +63,36 @@ Directory::Directory(const boost::filesystem::path &base) : DynArray(sizeof(File
 //
 int Directory::read(const char *fileSpec, int sortName)
 {
-    FileInfo fileInfo;
     MSG("Listing Directory %s sortName=%d\n", fileSpec, sortName);
 
-    struct stat file_stat;
-    stat(fileSpec, &file_stat);
+    std::string fileSearchRegexString (fileSpec);
+    boost::replace_all(fileSearchRegexString, ".", "\\.");
+    boost::replace_all(fileSearchRegexString, "*", ".*");
+	std::regex pattern(fileSearchRegexString, std::regex_constants::icase);
 
-    strncpy(fileInfo.name, fileSpec, sizeof(fileInfo.name));
+    auto files = misc.findFiles(pattern, base);
+    if (sortName)
+    {
+    	files.sort();
+    }
 
-    fileInfo.size = file_stat.st_size;
-    fileInfo.time.dwLowDateTime = 0;
-    fileInfo.time.dwHighDateTime = 0;
+    for (auto& file: files)
+    {
+    	FileInfo fileInfo;
+    	struct stat file_stat;
+		if (stat(file.c_str(), &file_stat) < 0) {
+			perror("failed to stat file");
+			throw std::runtime_error("Failed to stat file: " + file.string());
+		}
 
-    linkin(&fileInfo);
+		strncpy(fileInfo.name, file.c_str(), sizeof(fileInfo.name));
 
+		fileInfo.size = file_stat.st_size;
+		fileInfo.time.dwLowDateTime = 0;
+		fileInfo.time.dwHighDateTime = 0;
+
+    	linkin(&fileInfo);
+    }
     return size(); // DynArray::size()
 }
 //-------- End of function Directory::read -------//

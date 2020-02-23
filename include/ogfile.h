@@ -22,6 +22,7 @@
 // Description : Oject Game file, save and restore game
 
 #include <win32_compat.h>
+#include <string>
 
 #ifndef __OGFILE_H
 #define __OGFILE_H
@@ -193,7 +194,7 @@ class GameFileArray : public DynArray
 
   private:
     void disp_browse();
-    void load_all_game_header(const char *path, const char *extStr);
+    void load_all_game_header(const std::string& path, const std::string& extStr);
     int process_action(int);
     void del_game();
 };

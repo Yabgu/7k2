@@ -37,10 +37,18 @@
 #include <odir.h>
 #include <omisc.h>
 #include <ostr.h>
+#include <osys.h>
 
 #include <dbglog.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <regex>
+#include <iostream>
 
 DBGLOG_DEFAULT_CHANNEL(Misc);
 
@@ -59,6 +67,75 @@ static short move_around_table_size = 0;
 #endif
 // some country (like japan insert ',' every four digits)
 #define THOUSAND_SEPARATOR_COUNT 3
+
+std::list<boost::filesystem::path> Misc::findFiles(const std::regex &regex, const boost::filesystem::path &basePath)
+{
+    using namespace boost::filesystem;
+    const std::string base = basePath.string();
+    std::list<boost::filesystem::path> res;
+
+    try
+    {
+        for (auto &entry : boost::make_iterator_range(recursive_directory_iterator(basePath), {}))
+        {
+            if (is_regular_file(entry))
+            {
+                auto fileName = entry.path().string().substr(basePath.size());
+                if (!fileName.empty() && fileName[0] == '/' || fileName[0] == '\\')
+                {
+                    fileName = fileName.substr(1);
+                }
+                if (std::regex_match(fileName, regex))
+                {
+                	res.push_back(entry);
+                }
+            }
+        }
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
+    return res;
+}
+
+boost::filesystem::path Misc::findRelativeFileCaseInsensitive(const boost::filesystem::path &path)
+{
+    using namespace boost::filesystem;
+    auto pathString = path.string();
+    const std::string base((const char*)sys.dir_basepath);
+
+    boost::replace_all(pathString, "*", ".*");
+    std::regex pattern(pathString, std::regex_constants::icase);
+
+    try
+    {
+        for (auto &entry : boost::make_iterator_range(recursive_directory_iterator(base), {}))
+        {
+            if (is_regular_file(entry))
+            {
+                auto fileName = entry.path().string().substr(base.length());
+                if (!fileName.empty() && fileName[0] == '/' || fileName[0] == '\\')
+                {
+                    fileName = fileName.substr(1);
+                }
+
+                if (std::regex_match(fileName, pattern))
+                {
+                    return entry;
+                }
+            }
+        }
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
+    // throw std::runtime_error("cant find file");
+    return path;
+}
 
 //-------- Start of function Misc::delay -------------//
 //
@@ -1125,7 +1202,8 @@ float Misc::round_dec(float inNum)
 //
 int Misc::is_file_exist(const char *fileName)
 {
-    return boost::filesystem::exists(fileName);
+    return boost::filesystem::exists(fileName)
+    	|| boost::filesystem::exists(findRelativeFileCaseInsensitive(fileName));
 }
 //---------- End of function Misc::is_file_exist ---------//
 
@@ -1139,31 +1217,10 @@ int Misc::is_file_exist(const char *fileName)
 //
 int Misc::path_cat(char *dest, const char *src1, const char *src2, int max_len)
 {
-    int c = 0;
-    char *d = dest;
-    for (; c < max_len - 1; c++)
-    {
-        if (!*src1)
-            break;
-        *d = *src1;
-        d++;
-        src1++;
-    }
-    for (; c < max_len - 1; c++)
-    {
-        if (!*src2)
-            break;
-        *d = *src2;
-        d++;
-        src2++;
-    }
-    if (c >= max_len - 1)
-    {
-        *dest = 0;
-        return 0;
-    }
-    *d = 0;
-    return 1;
+    boost::filesystem::path srcPath = src1;
+    auto res = (srcPath / src2).string();
+    strncpy(dest, res.c_str(), max_len);
+    return res.length() < max_len;
 }
 //---------- End of function Misc::path_cat ---------//
 
@@ -1239,19 +1296,8 @@ void Misc::change_file_ext(char *desFileName, const char *srcFileName, const cha
 {
     int nameLen = misc.str_chr(srcFileName, '.'); // include the '.' in the nameLen
 
-#if (defined(CHINESE))
-#ifdef DEBUG
-    Dump("SXMSXM");
-    Dump(desFileName);
-    Dump("\n");
-    Dump(srcFileName);
-    Dump("\n");
-    Dump(newExt);
-    Dump("\n");
-#endif
-#endif
-
-    err_when(nameLen < 1 || nameLen > 9 || strlen(newExt) > 3);
+    //TODO: What the heck is this
+    //err_when(nameLen < 1 || nameLen > 9 || strlen(newExt) > 3);
 
     memcpy(desFileName, srcFileName, nameLen);
     strcpy(desFileName + nameLen, newExt); // extension for scenarion text file

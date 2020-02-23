@@ -117,6 +117,7 @@
 #include <oweather.h>
 #include <oworld.h>
 #include <vga_util.h>
+#include <boost/filesystem.hpp>
 
 //------- define game version constant --------//
 
@@ -391,6 +392,33 @@ int main(int argc, char **argv)
     const char *lobbyNameCmdLine = "-name";
     char *join_host = NULL;
     int lobbied = 0;
+
+    boost::filesystem::path basePath = boost::filesystem::current_path();
+    const char * const GamePath =  "Seven Kingdoms 2 HD";
+    if (argc > 1)
+    {
+        basePath = argv[1];
+    }
+    else if (boost::filesystem::exists(boost::filesystem::current_path() / GamePath))
+    {
+        basePath = boost::filesystem::current_path() / GamePath;
+    }
+    else if(argc == 1 && boost::filesystem::exists(boost::filesystem::path(argv[0]).parent_path() / GamePath))
+    {
+        basePath = boost::filesystem::path(argv[0]).parent_path() / GamePath;
+    }
+
+    if (boost::filesystem::exists(basePath / "7k2.exe") || boost::filesystem::exists(basePath / "7K2.exe"))
+    {
+        boost::filesystem::current_path(basePath);
+        sys.set_game_base_dir(basePath.string()); // set game directories names and game version
+    }
+    else
+    {
+        fprintf(stderr, "Cannot find 7k2.exe please run this with argument with folder 7k2.exe is under");
+        exit(1);
+    }
+    
 
     sys.set_config_dir();
 

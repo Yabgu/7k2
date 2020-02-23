@@ -26,6 +26,9 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <boost/filesystem/path.hpp>
+#include <list>
+#include <regex>
 
 //-------- Define macro constant ---------//
 
@@ -144,6 +147,10 @@ class Misc
 
     void randomize_chance();
     int chance(int testChance);
+
+    std::list<boost::filesystem::path> findFiles(const std::regex &regex, const boost::filesystem::path &basePath);
+
+    static boost::filesystem::path findRelativeFileCaseInsensitive(const boost::filesystem::path &path);
 
   private:
     void construct_move_around_table();

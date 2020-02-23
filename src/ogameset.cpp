@@ -63,7 +63,7 @@ void GameSet::deinit()
 void GameSet::load_set_header()
 {
     int i;
-    Directory setDir;
+    Directory setDir(sys.dir_basepath);
     SetRec *setRec;
     SetInfo *setInfo;
     char *dataPtr;

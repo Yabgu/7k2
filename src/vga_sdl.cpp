@@ -185,7 +185,9 @@ int VgaSDL::init()
     if (!set_mode(VGA_WIDTH, VGA_HEIGHT))
         return 0;
 
-    init_pal(DIR_RES "PAL_STD.RES");
+    auto palStdFile = misc.findRelativeFileCaseInsensitive(DIR_RES "PAL_STD.RES").string();
+
+    init_pal(palStdFile.c_str());
 
     // update Sys::deinit and Sys::change_display_mode
 

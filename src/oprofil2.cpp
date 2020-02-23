@@ -47,6 +47,7 @@
 #include <ovgalock.h>
 #include <stdio.h>
 #include <vga_util.h>
+#include <boost/filesystem.hpp>
 
 DBGLOG_DEFAULT_CHANNEL(PlayerProfile);
 
@@ -321,15 +322,9 @@ int PlayerProfile::register_menu()
         {
             if (refreshFlag & PPOPTION_ENUM_PROFILE)
             {
-                char full_path[MAX_PATH + 1];
                 profileCount = 0;
-                Directory profileDir;
-                if (!misc.path_cat(full_path, sys.dir_config, "*.prf", MAX_PATH))
-                {
-                    ERR("Path to the config directory too long.\n");
-                    return 0;
-                }
-                profileDir.read(full_path, 1); // sort file name
+                Directory profileDir(sys.dir_config);
+                profileDir.read("*.prf", 1); // sort file name
                 profileBlock.resize(sizeof(PlayerProfile) * profileDir.size());
                 profileArray = (PlayerProfile *)profileBlock.p();
                 int i;
@@ -691,7 +686,7 @@ int PlayerProfile::register_menu()
                         ERR("Path to the player profile too long.\n");
                         return 0;
                     }
-                    if (misc.is_file_exist(full_path))
+                    if (boost::filesystem::exists(full_path))
                     {
                         if (strlen(file_name) >= 4)
                             file_name[4] = '\0'; // cut to 4 char
@@ -933,14 +928,8 @@ static void disp_scroll_bar_func(SlideBar *scroll, int)
 //
 int PlayerProfile::load_count_profiles(PlayerProfile *profileArray, int maxLoad)
 {
-    char full_path[MAX_PATH + 1];
-    Directory profileDir;
-    if (!misc.path_cat(full_path, sys.dir_config, "*.prf", MAX_PATH))
-    {
-        ERR("Path to the config directory too long.\n");
-        return 0;
-    }
-    profileDir.read(full_path, 1); // sort file name
+    Directory profileDir(sys.dir_config);
+    profileDir.read("*.prf", 1); // sort file name
 
     int profileCount = 0;
     for (int i = 1; i <= profileDir.size() && profileCount < maxLoad; ++i)

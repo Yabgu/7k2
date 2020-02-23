@@ -393,19 +393,19 @@ void VgaUtil::separator(int x1, int y1, int x2, int y2)
 //
 void VgaUtil::disp_image_file(const char *fileName, int x1, int y1)
 {
-    String str;
+    std::string str;
 
     // use jpeg first
 
     str = DIR_IMAGE;
     str += fileName;
     str += ".jpg";
-    str = str.lower();
 
-    if (misc.is_file_exist(str))
+	if (misc.is_file_exist(str.c_str()))
     {
+    	auto foundPath = Misc::findRelativeFileCaseInsensitive(str);
         Jpeg jpeg;
-        jpeg.put_to_buf(&vga_back, 0, 0, str);
+        jpeg.put_to_buf(&vga_back, 0, 0, foundPath.c_str());
     }
     else
     {
@@ -419,7 +419,7 @@ void VgaUtil::disp_image_file(const char *fileName, int x1, int y1)
         str += fileName;
         str += ".COL";
 
-        if (palFile.file_open(str, 0))
+        if (palFile.file_open(str.c_str(), 0))
         {
             BYTE palBuf[256][3];
             palFile.file_seek(8); // bypass the header info
@@ -449,7 +449,7 @@ void VgaUtil::disp_image_file(const char *fileName, int x1, int y1)
         str += fileName;
         str += ".ICN";
 
-        if (pictFile.file_open(str, 0))
+        if (pictFile.file_open(str.c_str(), 0))
         {
             vga_back.put_large_bitmap(x1, y1, &pictFile, colorRemapTable);
             pictFile.file_close();

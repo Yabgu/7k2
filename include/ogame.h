@@ -38,6 +38,10 @@
 #include <olonglog.h>
 #endif
 
+#include <oprofile.h>
+
+#include <vector>
+
 //-------- Define game modes -----------//
 
 enum
@@ -147,6 +151,7 @@ class Game
   private:
     Campaign *cur_campaign;
     static char *auto_load_file_name;
+    std::vector<PlayerProfile> player_profiles;
 
     // ------- newly added variable -------//
   public:

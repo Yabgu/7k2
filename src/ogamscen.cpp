@@ -53,7 +53,7 @@ static int sort_scenario_func(const void *arg1, const void *arg2);
 //
 int Game::select_run_scenario(int countScenarioOnly)
 {
-    Directory gameDirList[MAX_SCENARIO_PATH];
+    //Directory gameDirList[MAX_SCENARIO_PATH];
     ScenInfo *scenInfoArray = NULL;
     int scenInfoSize = 0;
     int dirId;
@@ -61,13 +61,8 @@ int Game::select_run_scenario(int countScenarioOnly)
     {
         if (DIR_SCENARIO_PATH(dirId)[0])
         {
-            Directory &gameDir = gameDirList[dirId];
-            {
-                String str;
-                str = DIR_SCENARIO_PATH(dirId);
-                str += "*.SCN";
-                gameDir.read(str, 1); // Read in all file names with the "SCN" extension
-            }
+        	Directory gameDir(gameDir);
+            gameDir.read("*.SCN", 1); // Read in all file names with the "SCN" extension
 
             if (gameDir.size() > 0)
             {

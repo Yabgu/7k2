@@ -40,11 +40,7 @@ extern const int GAME_VERSION;
 
 //------- Data sub-directories -------//
 
-#ifdef NO_WINDOWS
 #define PATH_DELIM "/"
-#else // WINDOWS
-#define PATH_DELIM "\\"
-#endif
 
 // config dir
 #define CONFIG_ORGANIZATION_NAME "7kfans.com"

@@ -36,44 +36,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 
 DBGLOG_DEFAULT_CHANNEL(File);
-
-static boost::filesystem::path findRelativeFileCaseInsensitive(const boost::filesystem::path &path)
-{
-    using namespace boost::filesystem;
-    auto pathString = path.string();
-    static const std::string base = "/home/abdurrahim/Seven Kingdoms 2 HD/";
-
-    boost::replace_all(pathString, "*", ".*");
-    std::regex pattern(pathString, std::regex_constants::icase);
-
-    for (auto &entry : boost::make_iterator_range(recursive_directory_iterator(base), {}))
-    {
-        if (is_regular_file(entry))
-        {
-            auto fileName = entry.path().string().substr(base.length());
-            if (std::regex_match(fileName, pattern))
-            {
-                return entry;
-            }
-        }
-    }
-
-    for (auto &entry : boost::make_iterator_range(recursive_directory_iterator(path.parent_path()), {}))
-    {
-        if (is_regular_file(entry))
-        {
-            if (std::regex_match(entry.path().string(), pattern))
-            {
-                return entry;
-            }
-        }
-    }
-
-    // throw std::runtime_error("cant find file");
-    return path;
-}
 
 //-------- Begin of function File::file_open ----------//
 //
@@ -97,7 +62,6 @@ static boost::filesystem::path findRelativeFileCaseInsensitive(const boost::file
 //
 int File::file_open(const char *fileName, int handleError, int fileType)
 {
-    char name[MAX_PATH + 1];
     int size = strlen(fileName);
 
     if (strlen(fileName) > MAX_PATH)
@@ -106,31 +70,23 @@ int File::file_open(const char *fileName, int handleError, int fileType)
     if (file_handle != NULL)
         file_close();
 
-    strcpy(name, fileName);
-    for (int i = 0; i < size; i++)
-    {
-        if (name[i] == '\\')
-            name[i] = '/';
-    }
-
+    strcpy(file_name, fileName);
     handle_error = handleError;
     file_type = (FileType)fileType;
 
-    file_handle = fopen(name, "rb");
+    file_handle = fopen(file_name, "rb");
 
     if (!file_handle)
     {
-        auto found = findRelativeFileCaseInsensitive(name);
-        strcpy(name, found.c_str());
-        file_handle = fopen(name, "rb");
-    }
+        auto found = Misc::findRelativeFileCaseInsensitive(file_name);
+        strcpy(file_name, found.c_str());
+        file_handle = fopen(file_name, "rb");
 
-    if (!file_handle)
-    {
-        return 0;
+        if (!file_handle)
+        {
+            return 0;
+        }
     }
-
-    strcpy(file_name, name);
 
     MSG("[File::file_open] opened %s\n", file_name);
     return 1;
@@ -164,12 +120,6 @@ int File::file_create(const char *fileName, int handleError, int fileType)
 
     strcpy(file_name, fileName);
     // FIXME: this fileName handling is broken
-    for (int i = 0; i < strlen(fileName); i++)
-    {
-        file_name[i] = tolower(file_name[i]);
-        if (file_name[i] == '\\')
-            file_name[i] = '/';
-    }
 
     handle_error = handleError;
     file_type = (FileType)fileType;

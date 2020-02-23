@@ -45,7 +45,7 @@ class Directory : public DynArray
     boost::filesystem::path base;
 
   public:
-    Directory(const boost::filesystem::path &base = ".");
+    Directory(const boost::filesystem::path &base);
 
     int read(const char *, int = 0);
     FileInfo *operator[](int recNo)

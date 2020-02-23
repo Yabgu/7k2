@@ -25,6 +25,7 @@
 #define __OSYS_H
 
 #include <win32_compat.h>
+#include <string>
 
 // ------- declare type --------//
 
@@ -167,6 +168,7 @@ class Sys
 
     char cdrom_drive;
 
+    char dir_basepath[MAX_PATH + 1]; // Game data directory: TODO: Create directoryChooser dialog to pick this
     char dir_config[MAX_PATH + 1];
     char dir_image[MAX_PATH + 1];
     char dir_music[MAX_PATH + 1];
@@ -230,6 +232,13 @@ class Sys
     //---- for setting game directories ----//
 
     int set_config_dir();
+
+    /**
+     * Setup game paths
+     * @param basePath directory where game files are installed
+     */
+    void set_game_base_dir(const std::string& basePath);
+
     void set_game_dir();
 
     //-------- for load/save games --------//
