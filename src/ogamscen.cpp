@@ -61,7 +61,7 @@ int Game::select_run_scenario(int countScenarioOnly)
     {
         if (DIR_SCENARIO_PATH(dirId)[0])
         {
-        	Directory gameDir(gameDir);
+        	Directory gameDir(sys.dir_basepath);
             gameDir.read("*.SCN", 1); // Read in all file names with the "SCN" extension
 
             if (gameDir.size() > 0)
@@ -72,7 +72,7 @@ int Game::select_run_scenario(int countScenarioOnly)
                     (ScenInfo *)mem_resize(scenInfoArray, sizeof(ScenInfo) * (scenInfoSize + gameDir.size()));
                 for (int i = 1; i <= gameDir.size(); ++i, ++scenInfoSize)
                 {
-                    char txtFileName[20];
+                    char txtFileName[MAX_PATH];
                     scenInfoArray[scenInfoSize].file_name =
                         gameDir[i]->name; // keep the pointers to the file name string
                     scenInfoArray[scenInfoSize].dir_id = dirId;
